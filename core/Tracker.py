@@ -114,6 +114,7 @@ class Tracker:
         self.modules.append(self.feature_selector)
         self.consolidator = Consolidator.SingleNetConsolidator()
         self.modules.append(self.consolidator)
+        #Finn swarm pursuer is set
         self.pursuer = pursuing.SwarmPursuer()
         self.modules.append(self.pursuer)
 

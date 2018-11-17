@@ -179,6 +179,9 @@ class SwarmPursuer(Pursuer):
         #
         mask = frame.prediction_mask.copy()
 
+        #Finn okay, mask enthält keine Coordinaten, eher die visuellen Features
+        #logger.info("mask: %s", mask)
+
         #ps.append(time.time())  # 1
 
         mask[mask < self.target_lower_limit] = self.target_punish_low
@@ -192,10 +195,16 @@ class SwarmPursuer(Pursuer):
         #print("a", img_mask.max(), img_mask.min(), np.average(img_mask))
         frame.image_mask = img_mask
 
+        #Finn image mask enthält arrays mit mehreren, wtf
+        #logger.info("img_mask: %s", img_mask)
+
         #ps.append(time.time())  # 3
 
         locs = self.generate_particles(
             frame.previous_position, frame.size, lost)
+
+        #Finn im vorherigen frame
+        logger.info("previous position: %s", frame.previous_position)
 
         # Finn: in locs sind alle bounding boxen als <rect(1,1,1,1)>
         # print("locs: {}".format(locs))
@@ -257,7 +266,7 @@ class SwarmPursuer(Pursuer):
 
         best_arg = np.argmax(quals)
 
-        # Finn: aha das sind die Qualitäten der Boxen
+        # Finn beste Box wird gefunden und als predicted position eingetragen
         # print("quals: {}", quals)
 
         frame.predicted_position = Rect(locs[best_arg])

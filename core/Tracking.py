@@ -66,6 +66,7 @@ class Tracking(object):
         'tracking_evaluated',
     ]
 
+    #Finn Transitions werden wie methoden aufgerugen und gehen von der ersten in die letzte
     transitions = [
         ['commence_load_sample', 'created', 'loading_sample'],
         ['complete_load_sample', 'loading_sample', 'sample_loaded'],
@@ -193,6 +194,9 @@ class Tracking(object):
         self.initial_frame.predicted_position = self.sample.initial_position
         # for now, the initial frame is the current frame:
         self.current_frame = self.initial_frame
+
+        #FINN erstes Frame wird verarbeitet
+
         self.tracker.pursuer.set_initial_position(self.initial_frame.previous_position)
         self.tracker.roi_calculator.set_initial_position(self.initial_frame.previous_position)
 
