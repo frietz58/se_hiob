@@ -21,6 +21,9 @@ from . import selection
 from .sample_provider import DataDirectory
 from .Tracking import Tracking
 
+#Finn
+from . import scale_estimation
+
 logger = logging.getLogger(__name__)
 
 
@@ -117,6 +120,10 @@ class Tracker:
         #Finn swarm pursuer is set
         self.pursuer = pursuing.SwarmPursuer()
         self.modules.append(self.pursuer)
+
+        #Finn
+        self.estimator = scale_estimation.ScaleEstimator()
+        self.modules.append(self.estimator)
 
         # configure modules
         self.roi_calculator.configure(configuration)
@@ -234,6 +241,9 @@ class Tracker:
             self)
         self.consolidator.setup(self)
         self.pursuer.setup(self)
+
+        self.estimator.setup(self)
+
         self.is_setup = True
         logger.info("Setup done")
 

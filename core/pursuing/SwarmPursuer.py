@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 class SwarmPursuer(Pursuer):
 
     def __init__(self):
+
         self.dtype = tf.float32
         #self.thread_executor = futures.ProcessPoolExecutor(max_workers=workers)
         self.thread_executor = None
@@ -60,6 +61,7 @@ class SwarmPursuer(Pursuer):
 
     def setup(self, tracker):
         self.tracker = tracker
+        logger.info("swarm setup")
 
     def generate_geo_particles(self, geo, img_size, lost):
         if lost == 0:

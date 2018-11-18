@@ -16,6 +16,7 @@ from .Rect import Rect
 from .gauss import gen_gauss_mask
 from .graph import figure_to_image
 from . import evaluation
+from . import scale_estimation
 
 
 logger = logging.getLogger(__name__)
@@ -359,6 +360,7 @@ class Tracking(object):
             self.enter_no_more_frames()
 
     def tracking_track_frame(self):
+
         self.commence_tracking_frame()
         frame = self.current_frame
         # process frame:
@@ -387,6 +389,9 @@ class Tracking(object):
         ts_start = datetime.now()
         self.pursue_frame(frame)
         self.pursuing_total_seconds += (datetime.now() - ts_start).total_seconds()
+
+        self.estimate_scale(frame)
+
         # ps.append(time.time())  # 6
 
         # lost? TODO: make it modular and nice!
@@ -404,6 +409,7 @@ class Tracking(object):
         # for n, t in enumerate(ts):
         #     log += "; part{}: {:.2} ({:.2})".format(n, t, t / total)
         # print(log)
+
 
     def tracking_evaluate_frame(self):
         self.commence_evaluating_frame()
@@ -437,6 +443,7 @@ class Tracking(object):
         return not self.frames_left() or self.tracker.interrupt_received
 
     async def tracking_step(self):
+        logger.info("start main loop")
         await self.tracking_next_frame()
         self.tracking_track_frame()
         self.tracking_evaluate_frame()
@@ -444,6 +451,7 @@ class Tracking(object):
         self.tracking_log_frame()
         if self.configuration['ros_mode']:
             self.tracking_publish_position()
+        logger.info("end main loop")
 
     def finish_tracking(self):
         self.initial_frame = None
@@ -600,6 +608,13 @@ class Tracking(object):
                 frame.predicted_position = frame.previous_position
 
         frame.complete_pursuing()
+
+    # Finn
+    def estimate_scale(self, frame=None):
+        if frame is None:
+            frame = self.current_frame
+
+        self.tracker.estimator.estimate_scale(frame)
 
     def evaluate_frame(self, frame=None):
         if frame is None:
@@ -758,6 +773,14 @@ class Tracking(object):
                 draw.rectangle(pos, None, self.colours['prediction'])
         return im
 
+    def get_frame_fourier_img(self, frame=None):
+        if frame is None:
+            frame = self.current_frame
+
+        im = Image.fromarray(np.asarray(self.tracker.estimator.create_fourier_rep(frame).capture_image, dtype=np.uint8))
+        return im
+
+
     def get_frame_consolidation_images(self, frame=None, decorations=True):
         if frame is None:
             frame = self.current_frame
@@ -811,6 +834,8 @@ class Tracking(object):
             images[n] = im
         return images
 
+
+
     # tracking log evaluation:
     def get_evaluation_figures(self):
         cd = []
@@ -847,3 +872,6 @@ class Tracking(object):
             'center_distance': cd_im,
             'overlap_score': ov_im,
         }
+
+
+

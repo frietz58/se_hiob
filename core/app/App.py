@@ -21,7 +21,7 @@ class App:
         self.conf = conf
 
         self.root = tk.Tk()
-        self.root.title("Hiob")
+        self.root.title("Hiob with Scale Estimation")
 
         self.dead = False
         self.queue = queue.Queue()
@@ -61,6 +61,11 @@ class App:
             self.capture_frame, text="SROI", compound=tk.BOTTOM)
         self.sroi_image.pack(side=tk.RIGHT)
         self.images['sroi_image'] = self.sroi_image
+
+        self.fourier_image = ImageLabel(
+            self.capture_frame, text="Fourier", compound=tk.BOTTOM)
+        self.fourier_image.pack(side=tk.RIGHT)
+        self.images['fourier_image'] = self.fourier_image
 
         self.consolidation_image = ImageLabel(self.root)
         self.consolidation_image.pack()
@@ -178,6 +183,7 @@ class App:
              'sample_text': "Sample %s/%s, Attributes: %s" % (
                 sample.set_name, sample.name, ', '.join(sample.attributes)),
              'video_text': "Frame #%04d/%04d" % (sample.current_frame_id, sample.get_actual_frames()),
+             'fourier_image': tracking.get_frame_fourier_img()
              })
         while not tracking.feature_selection_done() and not threading.current_thread().terminating:
             self.verify_running()
