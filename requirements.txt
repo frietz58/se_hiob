@@ -22,3 +22,4 @@ webencodings==0.5.1
 Werkzeug==0.12.2
 rospkg>=1.1.4
 catkin-pkg>=0.4.1
+opencv-contrib-python==3.4.3.18

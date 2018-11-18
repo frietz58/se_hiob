@@ -5,6 +5,7 @@ Created on 2018-11-17
 """
 
 import logging
+import cv2
 import transitions
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,10 @@ class ScaleEstimator():
         logger.info("testing frame %s", frame.predicted_position)
 
     def create_fourier_rep(self, frame=None):
+        logger.info("creating fourier representation")
+        logger.info("frame.capture_iamge %s", frame.capture_image)
+        #img = cv2.imread(frame.capture_image)
+        #logger.info
         return frame
 
 
