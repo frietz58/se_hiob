@@ -772,13 +772,14 @@ class Tracking(object):
                     frame.predicted_position, frame.roi).inner
                 draw.rectangle(pos, None, self.colours['prediction'])
         return im
-
+    '''
     def get_frame_fourier_img(self, frame=None):
         if frame is None:
             frame = self.current_frame
 
         im = Image.fromarray(np.asarray(self.tracker.estimator.create_fourier_rep(frame).capture_image, dtype=np.uint8))
         return im
+    '''
 
 
     def get_frame_consolidation_images(self, frame=None, decorations=True):

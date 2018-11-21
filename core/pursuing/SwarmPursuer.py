@@ -16,6 +16,9 @@ from concurrent import futures
 import time
 import multiprocessing
 
+#from ..subpackage2.moduleZ import eggs
+from ..scale_estimation import ScaleEstimator
+
 avgs = []
 
 import logging
@@ -41,6 +44,8 @@ class SwarmPursuer(Pursuer):
         self.thread_executor = None
         self.np_random = None
         self.initial_location = None
+
+        self.estimator = ScaleEstimator()
 
     def configure(self, configuration):
         self.configuration = configuration
@@ -223,7 +228,8 @@ class SwarmPursuer(Pursuer):
         p4 = time.time()
         quals = list(self.thread_executor.map(func, locs))"""
 
-        if False and self.particle_scale_factor != 1.0:
+        if True and self.particle_scale_factor != 1.0:
+            logger.info("Particle Scale factor is %s", self.particle_scale_factor)
             scaled_locs = []
             for loc in locs:
                 width_difference = int(loc.width * self.particle_scale_factor)
@@ -268,10 +274,18 @@ class SwarmPursuer(Pursuer):
 
         best_arg = np.argmax(quals)
 
+
         # Finn beste Box wird gefunden und als predicted position eingetragen
         # print("quals: {}", quals)
 
         frame.predicted_position = Rect(locs[best_arg])
+
+        self.estimator.append_to_history(frame=frame)
+
+        #logger.info("Best Box (type Rect): %s", frame.predicted_position)
+
+
+
         # quality of prediction needs to be absolute, so we normalise it with
         # the "perfect" value this prediction would have:
         perfect_quality = 1

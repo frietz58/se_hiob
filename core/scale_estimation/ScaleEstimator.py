@@ -28,17 +28,14 @@ class ScaleEstimator():
     def __init__(self):
 
         self.frame = None
-        self.sroi = None
         self.number_scales = None
-        self.position = None
         self.tracker = None
+        self.box_history = []
 
     def setup(self, tracker=None):
         logger.info("setting up scale estimator")
-
         self.tracker = tracker
 
-        logger.info("tracker.pursuer from estimator: %s", tracker.pursuer)
 
     def estimate_scale(self, frame):
         self.frame = frame
@@ -48,10 +45,14 @@ class ScaleEstimator():
 
     def create_fourier_rep(self, frame=None):
         logger.info("creating fourier representation")
-        logger.info("frame.capture_iamge %s", frame.capture_image)
+        #logger.info("frame.capture_iamge %s", frame.capture_image)
         #img = cv2.imread(frame.capture_image)
         #logger.info
         return frame
+
+    def append_to_history(self, frame):
+        self.box_history.append([frame.number, frame.predicted_position.__getattr__("width"), frame.predicted_position.__getattr__("height")])
+        logger.info("Box at frame{0} has width {1} and height {2}".format(frame.number, frame.predicted_position.__getattr__("width"), frame.predicted_position.__getattr__("height")))
 
 
 

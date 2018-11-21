@@ -62,10 +62,12 @@ class App:
         self.sroi_image.pack(side=tk.RIGHT)
         self.images['sroi_image'] = self.sroi_image
 
+        '''
         self.fourier_image = ImageLabel(
             self.capture_frame, text="Fourier", compound=tk.BOTTOM)
         self.fourier_image.pack(side=tk.RIGHT)
         self.images['fourier_image'] = self.fourier_image
+        '''
 
         self.consolidation_image = ImageLabel(self.root)
         self.consolidation_image.pack()
@@ -183,7 +185,7 @@ class App:
              'sample_text': "Sample %s/%s, Attributes: %s" % (
                 sample.set_name, sample.name, ', '.join(sample.attributes)),
              'video_text': "Frame #%04d/%04d" % (sample.current_frame_id, sample.get_actual_frames()),
-             'fourier_image': tracking.get_frame_fourier_img()
+             #'fourier_image': tracking.get_frame_fourier_img()
              })
         while not tracking.feature_selection_done() and not threading.current_thread().terminating:
             self.verify_running()
@@ -242,6 +244,7 @@ class App:
                 'overlap_plot': self.overlap_plotter.get_image(),
                 'adjusted_overlap_plot': self.adjusted_overlap_plotter.get_image(),
                 'lost_plot': self.lost_plotter.get_image(),
+                #'fourier_image': tracking.get_frame_fourier_img()
             }
             self.feed_queue(entry)
             if "save_images" in self.conf and self.conf["save_images"]:

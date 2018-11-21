@@ -19,6 +19,10 @@ TODO: second paper, when we have a bibtex entry.
 # Installation
 
 #### Using HIOB
+
+    (hiob_venv) Finns-MBP:HIOB finn$ python hiob_gui.py -e config/environment.yaml -t config/tracker.yaml
+
+
 clone the repositiory
 
     $ git clone https://github.com/kratenko/HIOB.git

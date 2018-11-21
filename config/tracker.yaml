@@ -85,7 +85,7 @@ consolidator:
 
 pursuer:
   particle_count: 600
-  particle_scale_factor: 1.0
+  particle_scale_factor: 1.2
   target_lower_limit: 0.2
   target_punish_low: 0.0
   target_punish_outside: 0.0
@@ -107,6 +107,7 @@ tracking:
 #  - nico_recordings/tomato_and_carrot.1
 #  - nico_recordings/tomato_and_carrot.2
 #  - tb100/BlurCar1
+  - tb100/Biker
 #  - tb100/David
 #  - tb100/Panda
 #  - tb100/Basketball
@@ -132,7 +133,7 @@ tracking:
 #  - princeton/computerBar2
 #  - SET/princeton
 #  - princeton/book_turn
-  - nicovision/bang_sponge_01
+#  - nicovision/bang_sponge_01
 #  - nicovision/lift_sponge_02
 #  - nicovision/shake_small_banana_02
 #  - nicovision/scoot_blue_ball_02
