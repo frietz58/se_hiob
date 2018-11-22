@@ -98,6 +98,8 @@ class Tracker:
         self.total_adjusted_overlap_scores = np.empty(0)
         self.tracking_evaluations = []
 
+        logger.info("test")
+
         # samples to track
         self.data_directory = DataDirectory(data_dir=self.data_dir)
         self.samples = []
@@ -117,11 +119,9 @@ class Tracker:
         self.modules.append(self.feature_selector)
         self.consolidator = Consolidator.SingleNetConsolidator()
         self.modules.append(self.consolidator)
-        #Finn swarm pursuer is set
         self.pursuer = pursuing.SwarmPursuer()
         self.modules.append(self.pursuer)
 
-        #Finn
         self.estimator = scale_estimation.ScaleEstimator()
         self.modules.append(self.estimator)
 
@@ -132,6 +132,8 @@ class Tracker:
         self.feature_selector.configure(configuration)
         self.consolidator.configure(configuration)
         self.pursuer.configure(configuration)
+        self.estimator.configure(configuration)
+
         self.is_setup = False
 
         self.current_sample = None

@@ -85,7 +85,7 @@ consolidator:
 
 pursuer:
   particle_count: 600
-  particle_scale_factor: 1.2
+  particle_scale_factor: 1.0
   target_lower_limit: 0.2
   target_punish_low: 0.0
   target_punish_outside: 0.0
@@ -94,6 +94,10 @@ tracking_conf:
   fake_fps: 0
   skip_frames: 0
   shuffle: false
+
+scale_estimator:
+  #number of scaled candidates to generate, number from Danelljan et al.
+  number_candidates: 33
 
 # = tracking = 
 # which samples shall be tracked? Accepts samples, data sets, and data collections

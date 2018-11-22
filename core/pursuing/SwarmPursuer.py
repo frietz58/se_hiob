@@ -12,6 +12,7 @@ from matplotlib import pyplot as plt
 from .util import loc2xgeo, xgeo2loc
 from .Pursuer import Pursuer
 from ..Rect import Rect
+
 from concurrent import futures
 import time
 import multiprocessing
@@ -228,7 +229,7 @@ class SwarmPursuer(Pursuer):
         p4 = time.time()
         quals = list(self.thread_executor.map(func, locs))"""
 
-        if True and self.particle_scale_factor != 1.0:
+        if False and self.particle_scale_factor != 1.0:
             logger.info("Particle Scale factor is %s", self.particle_scale_factor)
             scaled_locs = []
             for loc in locs:
@@ -274,16 +275,26 @@ class SwarmPursuer(Pursuer):
 
         best_arg = np.argmax(quals)
 
-
-        # Finn beste Box wird gefunden und als predicted position eingetragen
-        # print("quals: {}", quals)
-
         frame.predicted_position = Rect(locs[best_arg])
 
+        #pos: initial position
+        #frame.roi: roi
+        #img_mask_sum: okay wtf macht das
+        #inner_sum: kp wo das herklommt
+        #sums: für das threading
+        #total_max: 1?
+        scaled_predictions = self.estimator.estimate_scale(frame)
+
+        scaled_quals = [self.position_quality(pos, frame.roi, img_mask_sum, inner_sum, scale_factor) / total_max
+                 for pos, inner_sum in zip(scaled_predictions, sums)]
+
+        best_scaled = np.argmax(scaled_quals)
+
+        logger.info("Best location {0}, best location scaled {1}".format(frame.predicted_position, Rect(scaled_predictions[best_scaled])))
+
+        frame.predicted_position = Rect(scaled_predictions[best_scaled])
+
         self.estimator.append_to_history(frame=frame)
-
-        #logger.info("Best Box (type Rect): %s", frame.predicted_position)
-
 
 
         # quality of prediction needs to be absolute, so we normalise it with

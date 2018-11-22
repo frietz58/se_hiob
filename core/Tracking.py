@@ -390,7 +390,6 @@ class Tracking(object):
         self.pursue_frame(frame)
         self.pursuing_total_seconds += (datetime.now() - ts_start).total_seconds()
 
-        self.estimate_scale(frame)
 
         # ps.append(time.time())  # 6
 
@@ -608,13 +607,6 @@ class Tracking(object):
                 frame.predicted_position = frame.previous_position
 
         frame.complete_pursuing()
-
-    # Finn
-    def estimate_scale(self, frame=None):
-        if frame is None:
-            frame = self.current_frame
-
-        self.tracker.estimator.estimate_scale(frame)
 
     def evaluate_frame(self, frame=None):
         if frame is None:
