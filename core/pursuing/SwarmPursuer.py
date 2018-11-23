@@ -45,7 +45,6 @@ class SwarmPursuer(Pursuer):
         self.thread_executor = None
         self.np_random = None
         self.initial_location = None
-
         self.estimator = ScaleEstimator()
 
     def configure(self, configuration):
@@ -142,7 +141,7 @@ class SwarmPursuer(Pursuer):
         #logger.info("QUALI: %s, %s", image_mask.shape, pos)
         # too small?
         # p1 = time.time()
-        scale_factor_squared = scale_factor[0] *scale_factor[1]
+        scale_factor_squared = scale_factor[0] * scale_factor[1]
         if pos.width < 8 or pos.height < 8:
             return -1e12
         # outside roi?
@@ -153,6 +152,8 @@ class SwarmPursuer(Pursuer):
                 int(pos.top):int(pos.bottom - 1),
                 int(pos.left):int(pos.right - 1)].sum()"""
         inner = inner_sum
+        #inner is a scalar, but where does it come from?
+        #logger.info("inner_sum: {0}, pos: {1}".format(inner, pos))
 
         # p3 = time.time()
         inner_fill = inner / (pos.pixel_count() / scale_factor_squared)
@@ -199,19 +200,17 @@ class SwarmPursuer(Pursuer):
         img_size = [frame.size[1], frame.size[0]]
 
         #ps.append(time.time())  # 2
+
         img_mask, scale_factor = self.upscale_mask(mask, frame.roi, img_size)
         #print("a", img_mask.max(), img_mask.min(), np.average(img_mask))
         frame.image_mask = img_mask
-
-        #Finn image mask enthält arrays mit mehreren, wtf
-        #logger.info("img_mask: %s", img_mask)
 
         #ps.append(time.time())  # 3
 
         locs = self.generate_particles(
             frame.previous_position, frame.size, lost)
 
-        #Finn im vorherigen frame
+
         logger.info("previous position: %s", frame.previous_position)
 
         # Finn: in locs sind alle bounding boxen als <rect(1,1,1,1)>
@@ -222,7 +221,12 @@ class SwarmPursuer(Pursuer):
 #        total_max = np.sum(np.abs(img_mask))
 
         #ps.append(time.time())  # 4
+
+        #img_mask is ndarray
         img_mask_sum = img_mask.sum()
+
+
+
         #ps.append(time.time())  # 5
         total_max = 1
         """func = partial(position_quality_helper, img_mask, frame.roi, total_max, img_mask_sum)
@@ -260,41 +264,66 @@ class SwarmPursuer(Pursuer):
 
         # if scaling is enabled, punish pixels with low feature rating
         punish_low = self.particle_scale_factor != 1.0
+
+
+
+        #This is just a mapping: [img_mask[x:y,a:b]]
         slices = [img_mask[round(pos.top / scale_factor[1]):round((pos.bottom - 1) / scale_factor[1]),
                   round(pos.left / scale_factor[0]):round((pos.right - 1) / scale_factor[0])] for pos in locs]
 
+        logger.info("what does it look like: {0}:{1}".format(round(locs[0].top / scale_factor[1]),
+                                                             round(locs[0].bottom - 1) / scale_factor[1]))
+
+
+
+        #Länge liste sclices = 601. Also jeder candidate + 1.
+        logger.info("slices: %s", slices[0].shape)
+        logger.info("img_mask: %s", img_mask.shape)
+        logger.info("scale factor [0]{0}, [1]{1}".format(scale_factor[0], scale_factor[1]))
+
         #ps.append(time.time())  # 6
+
 
         sums = list(self.thread_executor.map(np.sum, slices))
         #ps.append(time.time())  # 7
 
+        logger.info("sums argmax: %s", sums[np.argmax(sums)])
+
         quals = [self.position_quality(pos, frame.roi, img_mask_sum, inner_sum, scale_factor) / total_max
                  for pos, inner_sum in zip(locs, sums)]
+
 
         #ps.append(time.time())  # 8
 
         best_arg = np.argmax(quals)
-
         frame.predicted_position = Rect(locs[best_arg])
 
-        #pos: initial position
-        #frame.roi: roi
-        #img_mask_sum: okay wtf macht das
-        #inner_sum: kp wo das herklommt
-        #sums: für das threading
-        #total_max: 1?
+        frame.predicted_position = self.estimator.estimate_scale(frame=frame,
+                                                                 feature_mask=img_mask,
+                                                                 mask_scale_factor=scale_factor,
+                                                                 roi=frame.roi)
+
+        '''
+        pos: initial position
+        frame.roi: roi
+        img_mask_sum: okay wtf macht das
+        inner_sum: iterationsvariable der for schleife -.-
+        sums: für das threading
+        total_max: 1?
+        
+        
         scaled_predictions = self.estimator.estimate_scale(frame)
 
         scaled_quals = [self.position_quality(pos, frame.roi, img_mask_sum, inner_sum, scale_factor) / total_max
-                 for pos, inner_sum in zip(scaled_predictions, sums)]
+            for pos, inner_sum in zip(scaled_predictions, sums)]
 
-        best_scaled = np.argmax(scaled_quals)
+        #best_scaled = np.argmax(scaled_quals)
+        #logger.info("Best location {0}, best location scaled {1}".format(frame.predicted_position, Rect(scaled_predictions[best_scaled])))
+        #self.estimator.evaluate_scaled_candidates(scaled_predictions, frame)
+        #frame.predicted_position = Rect(scaled_predictions[best_scaled])
+        '''
 
-        logger.info("Best location {0}, best location scaled {1}".format(frame.predicted_position, Rect(scaled_predictions[best_scaled])))
-
-        frame.predicted_position = Rect(scaled_predictions[best_scaled])
-
-        self.estimator.append_to_history(frame=frame)
+        self.estimator.append_to_history(frame)
 
 
         # quality of prediction needs to be absolute, so we normalise it with
@@ -319,6 +348,7 @@ class SwarmPursuer(Pursuer):
         #print(log[2:])
 
         return frame.predicted_position
+
 
 
     @staticmethod

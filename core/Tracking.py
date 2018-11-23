@@ -779,6 +779,9 @@ class Tracking(object):
             frame = self.current_frame
         images = OrderedDict()
         for name, f in frame.consolidated_features.items():
+
+            #logger.info("condolidated features items: %s ", frame.consolidated_features.items())
+
             im = Image.fromarray(
                 self.cmap(f.reshape(self.mask_size), bytes=True)
             )
@@ -793,6 +796,7 @@ class Tracking(object):
                         frame.predicted_position, frame.roi).inner
                     draw.rectangle(pos, None, self.colours['prediction'])
             images[name] = im
+
         return images
 
     def get_frame_target_mask_image(self, frame=None, decorations=True):
