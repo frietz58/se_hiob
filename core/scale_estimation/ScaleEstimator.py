@@ -78,7 +78,6 @@ class ScaleEstimator():
             scaled_predictions.append(scaled_box)
 
         logger.info("created %s scaled positions", len(scaled_predictions))
-        logger.info(scaled_predictions)
 
         # append current prediction aswell, so that the array can be evaluated and that its possible,
         # that no changes in scale are necessary.
@@ -149,16 +148,10 @@ class ScaleEstimator():
         outer_fill = outer / max((roi.pixel_count() - candidate.pixel_count()) / squared_mask_scale_factor, 1)
 
         # Evaluate the candidate
-        quality_of_candidate = max(inner_fill - outer_fill, 0.0)
+        #quality_of_candidate = max(inner_fill - outer_fill, 0.0)
 
+        quality_of_candidate = inner
         return quality_of_candidate
-
-
-
-
-
-
-
 
     def create_fourier_rep(self, frame=None):
         logger.info("creating fourier representation")
