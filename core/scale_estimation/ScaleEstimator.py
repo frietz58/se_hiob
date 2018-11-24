@@ -143,14 +143,35 @@ class ScaleEstimator():
         inner = candidate_sum
         inner_fill = candidate_sum / (candidate.pixel_count() / squared_mask_scale_factor)
 
+        inner_punish = np.where(feature_mask[
+                        round(candidate.top / mask_scale_factor[1]):
+                        round((candidate.bottom - 1) / mask_scale_factor[1]),
+                        round(candidate.left / mask_scale_factor[0]):
+                        round((candidate.right - 1) / mask_scale_factor[0])] < 0.1)
+
+        #logger.info("inner_punish %s", inner_punish)
+
+        inner_punish_sum = np.sum(inner_punish)
+
+
         # Calculate the score of of the pixels that are in the the feature mask but not in the candidate
         outer = feature_mask.sum() - inner
         outer_fill = outer / max((roi.pixel_count() - candidate.pixel_count()) / squared_mask_scale_factor, 1)
 
-        # Evaluate the candidate
-        #quality_of_candidate = max(inner_fill - outer_fill, 0.0)
+        outer_punish = np.sum([np.where(feature_mask > 0.5)])
+        inner_helper = np.sum([feature_mask[
+                        round(candidate.top / mask_scale_factor[1]):
+                        round((candidate.bottom - 1) / mask_scale_factor[1]) > 0.5,
+                        round(candidate.left / mask_scale_factor[0]):
+                        round((candidate.right - 1) / mask_scale_factor[0])] > 0.5])
 
-        quality_of_candidate = inner
+        outer_punish_sum = outer_punish - inner_helper
+
+
+        # Evaluate the candidate
+        quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
+        logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(inner_punish_sum, outer_punish_sum, quality_of_candidate))
+
         return quality_of_candidate
 
     def create_fourier_rep(self, frame=None):
@@ -162,11 +183,12 @@ class ScaleEstimator():
     def append_to_history(self, frame):
         self.box_history.append([frame.number, frame.predicted_position.x, frame.predicted_position.y, frame.predicted_position.width, frame.predicted_position.height])
 
-        logger.info("Box at frame{0}: x: {1}, y: {2}, width: {3}, height: {4}".format(frame.number,
+        logger.info("Box at frame{0}: size: {5}x: {1}, y: {2}, width: {3}, height: {4}".format(frame.number,
                                                                                       frame.predicted_position.x,
                                                                                       frame.predicted_position.y,
                                                                                       frame.predicted_position.width,
-                                                                                      frame.predicted_position.height))
+                                                                                      frame.predicted_position.height,
+                                                                                        (frame.predicted_position.width * frame.predicted_position.height)))
 
 
 
