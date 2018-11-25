@@ -136,7 +136,7 @@ class ScaleEstimator():
         :return: the quality of the candidate based on its size
         """
 
-        # Calculate the score of the candidate based on its pixel size
+        # Calculate a score that punishes the candidate for containing pixel values < x
         inner_punish = np.where(feature_mask[
                         round(candidate.top / mask_scale_factor[1]):
                         round((candidate.bottom - 1) / mask_scale_factor[1]),
@@ -144,11 +144,9 @@ class ScaleEstimator():
                         round((candidate.right - 1) / mask_scale_factor[0])] < 0.1)
 
         inner_punish_sum = np.sum(inner_punish)
-        # inner_punish_sum = inner_punish.size
 
-        # Calculate the score of of the pixels that are in the the feature mask but not in the candidate
+        # Calculate a score that punishes the candidate for not containing pixel values > x
         outer_punish = np.sum([np.where(feature_mask > 0.5)])
-        # outer_punish = [np.where(feature_mask > 0.5)].size
         inner_helper = np.where(feature_mask[
                         round(candidate.top / mask_scale_factor[1]):
                         round((candidate.bottom - 1) / mask_scale_factor[1]),
@@ -156,12 +154,12 @@ class ScaleEstimator():
                         round((candidate.right - 1) / mask_scale_factor[0])] > 0.5)
 
         inner_helper_sum = np.sum(inner_helper)
-        # inner_helper_sum = inner_helper.size
         outer_punish_sum = outer_punish - inner_helper_sum
+        # TODO make this without the helper (only take the values that are bigger and not in the candidate...)
 
 
         # Evaluate the candidate
-        quality_of_candidate = candidate_sum - ((inner_punish_sum * 0.5) + outer_punish_sum)
+        quality_of_candidate = candidate_sum - ((inner_punish_sum * 0.1) + outer_punish_sum)
         # quality_of_candidate = candidate_sum - (outer_punish_sum)
         # logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(inner_punish_sum, outer_punish_sum, quality_of_candidate))
 

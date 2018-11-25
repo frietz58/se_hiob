@@ -265,33 +265,19 @@ class SwarmPursuer(Pursuer):
         # if scaling is enabled, punish pixels with low feature rating
         punish_low = self.particle_scale_factor != 1.0
 
-
-
-        #This is just a mapping: [img_mask[x:y,a:b]]
+        # This is just a mapping: [img_mask[x:y,a:b]]
         slices = [img_mask[round(pos.top / scale_factor[1]):round((pos.bottom - 1) / scale_factor[1]),
                   round(pos.left / scale_factor[0]):round((pos.right - 1) / scale_factor[0])] for pos in locs]
 
-        logger.info("what does it look like: {0}:{1}".format(round(locs[0].top / scale_factor[1]),
-                                                             round(locs[0].bottom - 1) / scale_factor[1]))
-
-
-
-        #Länge liste sclices = 601. Also jeder candidate + 1.
-        logger.info("slices: %s", slices[0].shape)
-        logger.info("img_mask: %s", img_mask.shape)
-        logger.info("scale factor [0]{0}, [1]{1}".format(scale_factor[0], scale_factor[1]))
-
         #ps.append(time.time())  # 6
 
-
+        # Sum up all the pixel values for a candidate on the feature mask, so that a candidate gets a score
         sums = list(self.thread_executor.map(np.sum, slices))
-        #ps.append(time.time())  # 7
 
-        logger.info("sums argmax: %s", sums[np.argmax(sums)])
+        #ps.append(time.time())  # 7
 
         quals = [self.position_quality(pos, frame.roi, img_mask_sum, inner_sum, scale_factor) / total_max
                  for pos, inner_sum in zip(locs, sums)]
-
 
         #ps.append(time.time())  # 8
 
