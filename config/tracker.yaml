@@ -111,7 +111,9 @@ tracking:
 #  - nico_recordings/tomato_and_carrot.1
 #  - nico_recordings/tomato_and_carrot.2
 #  - tb100/BlurCar1
-  - tb100/Biker
+##  - tb100/Biker
+##  - tb100/Surfer
+  - tb100/Girl
 #  - tb100/David
 #  - tb100/Panda
 #  - tb100/Basketball
@@ -130,6 +132,7 @@ tracking:
 #  - tb100/Ironman
 #  - tb100/Twinnings
 #  - tb100/CarScale
+
 #  - COLLECTION/tb100_probe
 #  - COLLECTION/tb100_paper50
 #  - princeton/zcup_move_1

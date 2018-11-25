@@ -117,14 +117,14 @@ class ScaleEstimator():
             evaluated_candidates.append(self.rate_scaled_candidate(single_sum,
                                                                    candidate,
                                                                    mask_scale_factor,
-                                                                   feature_mask,
-                                                                   roi))
+                                                                   feature_mask))
 
         best_candidate = np.argmax(evaluated_candidates)
+        logger.info("best candidate: %s", evaluated_candidates[best_candidate])
 
         return Rect(scaled_candidates[best_candidate])
 
-    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask, roi):
+    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask):
         """
         :param candidate_sum: the summed up pixel values of the candidate
         :param candidate: the current candidate
@@ -141,9 +141,9 @@ class ScaleEstimator():
                         round(candidate.top / mask_scale_factor[1]):
                         round((candidate.bottom - 1) / mask_scale_factor[1]),
                         round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] < 0.1)
+                        round((candidate.right - 1) / mask_scale_factor[0])] < 0.05)
 
-        inner_punish_sum = np.sum(inner_punish)
+        inner_punish_sum = np.sum(inner_punish) * 0.01
 
         # Calculate a score that punishes the candidate for not containing pixel values > x
         outer_punish = np.sum([np.where(feature_mask > 0.5)])
@@ -159,9 +159,8 @@ class ScaleEstimator():
 
 
         # Evaluate the candidate
-        quality_of_candidate = candidate_sum - ((inner_punish_sum * 0.1) + outer_punish_sum)
-        # quality_of_candidate = candidate_sum - (outer_punish_sum)
-        # logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(inner_punish_sum, outer_punish_sum, quality_of_candidate))
+        quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
+        logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(inner_punish_sum, outer_punish_sum, quality_of_candidate))
 
         return quality_of_candidate
 
