@@ -96,6 +96,10 @@ class App:
         self.lost_figure.pack(side=tk.RIGHT)
         self.images['lost_figure'] = self.lost_figure
 
+        self.size_figure = ImageLabel(self.figure_frame)
+        self.size_figure.pack(side=tk.RIGHT)
+        self.images['size_figure'] = self.size_figure
+
         self.confidence_plotter = SGraph(length=100)
         self.confidence_plot = ImageLabel(self.figure_frame)
         self.confidence_plot.pack()
@@ -144,6 +148,13 @@ class App:
             self.figure_frame, text="Lost", compound=tk.BOTTOM,)
         self.lost_plot.pack(side=tk.LEFT)
         self.images['lost_plot'] = self.lost_plot
+
+        self.size_plotter = SGraph(
+            min_y=0.0, max_y=100, length=100, height=100)
+        self.size_plot = ImageLabel(
+            self.figure_frame, text="Size", compound=tk.BOTTOM, )
+        self.size_plot.pack(side=tk.LEFT)
+        self.images['size_plot'] = self.size_plot
 
     def consume_entry(self, entry):
         for k, v in entry.items():
@@ -228,6 +239,7 @@ class App:
             self.overlap_plotter.append(fr['overlap_score'])
             self.adjusted_overlap_plotter.append(fr['adjusted_overlap_score'])
             self.lost_plotter.append(fr['lost'])
+            self.size_plotter.append(fr['size_score'])
             consolidation_image = tracking.get_frame_consolidation_images()['single']
             entry = {
                 'capture_image': tracking.get_frame_capture_image(),
@@ -244,7 +256,8 @@ class App:
                 'overlap_plot': self.overlap_plotter.get_image(),
                 'adjusted_overlap_plot': self.adjusted_overlap_plotter.get_image(),
                 'lost_plot': self.lost_plotter.get_image(),
-                #'fourier_image': tracking.get_frame_fourier_img()
+                'size_plot': self.size_plotter.get_image()
+               #'fourier_image': tracking.get_frame_fourier_img()
             }
             self.feed_queue(entry)
             if "save_images" in self.conf and self.conf["save_images"]:

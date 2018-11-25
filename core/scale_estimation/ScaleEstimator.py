@@ -136,41 +136,34 @@ class ScaleEstimator():
         :return: the quality of the candidate based on its size
         """
 
-        # The factor with which the feature mask has been scaled.
-        squared_mask_scale_factor = mask_scale_factor[0] * mask_scale_factor[1]
-
         # Calculate the score of the candidate based on its pixel size
-        inner = candidate_sum
-        inner_fill = candidate_sum / (candidate.pixel_count() / squared_mask_scale_factor)
-
         inner_punish = np.where(feature_mask[
                         round(candidate.top / mask_scale_factor[1]):
                         round((candidate.bottom - 1) / mask_scale_factor[1]),
                         round(candidate.left / mask_scale_factor[0]):
                         round((candidate.right - 1) / mask_scale_factor[0])] < 0.1)
 
-        #logger.info("inner_punish %s", inner_punish)
-
         inner_punish_sum = np.sum(inner_punish)
-
+        # inner_punish_sum = inner_punish.size
 
         # Calculate the score of of the pixels that are in the the feature mask but not in the candidate
-        outer = feature_mask.sum() - inner
-        outer_fill = outer / max((roi.pixel_count() - candidate.pixel_count()) / squared_mask_scale_factor, 1)
-
         outer_punish = np.sum([np.where(feature_mask > 0.5)])
-        inner_helper = np.sum([feature_mask[
+        # outer_punish = [np.where(feature_mask > 0.5)].size
+        inner_helper = np.where(feature_mask[
                         round(candidate.top / mask_scale_factor[1]):
-                        round((candidate.bottom - 1) / mask_scale_factor[1]) > 0.5,
+                        round((candidate.bottom - 1) / mask_scale_factor[1]),
                         round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] > 0.5])
+                        round((candidate.right - 1) / mask_scale_factor[0])] > 0.5)
 
-        outer_punish_sum = outer_punish - inner_helper
+        inner_helper_sum = np.sum(inner_helper)
+        # inner_helper_sum = inner_helper.size
+        outer_punish_sum = outer_punish - inner_helper_sum
 
 
         # Evaluate the candidate
-        quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
-        logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(inner_punish_sum, outer_punish_sum, quality_of_candidate))
+        quality_of_candidate = candidate_sum - ((inner_punish_sum * 0.5) + outer_punish_sum)
+        # quality_of_candidate = candidate_sum - (outer_punish_sum)
+        # logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(inner_punish_sum, outer_punish_sum, quality_of_candidate))
 
         return quality_of_candidate
 

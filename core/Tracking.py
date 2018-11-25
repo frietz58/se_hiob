@@ -624,12 +624,15 @@ class Tracking(object):
             result['center_distance'] = gt.center_distance(p)
             result['relative_center_distance'] = gt.relative_center_distance(p)
             result['adjusted_overlap_score'] = gt.adjusted_overlap_score(p)
+            result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
         else:
             result['overlap_score'] = None
             result['center_distance'] = None
             result['relative_center_distance'] = None
             result['adjusted_overlap_score'] = None
+            result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
         frame.result = result
+        logger.info("result: %s", frame.result)
         frame.complete_evaluation()
 
     # ==
