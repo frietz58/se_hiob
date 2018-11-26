@@ -89,7 +89,7 @@ def do_tracking_evaluation(tracking):
                 pos.left, pos.top, pos.right, pos.bottom)
         princeton_lines.append(line)
         # my own log line:
-        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
+        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
             n + 1,
             pos.left, pos.top, pos.width, pos.height,
             r['prediction_quality'],
@@ -99,7 +99,8 @@ def do_tracking_evaluation(tracking):
             r['overlap_score'],
             r['adjusted_overlap_score'],
             r['lost'],
-            r['updated']
+            r['updated'],
+            r['size_score']
         )
         csv_lines.append(line)
         if r['lost'] == 1:
@@ -137,6 +138,7 @@ def do_tracking_evaluation(tracking):
     ov = np.empty(len(log))
     aov = np.empty(len(log))
     cf = np.empty(len(log))
+    ss = np.empty(len(log))
     in20 = 0
     for n, l in enumerate(log):
         r = l['result']
@@ -147,6 +149,7 @@ def do_tracking_evaluation(tracking):
         ov[n] = r['overlap_score']
         aov[n] = r['adjusted_overlap_score']
         cf[n] = r['prediction_quality']
+        ss[n] = r['size_score']
 
     dim = np.arange(1, len(cd) + 1)
 
@@ -159,6 +162,18 @@ def do_tracking_evaluation(tracking):
     plt.axhline(y=20, color='r', linestyle='--')
     plt.plot(dim, cd, 'k', dim, cd, 'bo')
     plt.xlim(1, len(cd))
+    plt.savefig(figure_file2)
+    plt.savefig(figure_file3)
+
+    #Size Plot:
+    figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
+    figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
+    f = plt.figure()
+    plt.xlabel("frame")
+    plt.ylabel("size")
+    plt.axhline(y=ss[0], color='r', linestyle='--')
+    plt.plot(dim, ss, 'k', dim, ss, 'bo')
+    plt.xlim(1, len(ss))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
 
