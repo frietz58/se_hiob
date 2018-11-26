@@ -20,22 +20,34 @@ class ScaleEstimator():
 
     def __init__(self):
 
+        self.configuration = None
+        self.econf = None
+
         self.frame = None
-        self.number_scales = None
         self.tracker = None
         self.box_history = []
-        self.configuration = None
 
+        self.use_scale_estimation = None
+        self.number_scales = None
+        self.inner_punish_threshold = None
+        self.inner_punish_factor = None
+        self.outer_punish_threshold = None
 
     def setup(self, tracker=None):
-
         self.tracker = tracker
-        logger.info("scale estimator ready")
+        self.configuration = tracker.configuration
 
-    def configure(self, conf):
-        self.configuration = conf
-        logger.info("estimator conf set")
-        # TODO why does this never happen?
+    def configure(self, configuration):
+        self.econf = configuration['scale_estimator']
+        self.use_scale_estimation = self.econf['use_scale_estimation']
+        self.number_scales = self.econf['number_scales']
+        self.inner_punish_threshold = self.econf['inner_punish_threshold']
+        self.inner_punish_factor = self.econf['inner_punish_factor']
+        self.outer_punish_threshold = self.econf['outer_punish_threshold']
+
+        # logger is not initialized at this point, hence print statement...
+        if self.use_scale_estimation:
+            print("Scale Estimator has been configured")
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
@@ -48,6 +60,15 @@ class ScaleEstimator():
         :return: the best rated candidate
         """
 
+        self.frame = frame
+
+        # If scale estimation has been disabled in configuration, return unscaled bounding box
+        if not self.use_scale_estimation:
+            logger.critical("Scale Estimation is disabled, returning unchanged prediction")
+            return frame.predicted_position
+
+
+
         logger.info("starting scale estimation")
 
         scaled_candidates = self.generate_scaled_candidates(frame)
@@ -56,7 +77,6 @@ class ScaleEstimator():
         logger.info("finished scale estimation")
 
         return final_candidate
-
 
     def generate_scaled_candidates(self, frame):
         """
@@ -70,14 +90,14 @@ class ScaleEstimator():
         scaled_predictions = []
 
         # Generate n scaled candidates
-        for i in range(33):
+        for i in range(self.number_scales):
             scaled_width = np.random.normal(loc=current_prediction.width, scale=1.0)
             scaled_height = np.random.normal(loc=current_prediction.height, scale=1.0)
 
             scaled_box = Rect(frame.predicted_position.x, frame.predicted_position.y, scaled_width, scaled_height)
             scaled_predictions.append(scaled_box)
 
-        logger.info("created %s scaled positions", len(scaled_predictions))
+        logger.info("created %s scaled candidates", len(scaled_predictions))
 
         # append current prediction aswell, so that the array can be evaluated and that its possible,
         # that no changes in scale are necessary.
@@ -105,8 +125,6 @@ class ScaleEstimator():
                         round(pos.left / mask_scale_factor[0]):
                         round((pos.right - 1) / mask_scale_factor[0])] for pos in scaled_candidates]
 
-        logger.info("type: %s", type(mask_scale_factor))
-
         # Sum up the values from the candidates
         candidate_sums = list(map(np.sum, pixel_values))
 
@@ -120,7 +138,6 @@ class ScaleEstimator():
                                                                    feature_mask))
 
         best_candidate = np.argmax(evaluated_candidates)
-        logger.info("best candidate: %s", evaluated_candidates[best_candidate])
 
         return Rect(scaled_candidates[best_candidate])
 
@@ -141,17 +158,17 @@ class ScaleEstimator():
                         round(candidate.top / mask_scale_factor[1]):
                         round((candidate.bottom - 1) / mask_scale_factor[1]),
                         round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] < 0.05)
+                        round((candidate.right - 1) / mask_scale_factor[0])] < self.inner_punish_threshold)
 
-        inner_punish_sum = np.sum(inner_punish) * 0.01
+        inner_punish_sum = np.sum(inner_punish) * self.inner_punish_factor
 
         # Calculate a score that punishes the candidate for not containing pixel values > x
-        outer_punish = np.sum([np.where(feature_mask > 0.5)])
+        outer_punish = np.sum([np.where(feature_mask > self.outer_punish_threshold)])
         inner_helper = np.where(feature_mask[
                         round(candidate.top / mask_scale_factor[1]):
                         round((candidate.bottom - 1) / mask_scale_factor[1]),
                         round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] > 0.5)
+                        round((candidate.right - 1) / mask_scale_factor[0])] > self.outer_punish_threshold)
 
         inner_helper_sum = np.sum(inner_helper)
         outer_punish_sum = outer_punish - inner_helper_sum
@@ -160,25 +177,31 @@ class ScaleEstimator():
 
         # Evaluate the candidate
         quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
-        logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(inner_punish_sum, outer_punish_sum, quality_of_candidate))
+
+
+        # logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(
+        # inner_punish_sum,
+        # outer_punish_sum,
+        # quality_of_candidate))
 
         return quality_of_candidate
 
-    def create_fourier_rep(self, frame=None):
-        logger.info("creating fourier representation")
-        #logger.info("frame.capture_iamge %s", frame.capture_image)
-        #img = cv2.imread(frame.capture_image)
-        return frame
-
     def append_to_history(self, frame):
+        """
+        Writes the final (scaled or unscaled) box from the current frame to the execution log
+        :param frame: the current frame
+        """
         self.box_history.append([frame.number, frame.predicted_position.x, frame.predicted_position.y, frame.predicted_position.width, frame.predicted_position.height])
 
-        logger.info("Box at frame{0}: size: {5}x: {1}, y: {2}, width: {3}, height: {4}".format(frame.number,
-                                                                                      frame.predicted_position.x,
-                                                                                      frame.predicted_position.y,
-                                                                                      frame.predicted_position.width,
-                                                                                      frame.predicted_position.height,
-                                                                                        (frame.predicted_position.width * frame.predicted_position.height)))
+        logger.info("Box at frame{0}: size: {5}x: {1}, y: {2}, width: {3}, height: {4}".format(
+            frame.number,
+            frame.predicted_position.x,
+            frame.predicted_position.y,
+            frame.predicted_position.width,
+            frame.predicted_position.height, (
+                    frame.predicted_position.width *
+                    frame.predicted_position.height)
+        ))
 
 
 

@@ -96,8 +96,11 @@ tracking_conf:
   shuffle: false
 
 scale_estimator:
-  #number of scaled candidates to generate, number from Danelljan et al.
-  number_candidates: 33
+  use_scale_estimation: True # enable or disable scale estimation
+  number_scales: 33 # number of scaled candidates to generate, number from Danelljan et al.
+  inner_punish_threshold: 0.05 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
+  inner_punish_factor: 0.01 # the factor with which the inner punish score gets multiplied to decrease its impact
+  outer_punish_threshold: 0.5 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
 
 # = tracking = 
 # which samples shall be tracked? Accepts samples, data sets, and data collections
@@ -111,9 +114,9 @@ tracking:
 #  - nico_recordings/tomato_and_carrot.1
 #  - nico_recordings/tomato_and_carrot.2
 #  - tb100/BlurCar1
-##  - tb100/Biker
+  - tb100/Biker
 ##  - tb100/Surfer
-  - tb100/Girl
+##  - tb100/Girl
 #  - tb100/David
 #  - tb100/Panda
 #  - tb100/Basketball

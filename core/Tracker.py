@@ -20,8 +20,6 @@ from . import roi
 from . import selection
 from .sample_provider import DataDirectory
 from .Tracking import Tracking
-
-#Finn
 from . import scale_estimation
 
 logger = logging.getLogger(__name__)

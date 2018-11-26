@@ -632,7 +632,6 @@ class Tracking(object):
             result['adjusted_overlap_score'] = None
             result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
         frame.result = result
-        logger.info("result: %s", frame.result)
         frame.complete_evaluation()
 
     # ==

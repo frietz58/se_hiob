@@ -150,7 +150,7 @@ class App:
         self.images['lost_plot'] = self.lost_plot
 
         self.size_plotter = SGraph(
-            min_y=0.0, max_y=100, length=100, height=100)
+            min_y=0.0, max_y=200, length=100, height=100)
         self.size_plot = ImageLabel(
             self.figure_frame, text="Size", compound=tk.BOTTOM, )
         self.size_plot.pack(side=tk.LEFT)

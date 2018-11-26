@@ -45,7 +45,7 @@ class SwarmPursuer(Pursuer):
         self.thread_executor = None
         self.np_random = None
         self.initial_location = None
-        self.estimator = ScaleEstimator()
+        #self.estimator = ScaleEstimator() # Aha, das darf kein eigener sein, sondern der aus dem Tracker
 
     def configure(self, configuration):
         self.configuration = configuration
@@ -284,10 +284,11 @@ class SwarmPursuer(Pursuer):
         best_arg = np.argmax(quals)
         frame.predicted_position = Rect(locs[best_arg])
 
-        frame.predicted_position = self.estimator.estimate_scale(frame=frame,
-                                                                 feature_mask=img_mask,
-                                                                 mask_scale_factor=scale_factor,
-                                                                 roi=frame.roi)
+        frame.predicted_position = self.tracker.estimator.estimate_scale(
+            frame=frame,
+            feature_mask=img_mask,
+            mask_scale_factor=scale_factor,
+            roi=frame.roi)
 
         '''
         pos: initial position
@@ -309,7 +310,7 @@ class SwarmPursuer(Pursuer):
         #frame.predicted_position = Rect(scaled_predictions[best_scaled])
         '''
 
-        self.estimator.append_to_history(frame)
+        self.tracker.estimator.append_to_history(frame)
 
 
         # quality of prediction needs to be absolute, so we normalise it with
