@@ -755,7 +755,8 @@ class Tracking(object):
     def get_frame_sroi_image(self, frame=None, decorations=True):
         if frame is None:
             frame = self.current_frame
-        im = Image.fromarray(np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0])
+        arr = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)
+        im = Image.fromarray(arr[0])
         if decorations:
             draw = ImageDraw.Draw(im)
             if frame.ground_truth and frame.roi:
@@ -766,15 +767,10 @@ class Tracking(object):
                     frame.predicted_position, frame.roi).inner
                 draw.rectangle(pos, None, self.colours['prediction'])
         return im
-    '''
-    def get_frame_fourier_img(self, frame=None):
-        if frame is None:
-            frame = self.current_frame
 
-        im = Image.fromarray(np.asarray(self.tracker.estimator.create_fourier_rep(frame).capture_image, dtype=np.uint8))
+    def get_frame_fourier_image(self):
+        im = self.tracker.estimator.create_fourier_rep(self.tracker)
         return im
-    '''
-
 
     def get_frame_consolidation_images(self, frame=None, decorations=True):
         if frame is None:

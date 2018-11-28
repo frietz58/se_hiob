@@ -6,11 +6,13 @@ Created on 2018-11-17
 
 
 import numpy as np
-from ..Rect import Rect
+from PIL import Image, ImageDraw
+import logging
 import cv2
 import transitions
 
-import logging
+from ..Rect import Rect
+
 logger = logging.getLogger(__name__)
 
 
@@ -40,7 +42,7 @@ class ScaleEstimator():
     def configure(self, configuration):
         self.econf = configuration['scale_estimator']
         self.use_scale_estimation = self.econf['use_scale_estimation']
-        self.number_scales = self.econf['number_scales']
+        self.approach = self.econf['approach']
         self.inner_punish_threshold = self.econf['inner_punish_threshold']
         self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
@@ -67,14 +69,24 @@ class ScaleEstimator():
             logger.critical("Scale Estimation is disabled, returning unchanged prediction")
             return frame.predicted_position
 
+        if self.approach == 'candidates':
 
+            logger.info("starting scale estimation. Approach: Candidate Generation")
 
-        logger.info("starting scale estimation")
+            scaled_candidates = self.generate_scaled_candidates(frame)
+            final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
 
-        scaled_candidates = self.generate_scaled_candidates(frame)
-        final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
+            logger.info("finished scale estimation")
 
-        logger.info("finished scale estimation")
+        elif self.approach == 'correlation':
+
+            logger.info("starting scale estimation. Approach: Correlation Filter")
+
+            self.create_fourier_rep(self.tracker)
+            final_candidate = frame.predicted_position
+            logger.info("finished scale estimation")
+        else:
+            logger.critical("No implementation for approach in configuration")
 
         return final_candidate
 
@@ -185,6 +197,28 @@ class ScaleEstimator():
         # quality_of_candidate))
 
         return quality_of_candidate
+
+    def create_fourier_rep(self, tracker):
+
+        # arr = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)
+        # im = Image.fromarray(arr[0])
+
+        self.tracker = tracker
+
+        # im ist ndarray. dim 200 200 3 also 200x200 mit rgb data
+        im = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0]
+
+        #cv2_image = cv2.imread(im)
+
+        f = np.fft.fft2(im)
+        # f = abs(np.fft.fft2(im))
+
+        fshift = np.fft.fftshift(f)
+        magnitude_spectrum = 20 * np.log(np.abs(fshift))
+
+        pil_image = Image.fromarray(magnitude_spectrum, mode='RGB')
+
+        return pil_image
 
     def append_to_history(self, frame):
         """

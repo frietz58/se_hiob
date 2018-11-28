@@ -82,7 +82,6 @@ class Frame(object):
         self.result = None
         self.lost = 0
         self.updated = 'n'
-        self.fourier_image = None
 
         # state markers - only to be changed by state machine
         self.did_reduction = False

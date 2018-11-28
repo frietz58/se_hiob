@@ -97,6 +97,7 @@ tracking_conf:
 
 scale_estimator:
   use_scale_estimation: True # enable or disable scale estimation
+  approach: 'correlation' # Determines which approach to use for scale estimation. Either 'candidates' or 'correlation'
   number_scales: 33 # number of scaled candidates to generate, number from Danelljan et al.
   inner_punish_threshold: 0.05 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   inner_punish_factor: 0.01 # the factor with which the inner punish score gets multiplied to decrease its impact
