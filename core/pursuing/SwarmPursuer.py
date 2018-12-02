@@ -45,7 +45,6 @@ class SwarmPursuer(Pursuer):
         self.thread_executor = None
         self.np_random = None
         self.initial_location = None
-        #self.estimator = ScaleEstimator() # Aha, das darf kein eigener sein, sondern der aus dem Tracker
 
     def configure(self, configuration):
         self.configuration = configuration
@@ -289,26 +288,6 @@ class SwarmPursuer(Pursuer):
             feature_mask=img_mask,
             mask_scale_factor=scale_factor,
             roi=frame.roi)
-
-        '''
-        pos: initial position
-        frame.roi: roi
-        img_mask_sum: okay wtf macht das
-        inner_sum: iterationsvariable der for schleife -.-
-        sums: für das threading
-        total_max: 1?
-        
-        
-        scaled_predictions = self.estimator.estimate_scale(frame)
-
-        scaled_quals = [self.position_quality(pos, frame.roi, img_mask_sum, inner_sum, scale_factor) / total_max
-            for pos, inner_sum in zip(scaled_predictions, sums)]
-
-        #best_scaled = np.argmax(scaled_quals)
-        #logger.info("Best location {0}, best location scaled {1}".format(frame.predicted_position, Rect(scaled_predictions[best_scaled])))
-        #self.estimator.evaluate_scaled_candidates(scaled_predictions, frame)
-        #frame.predicted_position = Rect(scaled_predictions[best_scaled])
-        '''
 
         self.tracker.estimator.append_to_history(frame)
 

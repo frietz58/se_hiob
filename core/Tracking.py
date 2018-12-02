@@ -769,7 +769,7 @@ class Tracking(object):
         return im
 
     def get_frame_fourier_image(self):
-        im = self.tracker.estimator.create_fourier_rep(self.tracker)
+        im = self.tracker.estimator.create_fourier_rep(self.tracker, self.current_frame)
         return im
 
     def get_frame_consolidation_images(self, frame=None, decorations=True):

@@ -12,6 +12,7 @@ import io
 import tensorflow as tf
 import numpy as np
 import time
+import cv2
 
 from PIL import Image
 
@@ -37,6 +38,7 @@ class Sample(object):
         self.actual_frames = None
         # data from actual data set sample:
         self.image_cache = []
+        self.cv2_img_cache = []
         self.img_paths = []
         self.ground_truth = []
         self.current_frame_id = -1
@@ -90,6 +92,7 @@ class Sample(object):
                 self.img_paths.append(fn)
         self.img_paths.sort()
         images = []
+        cv2_images = []
         # fix weird frame cases like David and Football1
         if self.first_frame is None:
             self.first_frame = 1
@@ -99,6 +102,9 @@ class Sample(object):
         for img_path in self.img_paths[self.frame_offset:]:
             c += 1
             im = self.load_tb100_image(img_path)
+            cv2_img = self.get_tb100_cv2_image(img_path)
+
+            cv2_images.append(cv2_img)
             images.append(im)
 
         self.capture_size = tuple(reversed(images[0].shape[:-1]))
@@ -122,6 +128,7 @@ class Sample(object):
         # save what we got
         self.ground_truth = gt
         self.image_cache = images
+        self.cv2_img_cache = cv2_images
         # first ground truth position is initial position
         self.initial_position = gt[0]
         # verify number of actual frames from data set file:
@@ -142,6 +149,16 @@ class Sample(object):
         stream = io.BytesIO(data)
         im = np.array(Image.open(stream))
         return im
+
+    def get_tb100_cv2_image(self, img_path):
+        data = self.zip_file.read(img_path)
+        stream = io.BytesIO(data)
+
+        nparr = np.fromstring(data, np.uint8)
+        #img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        img_np = cv2.imdecode(nparr, 0)
+
+        return img_np
 
     def load_princeton(self, log_context=None):
         # find out, of sample is Evaluation or Validation set:

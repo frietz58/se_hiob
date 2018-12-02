@@ -8,8 +8,12 @@ Created on 2018-11-17
 import numpy as np
 from PIL import Image, ImageDraw
 import logging
+from scipy.ndimage import gaussian_filter
+import scipy.stats as st
 import cv2
 import transitions
+from matplotlib import pyplot as plt
+import pandas as pd
 
 from ..Rect import Rect
 
@@ -28,7 +32,9 @@ class ScaleEstimator():
         self.frame = None
         self.tracker = None
         self.box_history = []
+        self.sample = None
 
+        #configuration
         self.use_scale_estimation = None
         self.number_scales = None
         self.inner_punish_threshold = None
@@ -82,7 +88,7 @@ class ScaleEstimator():
 
             logger.info("starting scale estimation. Approach: Correlation Filter")
 
-            self.create_fourier_rep(self.tracker)
+            self.create_fourier_rep(self.tracker, self.frame)
             final_candidate = frame.predicted_position
             logger.info("finished scale estimation")
         else:
@@ -198,24 +204,74 @@ class ScaleEstimator():
 
         return quality_of_candidate
 
-    def create_fourier_rep(self, tracker):
+    def create_2d_gaussian_kernel(self, kernlen, nsig):
+        """Returns a 2D Gaussian kernel array."""
+
+        interval = (2 * nsig + 1.) / (kernlen)
+        x = np.linspace(-nsig - interval / 2., nsig + interval / 2., kernlen + 1)
+        kern1d = np.diff(st.norm.cdf(x))
+        kernel_raw = np.sqrt(np.outer(kern1d, kern1d))
+        kernel = kernel_raw / kernel_raw.sum()
+        return kernel
+
+    def create_fourier_rep(self, tracker, frame):
 
         # arr = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)
         # im = Image.fromarray(arr[0])
 
-        self.tracker = tracker
+        self.frame = frame
+        self.sample = self.tracker.current_sample
 
-        # im ist ndarray. dim 200 200 3 also 200x200 mit rgb data
+        current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+        cv2_roi = current_cv2_im[frame.roi.x:frame.roi.x + frame.roi.w, frame.roi.y:frame.roi.y + frame.roi.h]
+
+
         im = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0]
+        # im = np.asanyarray((self.image_path))
+        img = frame.capture_image
+        np.save('cap', img)
 
-        #cv2_image = cv2.imread(im)
-
-        f = np.fft.fft2(im)
-        # f = abs(np.fft.fft2(im))
-
-        fshift = np.fft.fftshift(f)
+        # Bring the image into the frequency domain and shift it, so that the zero frequency component (dc compoennt) is
+        # at the center of the image, instead of top left
+        # Then find the magnitude spectrum ?
+        roi_in_fourier = np.fft.fft2(img)
+        fshift = np.fft.fftshift(roi_in_fourier)
         magnitude_spectrum = 20 * np.log(np.abs(fshift))
+        np.save('mag_spec', magnitude_spectrum)
 
+        # build synthetic img
+        snth_filter = np.zeros((frame.roi.width, frame.roi.height))
+
+        # put 2d guassian at center of object
+        gauss = self.create_2d_gaussian_kernel(5, 2)
+        #x_coord = round(frame.predicted_position.centerx + np.shape(gauss)[0]/2)
+        #y_coord = round(frame.predicted_position.centery + np.shape(gauss)[1]/2)
+
+        x_coord_on_roi = round(frame.predicted_position.x - frame.roi.x + (np.shape(gauss)[0] / 2))
+        y_coord_on_roi = round(frame.predicted_position.y - frame.roi.y + (np.shape(gauss)[1] / 2))
+
+        snth_filter[x_coord_on_roi:x_coord_on_roi + gauss.shape[0], y_coord_on_roi:y_coord_on_roi + gauss.shape[1]] = gauss
+
+
+        #plt.interactive(True)
+        #plt.imshow(magnitude_spectrum, cmap='gray')
+        #plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+        #plt.show(block=True)
+        #plt.show()
+
+
+        # apply filter/do stuff in frequency domain
+        #rows = im.shape[0]
+        #cols = im.shape[1]
+        #crow, ccol = rows / 2, cols / 2
+        #fshift[int(crow - 30): int(crow + 30), int(ccol - 30):int(ccol + 30)] = 0
+
+        # bring the image back into the spaial domain
+        #f_ishift = np.fft.ifftshift(fshift)
+        #img_back = np.fft.ifft2(f_ishift)
+        #img_back = np.abs(img_back)
+
+        # create a pil image that can be seen in the gui output
         pil_image = Image.fromarray(magnitude_spectrum, mode='RGB')
 
         return pil_image
