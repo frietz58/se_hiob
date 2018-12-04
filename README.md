@@ -1,10 +1,15 @@
 HIOB
+
+This is a mirror of the git repo https://github.com/kratenko/HIOB. 
+The work has been done by Peer Springstübe, in succession and together with 
+Tobias Knöppler, Stefan Heinrich and Matthias Kerzel in the framework a Diploma Thesis.
+
 ====
 HIOB is modular hierarchical object tracking framework written in python and tensorflow. It uses a combination of offline trained CNNs for visual feature extraction and online trained CNNs to build a model of the tracked object. 
 
 HIOB was created for a diploma thesis on CNNs at the Department of Informatics of the [Universität Hamburg](https://www.uni-hamburg.de/) in the research group [Knowledge Technology (WTM)](https://www.inf.uni-hamburg.de/en/inst/ab/wtm/). During a bachelor thesis the performance has been further improved and it has been adapted to run inside of [ROS](http://www.ros.org/).
 
-The ROS integration of HIOB lives in a separate repository: https://github.com/theCalcaholic/hiob_ros
+The ROS integration of HIOB lives in a separate repository: https://git.informatik.uni-hamburg.de/wtm/hierarchical-object-tracking-ros
 TODO: add link to the docker image of hiob_ros.
 
 The algorithm in HIOB is inspired by the [FCNT](https://github.com/scott89/FCNT) by *Wang et al* presented in their [ICCV 2015 paper](http://202.118.75.4/lu/Paper/ICCV2015/iccv15_lijun.pdf). The program code of HIOB is completely independet from the FCNT and has been written by us.
@@ -21,11 +26,11 @@ TODO: second paper, when we have a bibtex entry.
 #### Using HIOB
 clone the repositiory
 
-    $ git clone https://github.com/kratenko/HIOB.git
+    $ git clone https://git.informatik.uni-hamburg.de/wtm/hierarchical-object-tracking.git
 
 or
 
-    $ git clone git@github.com:kratenko/HIOB.git
+    $ git clone git@git.informatik.uni-hamburg.de:wtm/hierarchical-object-tracking.git
 
 #### virtual environment
 HIOB needs python3 and tensorflow. We recommend building a virtual environment for HIOB.
