@@ -1,10 +1,12 @@
 HIOB
+====
 
 This is a mirror of the git repo https://github.com/kratenko/HIOB. 
 The work has been done by Peer Springstübe, in succession and together with 
 Tobias Knöppler, Stefan Heinrich and Matthias Kerzel in the framework a Diploma Thesis.
 
-====
+# Description
+
 HIOB is modular hierarchical object tracking framework written in python and tensorflow. It uses a combination of offline trained CNNs for visual feature extraction and online trained CNNs to build a model of the tracked object. 
 
 HIOB was created for a diploma thesis on CNNs at the Department of Informatics of the [Universität Hamburg](https://www.uni-hamburg.de/) in the research group [Knowledge Technology (WTM)](https://www.inf.uni-hamburg.de/en/inst/ab/wtm/). During a bachelor thesis the performance has been further improved and it has been adapted to run inside of [ROS](http://www.ros.org/).
