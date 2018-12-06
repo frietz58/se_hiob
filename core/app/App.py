@@ -62,10 +62,10 @@ class App:
         self.sroi_image.pack(side=tk.RIGHT)
         self.images['sroi_image'] = self.sroi_image
 
-        self.fourier_image = ImageLabel(
-            self.capture_frame, text="Fourier", compound=tk.BOTTOM)
-        self.fourier_image.pack(side=tk.RIGHT)
-        self.images['fourier_image'] = self.fourier_image
+        #self.fourier_image = ImageLabel(
+        #    self.capture_frame, text="Fourier", compound=tk.BOTTOM)
+        #self.fourier_image.pack(side=tk.RIGHT)
+        #self.images['fourier_image'] = self.fourier_image
 
         self.consolidation_image = ImageLabel(self.root)
         self.consolidation_image.pack()

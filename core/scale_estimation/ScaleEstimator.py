@@ -52,6 +52,7 @@ class ScaleEstimator():
         self.inner_punish_threshold = self.econf['inner_punish_threshold']
         self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
+        self.number_scales = self.econf['number_scales']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -216,41 +217,50 @@ class ScaleEstimator():
 
     def create_fourier_rep(self, tracker, frame):
 
-        # arr = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)
-        # im = Image.fromarray(arr[0])
-
         self.frame = frame
         self.sample = self.tracker.current_sample
 
+        # get current frame and bring it into the fourier domain
         current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
-        cv2_roi = current_cv2_im[frame.roi.x:frame.roi.x + frame.roi.w, frame.roi.y:frame.roi.y + frame.roi.h]
+        cv2_in_f = np.fft.fft2(current_cv2_im)
+        # cv2_roi = current_cv2_im[frame.roi.x:frame.roi.x + frame.roi.w, frame.roi.y:frame.roi.y + frame.roi.h]
+
+        # build synthetic img
+        snth_filter = np.zeros((np.shape(frame.capture_image)[0], np.shape(frame.capture_image)[1]))
+
+        # put 2d guassian at center of object
+        gauss = self.create_2d_gaussian_kernel(5, 2)
+        x_coord = round(frame.predicted_position.centerx - (np.shape(gauss)[0] / 2))
+        y_coord = round(frame.predicted_position.centery - (np.shape(gauss)[1] / 2))
+        snth_filter[
+            x_coord: x_coord + gauss.shape[0],
+            y_coord: y_coord + gauss.shape[1]
+        ] = gauss
+
+        # get snth_filter in the fourier domain
+        filter_in_f = np.fft.fft2(snth_filter)
+
+        # hadamard product (elementwise multiplication)
+        had = np.multiply(cv2_in_f, filter_in_f)
 
 
-        im = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0]
-        # im = np.asanyarray((self.image_path))
-        img = frame.capture_image
-        np.save('cap', img)
+        #im = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0]
+        #im = np.asanyarray((self.image_path))
+        #img = frame.capture_image
+        #np.save('cap', img)
 
         # Bring the image into the frequency domain and shift it, so that the zero frequency component (dc compoennt) is
         # at the center of the image, instead of top left
         # Then find the magnitude spectrum ?
-        roi_in_fourier = np.fft.fft2(img)
-        fshift = np.fft.fftshift(roi_in_fourier)
-        magnitude_spectrum = 20 * np.log(np.abs(fshift))
-        np.save('mag_spec', magnitude_spectrum)
+        # roi_in_fourier = np.fft.fft2(cv2_roi)
 
-        # build synthetic img
-        snth_filter = np.zeros((frame.roi.width, frame.roi.height))
 
-        # put 2d guassian at center of object
-        gauss = self.create_2d_gaussian_kernel(5, 2)
-        #x_coord = round(frame.predicted_position.centerx + np.shape(gauss)[0]/2)
-        #y_coord = round(frame.predicted_position.centery + np.shape(gauss)[1]/2)
+        #np.save('mag_spec', magnitude_spectrum)
 
-        x_coord_on_roi = round(frame.predicted_position.x - frame.roi.x + (np.shape(gauss)[0] / 2))
-        y_coord_on_roi = round(frame.predicted_position.y - frame.roi.y + (np.shape(gauss)[1] / 2))
+        #x_coord_on_roi = round(frame.predicted_position.x - frame.roi.x + (np.shape(gauss)[0] / 2))
+        #y_coord_on_roi = round(frame.predicted_position.y - frame.roi.y + (np.shape(gauss)[1] / 2))
 
-        snth_filter[x_coord_on_roi:x_coord_on_roi + gauss.shape[0], y_coord_on_roi:y_coord_on_roi + gauss.shape[1]] = gauss
+        #snth_filter[x_coord_on_roi:x_coord_on_roi + gauss.shape[0], y_coord_on_roi:y_coord_on_roi + gauss.shape[1]] = gauss
 
 
         #plt.interactive(True)
@@ -272,6 +282,8 @@ class ScaleEstimator():
         #img_back = np.abs(img_back)
 
         # create a pil image that can be seen in the gui output
+        fshift = np.fft.fftshift(cv2_in_f)
+        magnitude_spectrum = 20 * np.log(np.abs(fshift))
         pil_image = Image.fromarray(magnitude_spectrum, mode='RGB')
 
         return pil_image
