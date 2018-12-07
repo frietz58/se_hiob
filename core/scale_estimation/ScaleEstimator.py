@@ -34,6 +34,8 @@ class ScaleEstimator():
         self.box_history = []
         self.sample = None
         self.filter_history = []
+        self.scale_filter = []
+
 
         #configuration
         self.use_scale_estimation = None
@@ -58,6 +60,18 @@ class ScaleEstimator():
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
             print("Scale Estimator has been configured")
+
+    def handle_initial_frame(self, frame, sample):
+        """
+        :param frame: the 0th frame
+        :return:
+        """
+        self.frame = frame
+        self.sample = sample
+        current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+
+
+
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
@@ -90,7 +104,7 @@ class ScaleEstimator():
 
             logger.info("starting scale estimation. Approach: Correlation Filter")
 
-            self.create_fourier_rep(self.tracker, self.frame)
+            self.generate_scaled_filter()
             final_candidate = frame.predicted_position
             logger.info("finished scale estimation")
         else:
@@ -224,13 +238,24 @@ class ScaleEstimator():
         # get current frame and bring it into the fourier domain
         current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
         cv2_in_f = np.fft.fft2(current_cv2_im)
+
+        #fshift = np.fft.fftshift(cv2_in_f)
+        #magnitude_spectrum = 20*np.log(np.abs(fshift))
+        #magnitude_spectrum = np.asarray(magnitude_spectrum, dtype=np.uint8)
+        #np.save('mag_spec', magnitude_spectrum)
+
+        cv2_back = np.fft.ifft2(cv2_in_f)
+        cv2_back = np.abs(cv2_back)
+        np.save('img_back',  cv2_back)
+
         # cv2_roi = current_cv2_im[frame.roi.x:frame.roi.x + frame.roi.w, frame.roi.y:frame.roi.y + frame.roi.h]
 
         # build synthetic img
         snth_filter_output = np.zeros((np.shape(frame.capture_image)[0], np.shape(frame.capture_image)[1]))
 
         # put 2d guassian where the object is
-        gauss = self.create_2d_gaussian_kernel(5, 2)
+        gauss = self.create_2d_gaussian_kernel(frame.predicted_position.width/2, 2)
+        #gauss = self.create_2d_gaussian_kernel(5, 2)
         x_coord = round(frame.predicted_position.centerx - (np.shape(gauss)[0] / 2))
         y_coord = round(frame.predicted_position.centery - (np.shape(gauss)[1] / 2))
         snth_filter_output[
@@ -243,6 +268,10 @@ class ScaleEstimator():
         # get filter output in the fourier domain
         output_in_f = np.fft.fft2(snth_filter_output)
 
+        #output_back = np.fft.ifft2(output_in_f)
+        #output_back = np.abs(output_back)
+        #np.save('output_back', output_back)
+
         # now we can solve for the filter like this: filter = snth_output/input_img
         filter = np.divide(output_in_f, cv2_in_f)
         con_filter = np.conjugate(filter)
@@ -250,50 +279,15 @@ class ScaleEstimator():
         abs_filter = np.abs(spatial_filter)
         np.save('spatial_filter', abs_filter)
 
-        self.filter_history.append(abs_filter)
+        #self.filter_history.append(abs_filter)
 
-        self.build_avg_filter()
-
-        # hadamard product (elementwise multiplication)
-        had = np.multiply(cv2_in_f, output_in_f)
-
-
-        #im = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0]
-        #im = np.asanyarray((self.image_path))
-        #img = frame.capture_image
-        #np.save('cap', img)
-
-        # Bring the image into the frequency domain and shift it, so that the zero frequency component (dc compoennt) is
-        # at the center of the image, instead of top left
-        # Then find the magnitude spectrum ?
-        # roi_in_fourier = np.fft.fft2(cv2_roi)
-
-
-        #np.save('mag_spec', magnitude_spectrum)
+        #self.build_avg_filter()
 
         #x_coord_on_roi = round(frame.predicted_position.x - frame.roi.x + (np.shape(gauss)[0] / 2))
         #y_coord_on_roi = round(frame.predicted_position.y - frame.roi.y + (np.shape(gauss)[1] / 2))
-
         #snth_filter[x_coord_on_roi:x_coord_on_roi + gauss.shape[0], y_coord_on_roi:y_coord_on_roi + gauss.shape[1]] = gauss
 
 
-        #plt.interactive(True)
-        #plt.imshow(magnitude_spectrum, cmap='gray')
-        #plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
-        #plt.show(block=True)
-        #plt.show()
-
-
-        # apply filter/do stuff in frequency domain
-        #rows = im.shape[0]
-        #cols = im.shape[1]
-        #crow, ccol = rows / 2, cols / 2
-        #fshift[int(crow - 30): int(crow + 30), int(ccol - 30):int(ccol + 30)] = 0
-
-        # bring the image back into the spaial domain
-        #f_ishift = np.fft.ifftshift(fshift)
-        #img_back = np.fft.ifft2(f_ishift)
-        #img_back = np.abs(img_back)
 
         # create a pil image that can be seen in the gui output
         fshift = np.fft.fftshift(cv2_in_f)
@@ -323,13 +317,60 @@ class ScaleEstimator():
 
     def build_avg_filter(self):
 
-        if len(self.filter_history) > 9:
+        if len(self.filter_history) > 10:
             self.avg_filter = np.zeros(np.shape(self.filter_history[0]))
             for filter in self.filter_history:
                 self.avg_filter = np.add(self.avg_filter, filter)
 
             self.avg_filter = np.divide(self.avg_filter, len(self.filter_history))
-
+            self.avg_filter = np.fft.ifft2(self.avg_filter)
+            self.avg_filter = np.abs(self.avg_filter)
             np.save('avg_filter', self.avg_filter)
 
         return None
+
+    def generate_scaled_filter(self):
+
+        self.sample = self.tracker.current_sample
+
+        # number_scales should always be odd, so that an equal amount is smaller and bigger and it contains 1
+        scale_factors = np.linspace(0.5, 1.5, num=self.number_scales)
+
+        for factor in scale_factors:
+
+            # create patch centered around target object
+            scaled_width = int(round(self.frame.predicted_position.width * factor))
+            scaled_height = int(round(self.frame.predicted_position.height * factor))
+
+            current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+            im_x_coord = int(round(self.frame.predicted_position.centerx - scaled_width / 2))
+            im_y_coord = int(round(self.frame.predicted_position.centery - scaled_height / 2))
+            patch = current_cv2_im[
+                im_y_coord: im_y_coord + scaled_height,
+                im_x_coord: im_x_coord + scaled_width]
+            np.save('im_patch', patch)
+
+            #self.images_patches.append(patch)
+
+            # create filter output (so that we can later solve for the actual filter)
+            snth_filter_output = np.zeros((np.shape(patch)[0], np.shape(patch)[1]))
+
+            #create 2d guassian
+            gaussian = self.create_2d_gaussian_kernel(5, 2)
+
+            # put gaussian at center of output/object
+            #TODO make sure its actually in the center
+            patch_x_coord = (round(np.shape(patch)[0] / 2) - round(np.shape(gaussian)[0] / 2))
+            patch_y_coord = (round(np.shape(patch)[1] / 2) - round(np.shape(gaussian)[1] / 2))
+            snth_filter_output[
+            patch_y_coord: patch_y_coord + np.shape(gaussian)[1],
+            patch_x_coord: patch_x_coord + np.shape(gaussian)[0]
+            ] = gaussian
+            np.save('patch_with_gauss', snth_filter_output)
+
+            # bring both the patch and the filter output into the fourier domain and solve for filter
+            patch_in_f = np.fft.fft2(patch)
+            output_in_f = np.fft.fft2(snth_filter_output)
+            filter = np.divide(output_in_f, patch_in_f)
+
+            self.scale_filter.append([factor, filter])
