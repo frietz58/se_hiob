@@ -33,6 +33,7 @@ class ScaleEstimator():
         self.tracker = None
         self.box_history = []
         self.sample = None
+        self.filter_history = []
 
         #configuration
         self.use_scale_estimation = None
@@ -226,22 +227,35 @@ class ScaleEstimator():
         # cv2_roi = current_cv2_im[frame.roi.x:frame.roi.x + frame.roi.w, frame.roi.y:frame.roi.y + frame.roi.h]
 
         # build synthetic img
-        snth_filter = np.zeros((np.shape(frame.capture_image)[0], np.shape(frame.capture_image)[1]))
+        snth_filter_output = np.zeros((np.shape(frame.capture_image)[0], np.shape(frame.capture_image)[1]))
 
-        # put 2d guassian at center of object
+        # put 2d guassian where the object is
         gauss = self.create_2d_gaussian_kernel(5, 2)
         x_coord = round(frame.predicted_position.centerx - (np.shape(gauss)[0] / 2))
         y_coord = round(frame.predicted_position.centery - (np.shape(gauss)[1] / 2))
-        snth_filter[
-            x_coord: x_coord + gauss.shape[0],
-            y_coord: y_coord + gauss.shape[1]
+        snth_filter_output[
+            y_coord: y_coord + gauss.shape[0],
+            x_coord: x_coord + gauss.shape[1]
         ] = gauss
 
-        # get snth_filter in the fourier domain
-        filter_in_f = np.fft.fft2(snth_filter)
+        np.save('output', snth_filter_output)
+
+        # get filter output in the fourier domain
+        output_in_f = np.fft.fft2(snth_filter_output)
+
+        # now we can solve for the filter like this: filter = snth_output/input_img
+        filter = np.divide(output_in_f, cv2_in_f)
+        con_filter = np.conjugate(filter)
+        spatial_filter = np.fft.ifft2(con_filter)
+        abs_filter = np.abs(spatial_filter)
+        np.save('spatial_filter', abs_filter)
+
+        self.filter_history.append(abs_filter)
+
+        self.build_avg_filter()
 
         # hadamard product (elementwise multiplication)
-        had = np.multiply(cv2_in_f, filter_in_f)
+        had = np.multiply(cv2_in_f, output_in_f)
 
 
         #im = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0]
@@ -305,6 +319,17 @@ class ScaleEstimator():
                     frame.predicted_position.height)
         ))
 
+        return None
 
+    def build_avg_filter(self):
 
+        if len(self.filter_history) > 9:
+            self.avg_filter = np.zeros(np.shape(self.filter_history[0]))
+            for filter in self.filter_history:
+                self.avg_filter = np.add(self.avg_filter, filter)
 
+            self.avg_filter = np.divide(self.avg_filter, len(self.filter_history))
+
+            np.save('avg_filter', self.avg_filter)
+
+        return None
