@@ -200,6 +200,7 @@ class Tracking(object):
 
         self.tracker.pursuer.set_initial_position(self.initial_frame.previous_position)
         self.tracker.roi_calculator.set_initial_position(self.initial_frame.previous_position)
+        self.tracker.estimator.handle_initial_frame(self.current_frame, self.sample)
 
     async def _get_next_sample_frame(self):
         frame = Frame(tracking=self, number=self.sample.current_frame_id + 1, size=None)

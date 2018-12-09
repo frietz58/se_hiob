@@ -34,7 +34,7 @@ class ScaleEstimator():
         self.box_history = []
         self.sample = None
         self.filter_history = []
-        self.scale_filter = []
+        self.scaled_filters = []
 
 
         #configuration
@@ -63,15 +63,47 @@ class ScaleEstimator():
 
     def handle_initial_frame(self, frame, sample):
         """
+        :param sample: the current tracking sequence
         :param frame: the 0th frame
         :return:
         """
         self.frame = frame
         self.sample = sample
+
+        # create patch centered around target object (factor is 1, we know targets exact position and scale)
+        scaled_width = int(round(self.frame.predicted_position.width * 1))
+        scaled_height = int(round(self.frame.predicted_position.height * 1))
+
         current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+        im_x_coord = int(round(self.frame.predicted_position.centerx - scaled_width / 2))
+        im_y_coord = int(round(self.frame.predicted_position.centery - scaled_height / 2))
+        patch = current_cv2_im[
+                im_y_coord: im_y_coord + scaled_height,
+                im_x_coord: im_x_coord + scaled_width]
+        np.save('initial_patch', patch)
 
+        # create filter output (so that we can later solve for the actual filter)
+        snth_filter_output = np.zeros((np.shape(patch)[0], np.shape(patch)[1]))
 
+        # create 2d guassian
+        gaussian = self.create_2d_gaussian_kernel(5, 2)
 
+        # put gaussian at center of output/object
+        # TODO make sure its actually in the center
+        patch_x_coord = (round(np.shape(patch)[0] / 2) - round(np.shape(gaussian)[0] / 2))
+        patch_y_coord = (round(np.shape(patch)[1] / 2) - round(np.shape(gaussian)[1] / 2))
+        snth_filter_output[
+        patch_y_coord: patch_y_coord + np.shape(gaussian)[1],
+        patch_x_coord: patch_x_coord + np.shape(gaussian)[0]
+        ] = gaussian
+        np.save('patch_with_gauss', snth_filter_output)
+
+        # bring both the patch and the filter output into the fourier domain and solve for filter
+        patch_in_f = np.fft.fft2(patch)
+        output_in_f = np.fft.fft2(snth_filter_output)
+        filter = np.divide(output_in_f, patch_in_f)
+
+        self.scaled_filters.append({'factor': 1, 'filter': filter, 'size': (scaled_width, scaled_height)})
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
@@ -85,6 +117,7 @@ class ScaleEstimator():
         """
 
         self.frame = frame
+        final_candidate = None
 
         # If scale estimation has been disabled in configuration, return unscaled bounding box
         if not self.use_scale_estimation:
@@ -104,8 +137,11 @@ class ScaleEstimator():
 
             logger.info("starting scale estimation. Approach: Correlation Filter")
 
-            self.generate_scaled_filter()
+            scaled_filters = self.generate_scaled_filter()
             final_candidate = frame.predicted_position
+            best_filter = self.evaluate_scaled_filters(scaled_filters)
+            final_candidate = self.scale_prediction(best_filter, frame)
+
             logger.info("finished scale estimation")
         else:
             logger.critical("No implementation for approach in configuration")
@@ -183,7 +219,6 @@ class ScaleEstimator():
         size, the cnn output is 48x48
         :param feature_mask: the consolidated feature mask containing pixel values for how likely they belong to the
         object
-        :param roi: the region of interest
         :return: the quality of the candidate based on its size
         """
 
@@ -330,11 +365,17 @@ class ScaleEstimator():
         return None
 
     def generate_scaled_filter(self):
+        """
+        generates the image patches with different scale levels centered around the object and calculates the filters
+        describing each patch.
+        :return: An array with the filters for the different scale levels and the corresponding scale factors.
+        """
 
         self.sample = self.tracker.current_sample
 
         # number_scales should always be odd, so that an equal amount is smaller and bigger and it contains 1
         scale_factors = np.linspace(0.5, 1.5, num=self.number_scales)
+        locale_scaled_factors = []
 
         for factor in scale_factors:
 
@@ -350,7 +391,10 @@ class ScaleEstimator():
                 im_x_coord: im_x_coord + scaled_width]
             np.save('im_patch', patch)
 
-            #self.images_patches.append(patch)
+            # resize the patches so that they are all of the size of the prev prediction
+            patch = cv2.resize(patch, dsize=(
+                np.shape(self.scaled_filters[self.sample.current_frame_id - 1]['filter'])[1],
+                np.shape(self.scaled_filters[self.sample.current_frame_id - 1]['filter'])[0]))
 
             # create filter output (so that we can later solve for the actual filter)
             snth_filter_output = np.zeros((np.shape(patch)[0], np.shape(patch)[1]))
@@ -373,4 +417,46 @@ class ScaleEstimator():
             output_in_f = np.fft.fft2(snth_filter_output)
             filter = np.divide(output_in_f, patch_in_f)
 
-            self.scale_filter.append([factor, filter])
+            locale_scaled_factors.append({'factor': factor, 'filter': filter, 'size': (scaled_width, scaled_height)})
+
+        return locale_scaled_factors
+
+    def mse(self, a, b):
+        """
+        :param a: array one
+        :param b: array two
+        :return: the mse between the two array. Arrays must be os same dimensions
+        """
+        err = np.sum((a.astype("float") - b.astype("float")) ** 2)
+        err /= float(a.shape[0] * b.shape[1])
+
+        return err
+
+    def evaluate_scaled_filters(self, filters):
+
+        prev_best = self.scaled_filters[self.tracker.current_sample.current_frame_id - 1]
+        mse_filters = []
+
+        for filter_dict in filters:
+            mse = self.mse(filter_dict['filter'], prev_best['filter'])
+            mse_filters.append({'mse': mse, 'filter': filter_dict})
+            smallest_mse = 1000000
+            best_pair = None
+
+        for pair in mse_filters:
+            if pair['mse'] < smallest_mse:
+                smallest_mse = pair['mse']
+                best_pair = pair
+
+        return best_pair['filter']
+
+    def scale_prediction(self, filter, frame):
+        scaled_width = int(round(self.frame.predicted_position.width * filter['factor']))
+        scaled_height = int(round(self.frame.predicted_position.height * filter['factor']))
+
+        scaled_box = Rect(frame.predicted_position.x, frame.predicted_position.y, scaled_width, scaled_height)
+        self.scaled_filters.append(filter)
+
+        return scaled_box
+
+
