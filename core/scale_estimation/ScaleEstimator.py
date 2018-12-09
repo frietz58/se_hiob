@@ -43,6 +43,7 @@ class ScaleEstimator():
         self.inner_punish_threshold = None
         self.inner_punish_factor = None
         self.outer_punish_threshold = None
+        self.scale_factor_range = None
 
     def setup(self, tracker=None):
         self.tracker = tracker
@@ -56,6 +57,7 @@ class ScaleEstimator():
         self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
         self.number_scales = self.econf['number_scales']
+        self.scale_factor_range = self.econf['scale_factor_range']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -374,7 +376,7 @@ class ScaleEstimator():
         self.sample = self.tracker.current_sample
 
         # number_scales should always be odd, so that an equal amount is smaller and bigger and it contains 1
-        scale_factors = np.linspace(0.5, 1.5, num=self.number_scales)
+        scale_factors = np.linspace(self.scale_factor_range[0], self.scale_factor_range[1], num=self.number_scales)
         locale_scaled_factors = []
 
         for factor in scale_factors:

@@ -102,6 +102,7 @@ scale_estimator:
   inner_punish_threshold: 0.05 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   inner_punish_factor: 0.01 # the factor with which the inner punish score gets multiplied to decrease its impact
   outer_punish_threshold: 0.5 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
+  scale_factor_range: [0.9, 1.1] # the range for which the number_scales are linspaced between
 
 # = tracking = 
 # which samples shall be tracked? Accepts samples, data sets, and data collections
