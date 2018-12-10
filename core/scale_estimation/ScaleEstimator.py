@@ -6,14 +6,15 @@ Created on 2018-11-17
 
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
+import concurrent
 import logging
-from scipy.ndimage import gaussian_filter
 import scipy.stats as st
 import cv2
-import transitions
+from multiprocessing import Pool
+
+
 from matplotlib import pyplot as plt
-import pandas as pd
 
 from ..Rect import Rect
 
@@ -31,11 +32,16 @@ class ScaleEstimator():
 
         self.frame = None
         self.tracker = None
-        self.box_history = []
+        self.initial_size = None
         self.sample = None
+        self.conj_G = None
+        self.executor = None
+        self.worker_count = None
         self.filter_history = []
         self.scaled_filters = []
-
+        self.box_history = []
+        self.dsst_numerator_a = []
+        self.dsst_denominator_b = []
 
         #configuration
         self.use_scale_estimation = None
@@ -44,6 +50,9 @@ class ScaleEstimator():
         self.inner_punish_factor = None
         self.outer_punish_threshold = None
         self.scale_factor_range = None
+        self.scale_factor = None
+        self.learning_rate = None
+        self.regularization = None
 
     def setup(self, tracker=None):
         self.tracker = tracker
@@ -58,54 +67,13 @@ class ScaleEstimator():
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
         self.number_scales = self.econf['number_scales']
         self.scale_factor_range = self.econf['scale_factor_range']
+        self.scale_factor = self.econf['scale_factor']
+        self.learning_rate = self.econf['ln']
+        self.regularization = self.econf['reg']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
             print("Scale Estimator has been configured")
-
-    def handle_initial_frame(self, frame, sample):
-        """
-        :param sample: the current tracking sequence
-        :param frame: the 0th frame
-        :return:
-        """
-        self.frame = frame
-        self.sample = sample
-
-        # create patch centered around target object (factor is 1, we know targets exact position and scale)
-        scaled_width = int(round(self.frame.predicted_position.width * 1))
-        scaled_height = int(round(self.frame.predicted_position.height * 1))
-
-        current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
-        im_x_coord = int(round(self.frame.predicted_position.centerx - scaled_width / 2))
-        im_y_coord = int(round(self.frame.predicted_position.centery - scaled_height / 2))
-        patch = current_cv2_im[
-                im_y_coord: im_y_coord + scaled_height,
-                im_x_coord: im_x_coord + scaled_width]
-        np.save('initial_patch', patch)
-
-        # create filter output (so that we can later solve for the actual filter)
-        snth_filter_output = np.zeros((np.shape(patch)[0], np.shape(patch)[1]))
-
-        # create 2d guassian
-        gaussian = self.create_2d_gaussian_kernel(5, 2)
-
-        # put gaussian at center of output/object
-        # TODO make sure its actually in the center
-        patch_x_coord = (round(np.shape(patch)[0] / 2) - round(np.shape(gaussian)[0] / 2))
-        patch_y_coord = (round(np.shape(patch)[1] / 2) - round(np.shape(gaussian)[1] / 2))
-        snth_filter_output[
-        patch_y_coord: patch_y_coord + np.shape(gaussian)[1],
-        patch_x_coord: patch_x_coord + np.shape(gaussian)[0]
-        ] = gaussian
-        np.save('patch_with_gauss', snth_filter_output)
-
-        # bring both the patch and the filter output into the fourier domain and solve for filter
-        patch_in_f = np.fft.fft2(patch)
-        output_in_f = np.fft.fft2(snth_filter_output)
-        filter = np.divide(output_in_f, patch_in_f)
-
-        self.scaled_filters.append({'factor': 1, 'filter': filter, 'size': (scaled_width, scaled_height)})
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
@@ -127,7 +95,6 @@ class ScaleEstimator():
             return frame.predicted_position
 
         if self.approach == 'candidates':
-
             logger.info("starting scale estimation. Approach: Candidate Generation")
 
             scaled_candidates = self.generate_scaled_candidates(frame)
@@ -135,20 +102,107 @@ class ScaleEstimator():
 
             logger.info("finished scale estimation")
 
-        elif self.approach == 'correlation':
-
+        elif self.approach == 'mse':
             logger.info("starting scale estimation. Approach: Correlation Filter")
-
             scaled_filters = self.generate_scaled_filter()
             final_candidate = frame.predicted_position
             best_filter = self.evaluate_scaled_filters(scaled_filters)
             final_candidate = self.scale_prediction(best_filter, frame)
 
             logger.info("finished scale estimation")
+
+        elif self.approach == 'dsst':
+            logger.info("starting scale estimation. Approach: DSST")
+            scaled_samples = self.generate_scaled_patches()
+            self.correlation_score_helper(scaled_samples)
+            final_candidate = frame.predicted_position
+            logger.info("finished scale estimation")
+
         else:
             logger.critical("No implementation for approach in configuration")
 
         return final_candidate
+
+    def handle_initial_frame(self, frame, sample):
+        """
+        :param sample: the current tracking sequence
+        :param frame: the 0th frame
+        :return:
+        """
+        self.frame = frame
+        self.sample = sample
+
+        if self.approach == 'mse':
+            # create patch centered around target object (factor is 1, we know targets exact position and scale)
+            scaled_width = int(round(self.frame.predicted_position.width * 1))
+            scaled_height = int(round(self.frame.predicted_position.height * 1))
+
+            current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+            im_x_coord = int(round(self.frame.predicted_position.centerx - scaled_width / 2))
+            im_y_coord = int(round(self.frame.predicted_position.centery - scaled_height / 2))
+            patch = current_cv2_im[
+                    im_y_coord: im_y_coord + scaled_height,
+                    im_x_coord: im_x_coord + scaled_width]
+            np.save('initial_patch', patch)
+
+            # create filter output (so that we can later solve for the actual filter)
+            snth_filter_output = np.zeros((np.shape(patch)[0], np.shape(patch)[1]))
+
+            # create 2d guassian
+            gaussian = self.create_2d_gaussian_kernel(5, 2)
+
+            # put gaussian at center of output/object
+            # TODO make sure its actually in the center
+            patch_x_coord = (round(np.shape(patch)[0] / 2) - round(np.shape(gaussian)[0] / 2))
+            patch_y_coord = (round(np.shape(patch)[1] / 2) - round(np.shape(gaussian)[1] / 2))
+            snth_filter_output[
+            patch_y_coord: patch_y_coord + np.shape(gaussian)[1],
+            patch_x_coord: patch_x_coord + np.shape(gaussian)[0]
+            ] = gaussian
+            np.save('patch_with_gauss', snth_filter_output)
+
+            # bring both the patch and the filter output into the fourier domain and solve for filter
+            patch_in_f = np.fft.fft2(patch)
+            output_in_f = np.fft.fft2(snth_filter_output)
+            filter = np.divide(output_in_f, patch_in_f)
+
+            self.scaled_filters.append({'factor': 1, 'filter': filter, 'size': (scaled_width, scaled_height)})
+
+        elif self.approach == 'dsst':
+            current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+            self.initial_size = frame.predicted_position
+
+            # create img patch of exact object
+            target_patch = current_cv2_im[
+                           self.frame.predicted_position.x:
+                           self.frame.predicted_position.x + self.frame.predicted_position.width,
+                           self.frame.predicted_position.y:
+                           self.frame.predicted_position.x + self.frame.predicted_position.height
+                           ]
+
+            # get the hog feature vector of the patch, aspect ration needs to be 1:2
+            resized_patch = cv2.resize(target_patch, dsize=(64, 128))
+            hog = self.extract_hog_features(resized_patch)
+            HOG = np.fft.fft(hog)
+            conj_Hog = np.conj(HOG)
+
+            # create target 1-d gaussian: TODO wie genau???
+            #g = np.random.normal(loc=1, scale=1/16 * self.number_scales, size=(64 * 128))
+            g = np.random.normal(loc=1, scale=1 / 16 * self.number_scales, size=10)
+            G = np.fft.fft(g) #here
+            self.conj_G = np.conj(G)
+
+            # compute numerator and demominator
+            a = np.multiply(self.learning_rate, np.multiply(self.conj_G, HOG))
+            self.dsst_numerator_a.append(a)
+
+            b = np.multiply(self.learning_rate, np.multiply(conj_Hog, HOG))
+            self.dsst_denominator_b.append(b)
+
+
+        elif self.approach == 'candidates':
+            # nothing needs to be done
+            logger.info('')
 
     def generate_scaled_candidates(self, frame):
         """
@@ -338,17 +392,22 @@ class ScaleEstimator():
         Writes the final (scaled or unscaled) box from the current frame to the execution log
         :param frame: the current frame
         """
-        self.box_history.append([frame.number, frame.predicted_position.x, frame.predicted_position.y, frame.predicted_position.width, frame.predicted_position.height])
+        if frame.number is not 0:
+            self.box_history.append([frame.number,
+                                     frame.predicted_position.x,
+                                     frame.predicted_position.y,
+                                     frame.predicted_position.width,
+                                     frame.predicted_position.height])
 
-        logger.info("Box at frame{0}: size: {5}x: {1}, y: {2}, width: {3}, height: {4}".format(
-            frame.number,
-            frame.predicted_position.x,
-            frame.predicted_position.y,
-            frame.predicted_position.width,
-            frame.predicted_position.height, (
-                    frame.predicted_position.width *
-                    frame.predicted_position.height)
-        ))
+            logger.info("Box at frame{0}: size: {5}x: {1}, y: {2}, width: {3}, height: {4}".format(
+                frame.number,
+                frame.predicted_position.x,
+                frame.predicted_position.y,
+                frame.predicted_position.width,
+                frame.predicted_position.height, (
+                        frame.predicted_position.width *
+                        frame.predicted_position.height)
+            ))
 
         return None
 
@@ -386,12 +445,18 @@ class ScaleEstimator():
             scaled_height = int(round(self.frame.predicted_position.height * factor))
 
             current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+
+            self.extract_hog_features(current_cv2_im)
+
             im_x_coord = int(round(self.frame.predicted_position.centerx - scaled_width / 2))
             im_y_coord = int(round(self.frame.predicted_position.centery - scaled_height / 2))
             patch = current_cv2_im[
                 im_y_coord: im_y_coord + scaled_height,
                 im_x_coord: im_x_coord + scaled_width]
             np.save('im_patch', patch)
+
+            #resized_patch = cv2.resize(patch, dsize=(64, 128))
+            #self.extract_hog_features(resized_patch)
 
             # resize the patches so that they are all of the size of the prev prediction
             patch = cv2.resize(patch, dsize=(
@@ -429,13 +494,14 @@ class ScaleEstimator():
         :param b: array two
         :return: the mse between the two array. Arrays must be os same dimensions
         """
+        a = np.abs(a)
+        b = np.abs(b)
         err = np.sum((a.astype("float") - b.astype("float")) ** 2)
         err /= float(a.shape[0] * b.shape[1])
 
         return err
 
     def evaluate_scaled_filters(self, filters):
-
         prev_best = self.scaled_filters[self.tracker.current_sample.current_frame_id - 1]
         mse_filters = []
 
@@ -461,4 +527,81 @@ class ScaleEstimator():
 
         return scaled_box
 
+    def extract_hog_features(self, cv2_arr):
+        hog = cv2.HOGDescriptor()
+        hog_features = hog.compute(cv2_arr)
+
+        return hog_features
+
+    def generate_scaled_patches(self):
+
+        scale_sample = []
+        upper_factor_limit = 1 + ((self.number_scales - 1) / 2) * 0.02 # TODO take this from the configuration
+        bottom_factor_limit = 1 - ((self.number_scales - 1) / 2) * 0.02
+        factor_range = np.linspace(bottom_factor_limit, upper_factor_limit, self.number_scales)
+
+        for factor in factor_range:
+
+            # create patch centered around target object and resize it to a fixed size
+            scaled_width = int(round(self.frame.predicted_position.width * factor))
+            scaled_height = int(round(self.frame.predicted_position.height * factor))
+
+            current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
+
+            im_x_coord = int(round(self.frame.predicted_position.centerx - scaled_width / 2))
+            im_y_coord = int(round(self.frame.predicted_position.centery - scaled_height / 2))
+
+            # make sure the coordinate are within the image
+            if im_x_coord > 0 and im_y_coord > 0:
+                patch = current_cv2_im[
+                        im_y_coord: im_y_coord + scaled_height,
+                        im_x_coord: im_x_coord + scaled_width]
+                patch = cv2.resize(patch, (64, 128))
+                np.save('im_patch', patch)
+            else:
+                logger.info('skipping patch because invalid position')
+
+            # extract visual HOG features
+            feat_vec = self.extract_hog_features(current_cv2_im)
+
+            scale_sample.append({'factor': factor, 'img_patch': patch, 'features': feat_vec})
+
+        return scale_sample
+
+    def correlation_score_helper(self, scale_sample):
+
+        #with concurrent.futures.ProcessPoolExecutor() as executor:
+            #executor.map(self.multi_process_calc, scale_sample)
+
+        for prev_a, curr_a in zip(self.dsst_numerator_a[self.frame.number - 1], scale_sample):
+            a = np.multiply((1 - self.learning_rate), prev_a)
+            step0 = np.multiply(self.conj_G, curr_a['features'])
+            step1 = np.multiply(self.learning_rate, step0)
+            a = np.add(a, step1)
+
+        for prev_b, curr_b in zip(self.dsst_denominator_b[self.frame.number - 1], scale_sample):
+            b = np.multiply((1 - self.learning_rate), prev_b)
+            step0 = np.multiply(np.conj(scale_sample['features']), scale_sample['features'])
+            step1 = np.multiply(self.learning_rate, step0)
+            b = np.add(b, step1)
+
+        self.dsst_numerator_a.append(a),
+        self.dsst_denominator_b.append(b)
+
+    def multi_process_calc(self, scale_sample):
+
+        for prev_a, curr_a in zip(self.dsst_numerator_a[self.frame.number - 1], scale_sample):
+            a = np.multiply((1 - self.learning_rate), prev_a)
+            step0 = np.multiply(self.conj_G, curr_a['features'])
+            step1 = np.multiply(self.learning_rate, step0)
+            a = np.add(a, step1)
+
+        for prev_b, curr_b in zip(self.dsst_denominator_b[self.frame.number - 1], scale_sample):
+            b = np.multiply((1 - self.learning_rate), prev_b)
+            step0 = np.multiply(np.conj(scale_sample['features']), scale_sample['features'])
+            step1 = np.multiply(self.learning_rate, step0)
+            b = np.add(b, step1)
+
+        self.dsst_numerator_a.append(a),
+        self.dsst_denominator_b.append(b)
 
