@@ -12,6 +12,7 @@ import logging
 import scipy.stats as st
 import cv2
 from multiprocessing import Pool
+from . import DsstApproach
 
 
 from matplotlib import pyplot as plt
@@ -21,7 +22,7 @@ from ..Rect import Rect
 logger = logging.getLogger(__name__)
 
 
-class ScaleEstimator():
+class ScaleEstimator:
 
     #TODO make it a state machine
 
@@ -556,7 +557,7 @@ class ScaleEstimator():
                 patch = current_cv2_im[
                         im_y_coord: im_y_coord + scaled_height,
                         im_x_coord: im_x_coord + scaled_width]
-                patch = cv2.resize(patch, (64, 128))
+                patch = cv2.resize(patch, (32, 128))
                 np.save('im_patch', patch)
             else:
                 logger.info('skipping patch because invalid position')
