@@ -104,8 +104,10 @@ scale_estimator:
 
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls
-  reg: 0.01 # regularization param
-  ln: 0.025 # learning rate
+  scale_sigma_factor: 0.25
+  lambda: 1e-2
+  learning_rate: 0.025
+  reg: 0.01
 
   #mse params:
   scale_factor_range: [0.95, 1.05] # the range for which the number_scales are linspaced between

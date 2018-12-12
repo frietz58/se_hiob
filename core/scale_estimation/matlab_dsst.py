@@ -2,11 +2,11 @@ import numpy as np
 import cv2
 
 
-class DsstApproach:
+class DsstEstimator:
 
     def __init__(self):
 
-        self.padding = None
+        self.padding = 1.0
         self.nScales = None
         self.scale_step = None
         self.scale_sigma_factor = None
@@ -19,21 +19,20 @@ class DsstApproach:
         self.pos = None
         self.init_target_sz = None
         self.base_target_sz = None
+        self.frame = None
 
-    def setup(self, padding, n_scales, scale_step, scale_sigma_factor, target_size, img_files, lam):
+    def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, lam):
 
-        self.padding = padding
         self.nScales = n_scales
         self.scale_step = scale_step
         self.scale_sigma_factor = scale_sigma_factor
-        self.target_sz = target_size
         self.img_files = img_files
         self.lam = lam
 
-    def execute_scale_estimation(self, target_sz, pos):
+    def execute_scale_estimation(self, frame):
 
         # target size at scale = 1
-        self.base_target_sz = target_sz
+        self.base_target_sz = frame.predicted_position
 
         sz = np.floor(self.base_target_sz * (1 + self.padding));
 
@@ -82,7 +81,7 @@ class DsstApproach:
             if frame > 1:
 
                 # extract the test sample feature map for the scale filter
-                xs = self.get_scale_sample(im, pos, self.base_target_sz, currentScaleFactor * scale_factors, scale_window,
+                xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz, currentScaleFactor * scale_factors, scale_window,
                                       scale_model_sz)
 
                 # calculate the correlation response of the scale filter
@@ -100,7 +99,7 @@ class DsstApproach:
                     currentScaleFactor = max_scale_factor;
 
                 # extract the training sample feature map for the scale filter
-                xs = self.get_scale_sample(im, pos, self.base_target_sz, currentScaleFactor * scale_factors, scale_window,
+                xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz, currentScaleFactor * scale_factors, scale_window,
                                       scale_model_sz)
 
                 # calculate the scale filter update
@@ -166,4 +165,9 @@ class DsstApproach:
             out[:, s] = np.multipy(temp[:, :], scale_window(s))
 
         return out
+
+    def test(self):
+        print("Module import works")
+
+
 

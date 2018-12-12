@@ -1,2 +1,2 @@
 from .ScaleEstimator import ScaleEstimator
-from .matlab_dsst import DsstApproach
+from .matlab_dsst import DsstEstimator

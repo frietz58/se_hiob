@@ -12,8 +12,7 @@ import logging
 import scipy.stats as st
 import cv2
 from multiprocessing import Pool
-from . import DsstApproach
-
+from .matlab_dsst import DsstEstimator
 
 from matplotlib import pyplot as plt
 
@@ -30,6 +29,7 @@ class ScaleEstimator:
 
         self.configuration = None
         self.econf = None
+        self.dsst = DsstEstimator()
 
         self.frame = None
         self.tracker = None
@@ -38,6 +38,7 @@ class ScaleEstimator:
         self.conj_G = None
         self.executor = None
         self.worker_count = None
+        self.sample = None
         self.filter_history = []
         self.scaled_filters = []
         self.box_history = []
@@ -54,10 +55,16 @@ class ScaleEstimator:
         self.scale_factor = None
         self.learning_rate = None
         self.regularization = None
+        self.scale_sigma_factor = None
+        self.lam = None
 
-    def setup(self, tracker=None):
+    def setup(self, tracker=None, sample=None):
         self.tracker = tracker
         self.configuration = tracker.configuration
+        self.sample = sample
+
+        self.set_up_modules()
+
 
     def configure(self, configuration):
         self.econf = configuration['scale_estimator']
@@ -69,12 +76,21 @@ class ScaleEstimator:
         self.number_scales = self.econf['number_scales']
         self.scale_factor_range = self.econf['scale_factor_range']
         self.scale_factor = self.econf['scale_factor']
-        self.learning_rate = self.econf['ln']
+        self.learning_rate = self.econf['learning_rate']
         self.regularization = self.econf['reg']
+        self.scale_sigma_factor = self.econf['scale_sigma_factor']
+        self.lam = self.econf['lambda']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
             print("Scale Estimator has been configured")
+
+    def set_up_modules(self):
+        self.dsst.setup(n_scales=self.number_scales,
+                        scale_step=self.scale_factor,
+                        scale_sigma_factor=self.scale_sigma_factor,
+                        img_files=self.sample.cv2_img_cache,
+                        lam=self.lam)
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
@@ -114,9 +130,12 @@ class ScaleEstimator:
 
         elif self.approach == 'dsst':
             logger.info("starting scale estimation. Approach: DSST")
+
+            """
             scaled_samples = self.generate_scaled_patches()
             self.correlation_score_helper(scaled_samples)
             final_candidate = frame.predicted_position
+            """
             logger.info("finished scale estimation")
 
         else:
@@ -170,6 +189,8 @@ class ScaleEstimator:
             self.scaled_filters.append({'factor': 1, 'filter': filter, 'size': (scaled_width, scaled_height)})
 
         elif self.approach == 'dsst':
+
+            """
             current_cv2_im = self.sample.cv2_img_cache[self.sample.current_frame_id]
             self.initial_size = frame.predicted_position
 
@@ -199,6 +220,7 @@ class ScaleEstimator:
 
             b = np.multiply(self.learning_rate, np.multiply(conj_Hog, HOG))
             self.dsst_denominator_b.append(b)
+            """
 
 
         elif self.approach == 'candidates':
