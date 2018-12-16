@@ -154,14 +154,15 @@ class DsstEstimator:
             # extract image
             # im_patch = (im[ys, xs])  # TODO is this right?
             im_patch = im[
-                       ys - int(np.floor(patch_sz[0] / 2)):
-                       ys - int(np.floor(patch_sz[0] / 2) + patch_sz[0]),
-                       xs - int(np.floor(patch_sz[1] / 2)):
-                       xs - int(np.floor(patch_sz[1] / 2) + patch_sz[1])
+                       int(ys - np.floor(patch_sz[0] / 2)):
+                       int(ys - np.floor(patch_sz[0] / 2) + patch_sz[0]),
+                       int(xs - np.floor(patch_sz[1] / 2)):
+                       int(xs - np.floor(patch_sz[1] / 2) + patch_sz[1])
                        ]
 
             # resize image to model size
-            im_patch_resized = cv2.resize(im_patch, scale_model_sz)
+            # im_patch_resized = cv2.resize(im_patch, scale_model_sz)
+            im_patch_resized = cv2.resize(im_patch, (int(scale_model_sz[0]), int(scale_model_sz[1])))
 
             # extract scale features
             winSize = (32, 32)
