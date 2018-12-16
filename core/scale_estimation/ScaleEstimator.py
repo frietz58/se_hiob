@@ -57,6 +57,7 @@ class ScaleEstimator:
         self.regularization = None
         self.scale_sigma_factor = None
         self.lam = None
+        self.scale_model_max = None
 
     def setup(self, tracker=None, sample=None):
         self.tracker = tracker
@@ -80,6 +81,7 @@ class ScaleEstimator:
         self.regularization = self.econf['reg']
         self.scale_sigma_factor = self.econf['scale_sigma_factor']
         self.lam = self.econf['lambda']
+        self.scale_model_max = self.econf['scale_model_max']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -90,7 +92,8 @@ class ScaleEstimator:
                         scale_step=self.scale_factor,
                         scale_sigma_factor=self.scale_sigma_factor,
                         img_files=self.sample.cv2_img_cache,
-                        lam=self.lam)
+                        lam=self.lam,
+                        scale_model_max=self.scale_model_max)
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
@@ -130,7 +133,7 @@ class ScaleEstimator:
 
         elif self.approach == 'dsst':
             logger.info("starting scale estimation. Approach: DSST")
-
+            self.dsst.execute_scale_estimation(frame)
             """
             scaled_samples = self.generate_scaled_patches()
             self.correlation_score_helper(scaled_samples)

@@ -289,7 +289,7 @@ class SwarmPursuer(Pursuer):
             mask_scale_factor=scale_factor,
             roi=frame.roi)
 
-        self.tracker.estimator.append_to_history(frame)
+        #self.tracker.estimator.append_to_history(frame)
 
 
         # quality of prediction needs to be absolute, so we normalise it with

@@ -21,20 +21,24 @@ class DsstEstimator:
         self.base_target_sz = None
         self.frame = None
 
-    def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, lam):
+    def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, lam, scale_model_max):
 
         self.nScales = n_scales
         self.scale_step = scale_step
         self.scale_sigma_factor = scale_sigma_factor
         self.img_files = img_files
         self.lam = lam
+        self.scale_model_max_area = scale_model_max
 
     def execute_scale_estimation(self, frame):
 
-        # target size at scale = 1
-        self.base_target_sz = frame.predicted_position
+        self.frame = frame
 
-        sz = np.floor(self.base_target_sz * (1 + self.padding));
+        # target size at scale = 1
+        self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+        self.init_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+
+        sz = np.floor(np.multiply(self.base_target_sz, (1 + self.padding)))
 
         # desired scale filter output (gaussian shaped), bandwidth proportional to
         # number of scales
@@ -57,7 +61,7 @@ class DsstEstimator:
 
         # compute the resize dimensions used for feature extraction in the scale
         # estimation
-        scale_model_factor = 1;
+        scale_model_factor = 1
         if np.prod(self.init_target_sz) > self.scale_model_max_area:
             scale_model_factor = np.sqrt(self.scale_model_max_area / np.prod(self.init_target_sz))
 
@@ -66,65 +70,67 @@ class DsstEstimator:
         currentScaleFactor = 1
 
         # find maximum and minimum scales
-        im = cv2.imread(self.img_files[1]);
+        im = self.img_files[1]
         min_scale_factor = np.power(self.scale_step,
                                     np.rint(np.log(np.amax(np.divide(5, sz)) / np.log(self.scale_step))))
         max_scale_factor = np.power(self.scale_step,
                                     np.floor(np.log(np.amin(np.divide(
-                                        [np.shape(im, 1),
-                                         np.shape(im, 2)],
+                                        [np.shape(im)[0],
+                                         np.shape(im)[1]],
                                         self.base_target_sz))) / np.log(self.scale_step)))
 
-        for frame in len(self.img_files):
-            im = cv2.imread(self.img_files[frame])
+        im = self.img_files[frame.number]
 
-            if frame > 1:
+        if self.frame.number > 1:
 
-                # extract the test sample feature map for the scale filter
-                xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz, currentScaleFactor * scale_factors, scale_window,
-                                      scale_model_sz)
+            # extract the test sample feature map for the scale filter
+            xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz,
+                                       currentScaleFactor * scale_factors, scale_window,
+                                       scale_model_sz)
 
-                # calculate the correlation response of the scale filter
-                xsf = np.fft.fftn(xs, [], 2);  # TODO make sure this is correct
-                scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(sf_num, xsf), 1), (sf_den + self.lam))))
+            # calculate the correlation response of the scale filter
+            xsf = np.fft.fftn(xs, [], 2);  # TODO make sure this is correct
+            scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(sf_num, xsf), 1), (sf_den + self.lam))))
 
-                # find the maximum scale response
-                recovered_scale = np.nonzero(scale_response == np.amax(scale_response, 1))
+            # find the maximum scale response
+            recovered_scale = np.nonzero(scale_response == np.amax(scale_response, 1))
 
-                # update the scale
-                currentScaleFactor = currentScaleFactor * scale_factors(recovered_scale)  # TODO
-                if currentScaleFactor < min_scale_factor:
-                    currentScaleFactor = min_scale_factor;
-                elif currentScaleFactor > max_scale_factor:
-                    currentScaleFactor = max_scale_factor;
+            # update the scale
+            currentScaleFactor = currentScaleFactor * scale_factors(recovered_scale)  # TODO
+            if currentScaleFactor < min_scale_factor:
+                currentScaleFactor = min_scale_factor
+            elif currentScaleFactor > max_scale_factor:
+                currentScaleFactor = max_scale_factor
 
-                # extract the training sample feature map for the scale filter
-                xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz, currentScaleFactor * scale_factors, scale_window,
-                                      scale_model_sz)
+        # extract the training sample feature map for the scale filter
+        xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz,
+                                    currentScaleFactor * scale_factors, scale_window,
+                                    scale_model_sz)
 
-                # calculate the scale filter update
-                xsf = np.fft.fftn(xs, [], 2);
-                new_sf_num = np.multiply(ysf, np.conj(xsf))
-                new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf), 1))
+        # calculate the scale filter update
+        xsf = np.fft.fftn(xs, [], 2)
+        new_sf_num = np.multiply(ysf, np.conj(xsf))
+        new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf), 1))
 
-                if frame == 1:
-                    # first frame, train with a single image
-                    sf_den = new_sf_den;
-                    sf_num = new_sf_num;
-                else:
-                    # subsequent frames, update the model
-                    sf_den = (1 - self.learning_rate) * sf_den + self.learning_rate * new_sf_den;
-                    sf_num = (1 - self.learning_rate) * sf_num + self.learning_rate * new_sf_num;
+        if frame == 1:
+            # first frame, train with a single image
+            sf_den = new_sf_den;
+            sf_num = new_sf_num;
+        else:
+            # subsequent frames, update the model
+            sf_den = (1 - self.learning_rate) * sf_den + self.learning_rate * new_sf_den;
+            sf_num = (1 - self.learning_rate) * sf_num + self.learning_rate * new_sf_num;
 
-    def get_scale_sample(self, im, pos, scaleFactors, scale_window, scale_model_sz):
+
+    def get_scale_sample(self, im, pos, base_target_sz, scaleFactors, scale_window, scale_model_sz):
 
         # Extracts a sample for the scale filter at the current
         # location and scale.
 
         nScales = len(scaleFactors)
 
-        for s in len(nScales):
-            patch_sz = np.floor(self.base_target_sz * scaleFactors[s])
+        for s in scaleFactors:
+            patch_sz = np.floor(base_target_sz * scaleFactors[s])
 
             xs = np.floor(pos[2]) + np.arange(1, patch_sz[2] + 1) - np.floor(patch_sz[2] / 2);
             ys = np.floor(pos[1]) + np.arange(1, patch_sz[1] + 1) - np.floor(patch_sz[1] / 2);
