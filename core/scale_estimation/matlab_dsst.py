@@ -130,10 +130,13 @@ class DsstEstimator:
         nScales = len(scaleFactors)
 
         for s in scaleFactors:
-            patch_sz = np.floor(base_target_sz * scaleFactors[s])
+            patch_sz = np.floor(np.multiply(base_target_sz, s))
 
-            xs = np.floor(pos[2]) + np.arange(1, patch_sz[2] + 1) - np.floor(patch_sz[2] / 2);
-            ys = np.floor(pos[1]) + np.arange(1, patch_sz[1] + 1) - np.floor(patch_sz[1] / 2);
+            #xs = np.floor(pos.x) + np.arange(1, patch_sz[1] + 1) - np.floor(patch_sz[1] / 2)
+            #ys = np.floor(pos.y) + np.arange(1, patch_sz[0] + 1) - np.floor(patch_sz[0] / 2)
+
+            xs = np.floor(pos.x) + patch_sz[1] + 1 - np.floor(patch_sz[1] / 2)
+            ys = np.floor(pos.y) + patch_sz[0] + 1 - np.floor(patch_sz[0] / 2)
 
             # check for out - of - bounds coordinates, and set them to the values at the borders
             if xs < 1:
@@ -142,14 +145,20 @@ class DsstEstimator:
             if ys < 1:
                 ys = 1
 
-            if xs > np.shape(im)[2]:
-                xs = np.shape(im)[2]
+            if xs > np.shape(im)[0]:
+                xs = np.shape(im)[0]
 
             if ys > np.shape(im)[1]:
                 ys = np.shape(im)[1]
 
             # extract image
-            im_patch = (im[ys, xs])  # TODO is this right?
+            # im_patch = (im[ys, xs])  # TODO is this right?
+            im_patch = im[
+                       ys - int(np.floor(patch_sz[0] / 2)):
+                       ys - int(np.floor(patch_sz[0] / 2) + patch_sz[0]),
+                       xs - int(np.floor(patch_sz[1] / 2)):
+                       xs - int(np.floor(patch_sz[1] / 2) + patch_sz[1])
+                       ]
 
             # resize image to model size
             im_patch_resized = cv2.resize(im_patch, scale_model_sz)
