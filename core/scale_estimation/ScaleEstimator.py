@@ -554,6 +554,14 @@ class ScaleEstimator:
         return scaled_box
 
     def extract_hog_features(self, cv2_arr):
+        # testing
+        winSize = (32, 32)
+        blockSize = (16, 16)
+        blockStride = (8, 8)
+        cellSize = (4, 4)
+        nbins = 9
+        #hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins)
+
         hog = cv2.HOGDescriptor()
         hog_features = hog.compute(cv2_arr)
 

@@ -128,9 +128,10 @@ class DsstEstimator:
         # location and scale.
 
         nScales = len(scaleFactors)
+        first = True
 
-        for s in scaleFactors:
-            patch_sz = np.floor(np.multiply(base_target_sz, s))
+        for s in range(nScales):
+            patch_sz = np.floor(np.multiply(base_target_sz, scaleFactors[s]))
 
             #xs = np.floor(pos.x) + np.arange(1, patch_sz[1] + 1) - np.floor(patch_sz[1] / 2)
             #ys = np.floor(pos.y) + np.arange(1, patch_sz[0] + 1) - np.floor(patch_sz[0] / 2)
@@ -165,21 +166,22 @@ class DsstEstimator:
             im_patch_resized = cv2.resize(im_patch, (int(scale_model_sz[0]), int(scale_model_sz[1])))
 
             # extract scale features
-            winSize = (int(scale_model_sz[0]), int(scale_model_sz[1]))
+            # winSize = (int(scale_model_sz[0]), int(scale_model_sz[1]))
+            winSize = (32, 32)
             blockSize = (16, 16)
             blockStride = (8, 8)
-            cellSize = (8, 8)
+            cellSize = (4, 4)
             nbins = 9
             hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins)
 
             temp_hog = hog.compute(im_patch_resized)
-            temp = temp_hog[:, :, 1: 31]  # ...TODO what?
+            # temp = temp_hog[:, :, 1: 31]  # ...TODO what?
 
-            if s == 1:
-                out = np.zeros(np.size(temp), nScales, 'single')
+            if first:
+                out = np.zeros(np.size(temp_hog))
+                first = False
 
-            #
-            out[:, s] = np.multipy(temp[:, :], scale_window(s))
+            out[:, scaleFactors[s]] = np.multiply(temp_hog, scale_window(s))
 
         return out
 
