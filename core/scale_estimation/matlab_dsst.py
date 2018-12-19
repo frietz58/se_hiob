@@ -165,13 +165,14 @@ class DsstEstimator:
             im_patch_resized = cv2.resize(im_patch, (int(scale_model_sz[0]), int(scale_model_sz[1])))
 
             # extract scale features
-            winSize = (32, 32)
+            winSize = (int(scale_model_sz[0]), int(scale_model_sz[1]))
             blockSize = (16, 16)
-            blockStride = (16, 16)
-            cellSize = (4, 4)
-            hog = cv2.HOGDescriptor(winSize, blockStride, blockSize, cellSize)
+            blockStride = (8, 8)
+            cellSize = (8, 8)
+            nbins = 9
+            hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins)
 
-            temp_hog = hog(im_patch_resized)
+            temp_hog = hog.compute(im_patch_resized)
             temp = temp_hog[:, :, 1: 31]  # ...TODO what?
 
             if s == 1:
