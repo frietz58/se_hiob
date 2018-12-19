@@ -163,7 +163,8 @@ class DsstEstimator:
 
             # resize image to model size
             # im_patch_resized = cv2.resize(im_patch, scale_model_sz)
-            im_patch_resized = cv2.resize(im_patch, (int(scale_model_sz[0]), int(scale_model_sz[1])))
+            # im_patch_resized = cv2.resize(im_patch, (int(scale_model_sz[0]), int(scale_model_sz[1])))
+            im_patch_resized = cv2.resize(im_patch, (32, 32))
 
             # extract scale features
             # winSize = (int(scale_model_sz[0]), int(scale_model_sz[1]))
@@ -173,7 +174,7 @@ class DsstEstimator:
             cellSize = (4, 4)
             nbins = 9
             hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins)
-
+            #hog = cv2.HOGDescriptor()
             temp_hog = hog.compute(im_patch_resized)
             # temp = temp_hog[:, :, 1: 31]  # ...TODO what?
 
@@ -181,7 +182,8 @@ class DsstEstimator:
                 out = np.zeros(np.size(temp_hog))
                 first = False
 
-            out[:, scaleFactors[s]] = np.multiply(temp_hog, scale_window(s))
+            #TODO proper indexing, what are we trying to achieve here?
+            out[:, scaleFactors[s]] = np.multiply(temp_hog, scale_window[s])
 
         return out
 
