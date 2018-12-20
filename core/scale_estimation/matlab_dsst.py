@@ -1,5 +1,7 @@
 import numpy as np
 import cv2
+import logging
+logger = logging.getLogger(__name__)
 
 
 class DsstEstimator:
@@ -40,7 +42,8 @@ class DsstEstimator:
 
         # target size at scale = 1
         self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
-        self.init_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+        if frame.number == 1:
+            self.init_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
 
         sz = np.floor(np.multiply(self.base_target_sz, (1 + self.padding)))
 
@@ -128,6 +131,7 @@ class DsstEstimator:
             self.sf_den = (1 - self.learning_rate) * self.sf_den + self.learning_rate * new_sf_den
             self.sf_num = (1 - self.learning_rate) * self.sf_num + self.learning_rate * new_sf_num
 
+        logger.info("currentScaleFactor {0}".format(currentScaleFactor))
         target_sz = np.floor(np.multiply(self.base_target_sz, currentScaleFactor))
 
         return target_sz
