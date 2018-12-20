@@ -80,7 +80,6 @@ class ScaleEstimator:
         self.learning_rate = self.econf['learning_rate']
         self.regularization = self.econf['reg']
         self.scale_sigma_factor = self.econf['scale_sigma_factor']
-        self.lam = self.econf['lambda']
         self.scale_model_max = self.econf['scale_model_max']
 
         # logger is not initialized at this point, hence print statement...
@@ -92,7 +91,6 @@ class ScaleEstimator:
                         scale_step=self.scale_factor,
                         scale_sigma_factor=self.scale_sigma_factor,
                         img_files=self.sample.cv2_img_cache,
-                        lam=self.lam,
                         scale_model_max=self.scale_model_max)
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
@@ -138,6 +136,7 @@ class ScaleEstimator:
                                             frame.predicted_position.y,
                                             size[0],
                                             size[1])
+            final_candidate = frame.predicted_position
             """
             scaled_samples = self.generate_scaled_patches()
             self.correlation_score_helper(scaled_samples)

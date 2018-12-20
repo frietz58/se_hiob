@@ -20,21 +20,21 @@ class DsstEstimator:
         self.init_target_sz = None
         self.base_target_sz = None
         self.frame = None
+        self.sf_den = None
+        self.sf_num = None
 
-    def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, lam, scale_model_max):
+    def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, scale_model_max):
 
         self.nScales = n_scales
         self.scale_step = scale_step
         self.scale_sigma_factor = scale_sigma_factor
         self.img_files = img_files
-        self.lam = lam
+        self.lam = 1e-2
         self.scale_model_max_area = scale_model_max
 
     def execute_scale_estimation(self, frame):
 
         self.frame = frame
-        self.sf_den = None
-        self.sf_num = None
 
         # target size at scale = 1
         self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
@@ -91,11 +91,13 @@ class DsstEstimator:
                                        scale_model_sz)
 
             # calculate the correlation response of the scale filter
-            xsf = np.fft.fftn(xs, [], 2);  # TODO make sure this is correct
-            scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(sf_num, xsf), 1), (sf_den + self.lam))))
+            xsf = np.fft.fft2(xs)
+            scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(self.sf_num, xsf), 1),
+                                                            (self.sf_den + self.lam))))
 
             # find the maximum scale response
-            recovered_scale = np.nonzero(scale_response == np.amax(scale_response, 1))
+            #recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
+            recovered_scale = np.where(scale_response == max)[0][0]
 
             # update the scale
             currentScaleFactor = currentScaleFactor * scale_factors(recovered_scale)  # TODO

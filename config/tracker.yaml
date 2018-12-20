@@ -105,7 +105,6 @@ scale_estimator:
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls
   scale_sigma_factor: 0.25
-  lambda: 1e-2
   learning_rate: 0.025
   reg: 0.01
   scale_model_max: 512 #max area of the scale model on the image
