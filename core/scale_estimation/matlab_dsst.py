@@ -14,6 +14,7 @@ class DsstEstimator:
         self.target_sz = None
         self.img_files = None
         self.lam = None
+        self.learning_rate = None
 
         self.scale_window = None
         self.pos = None
@@ -23,7 +24,7 @@ class DsstEstimator:
         self.sf_den = None
         self.sf_num = None
 
-    def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, scale_model_max):
+    def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, scale_model_max, learning_rate):
 
         self.nScales = n_scales
         self.scale_step = scale_step
@@ -31,6 +32,7 @@ class DsstEstimator:
         self.img_files = img_files
         self.lam = 1e-2
         self.scale_model_max_area = scale_model_max
+        self.learning_rate = learning_rate
 
     def execute_scale_estimation(self, frame):
 
@@ -67,7 +69,7 @@ class DsstEstimator:
         if np.prod(self.init_target_sz) > self.scale_model_max_area:
             scale_model_factor = np.sqrt(self.scale_model_max_area / np.prod(self.init_target_sz))
 
-        scale_model_sz = np.floor(self.init_target_sz * scale_model_factor)
+        scale_model_sz = np.floor(np.multiply(self.init_target_sz, scale_model_factor))
 
         currentScaleFactor = 1
 
@@ -96,11 +98,12 @@ class DsstEstimator:
                                                             (self.sf_den + self.lam))))
 
             # find the maximum scale response
-            #recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
-            recovered_scale = np.where(scale_response == max)[0][0]
+            # recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
+            recovered_scale = np.where(scale_response == np.amax(scale_response))[0][0]
 
             # update the scale
-            currentScaleFactor = currentScaleFactor * scale_factors(recovered_scale)  # TODO
+            # currentScaleFactor = currentScaleFactor * scale_factors[recovered_scale]  # TODO
+            currentScaleFactor = currentScaleFactor * scale_response[recovered_scale] # TODO is this right?
             if currentScaleFactor < min_scale_factor:
                 currentScaleFactor = min_scale_factor
             elif currentScaleFactor > max_scale_factor:
@@ -125,7 +128,7 @@ class DsstEstimator:
             self.sf_den = (1 - self.learning_rate) * self.sf_den + self.learning_rate * new_sf_den
             self.sf_num = (1 - self.learning_rate) * self.sf_num + self.learning_rate * new_sf_num
 
-        target_sz = np.floor(self.base_target_sz * currentScaleFactor)
+        target_sz = np.floor(np.multiply(self.base_target_sz, currentScaleFactor))
 
         return target_sz
 

@@ -91,7 +91,8 @@ class ScaleEstimator:
                         scale_step=self.scale_factor,
                         scale_sigma_factor=self.scale_sigma_factor,
                         img_files=self.sample.cv2_img_cache,
-                        scale_model_max=self.scale_model_max)
+                        scale_model_max=self.scale_model_max,
+                        learning_rate=self.learning_rate)
 
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
