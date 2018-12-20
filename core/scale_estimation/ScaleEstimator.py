@@ -133,7 +133,11 @@ class ScaleEstimator:
 
         elif self.approach == 'dsst':
             logger.info("starting scale estimation. Approach: DSST")
-            self.dsst.execute_scale_estimation(frame)
+            size = self.dsst.execute_scale_estimation(frame)
+            frame.predicted_position = Rect(frame.predicted_position.x,
+                                            frame.predicted_position.y,
+                                            size[0],
+                                            size[1])
             """
             scaled_samples = self.generate_scaled_patches()
             self.correlation_score_helper(scaled_samples)

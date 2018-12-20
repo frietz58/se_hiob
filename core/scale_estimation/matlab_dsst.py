@@ -33,6 +33,8 @@ class DsstEstimator:
     def execute_scale_estimation(self, frame):
 
         self.frame = frame
+        self.sf_den = None
+        self.sf_num = None
 
         # target size at scale = 1
         self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
@@ -43,7 +45,7 @@ class DsstEstimator:
         # desired scale filter output (gaussian shaped), bandwidth proportional to
         # number of scales
         scale_sigma = self.nScales / np.sqrt(33) * self.scale_sigma_factor  # correct val
-        ss = np.arange(-15, 17)  # correct val
+        ss = np.arange(-15, 18)  # not correct val, changed 17 to 18  for testing
         ys = np.exp(-0.5 * (np.power(ss, 2) / scale_sigma ** 2))  # correct val
         ysf = np.fft.fft(ys)  # correct val
 
@@ -108,19 +110,22 @@ class DsstEstimator:
                                     scale_model_sz)
 
         # calculate the scale filter update
-        xsf = np.fft.fftn(xs, [], 2)
+        xsf = np.fft.fft2(xs)
         new_sf_num = np.multiply(ysf, np.conj(xsf))
-        new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf), 1))
+        new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf)), 1)
 
-        if frame == 1:
+        if self.frame.number == 1:
             # first frame, train with a single image
-            sf_den = new_sf_den;
-            sf_num = new_sf_num;
+            self.sf_den = new_sf_den
+            self.sf_num = new_sf_num
         else:
             # subsequent frames, update the model
-            sf_den = (1 - self.learning_rate) * sf_den + self.learning_rate * new_sf_den;
-            sf_num = (1 - self.learning_rate) * sf_num + self.learning_rate * new_sf_num;
+            self.sf_den = (1 - self.learning_rate) * self.sf_den + self.learning_rate * new_sf_den
+            self.sf_num = (1 - self.learning_rate) * self.sf_num + self.learning_rate * new_sf_num
 
+        target_sz = np.floor(self.base_target_sz * currentScaleFactor)
+
+        return target_sz
 
     def get_scale_sample(self, im, pos, base_target_sz, scaleFactors, scale_window, scale_model_sz):
 
@@ -179,12 +184,12 @@ class DsstEstimator:
             # temp = temp_hog[:, :, 1: 31]  # ...TODO what?
 
             if first:
-                out = np.zeros(np.size(temp_hog))
+                out = np.zeros((np.size(temp_hog), nScales))
                 first = False
 
-            #TODO proper indexing, what are we trying to achieve here?
-            out[:, scaleFactors[s]] = np.multiply(temp_hog, scale_window[s])
+            out[:, s] = np.multiply(temp_hog.flatten(), scale_window[s])
 
+        # out becomes a matrix, where each column is the hog feature vector at a different scale lvl
         return out
 
     def test(self):
