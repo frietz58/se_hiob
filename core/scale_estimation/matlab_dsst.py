@@ -79,12 +79,14 @@ class DsstEstimator:
         # find maximum and minimum scales
         im = self.img_files[1]
         min_scale_factor = np.power(self.scale_step,
-                                    np.rint(np.log(np.amax(np.divide(5, sz)) / np.log(self.scale_step))))
-        max_scale_factor = np.power(self.scale_step,
-                                    np.floor(np.log(np.amin(np.divide(
-                                        [np.shape(im)[0],
-                                         np.shape(im)[1]],
-                                        self.base_target_sz))) / np.log(self.scale_step)))
+                                    np.rint(np.log(np.amax(np.divide(5, sz))) / np.log(self.scale_step)))
+
+        max_scale_factor = np.power(
+            self.scale_step,
+            np.floor(
+                np.divide(
+                    np.log(min(np.divide([im.shape[0], im.shape[1]], self.base_target_sz))),
+                    np.log(self.scale_step))))
 
         im = self.img_files[frame.number]
 
