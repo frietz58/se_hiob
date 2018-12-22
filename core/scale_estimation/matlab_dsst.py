@@ -49,10 +49,11 @@ class DsstEstimator:
 
         # desired scale filter output (gaussian shaped), bandwidth proportional to
         # number of scales
-        scale_sigma = self.nScales / np.sqrt(33) * self.scale_sigma_factor  # correct val
-        ss = np.arange(-15, 18)  # not correct val, changed 17 to 18  for testing
-        ys = np.exp(-0.5 * (np.power(ss, 2) / scale_sigma ** 2))  # correct val
-        ysf = np.fft.fft(ys)  # correct val
+        scale_sigma = self.nScales / np.sqrt(33) * self.scale_sigma_factor
+        ss = np.subtract(np.arange(1, self.nScales + 1), np.ceil(33 / 2))
+        ys = np.exp(-0.5 * (np.power(ss, 2)) / scale_sigma ** 2)
+        ysf = np.fft.fft(ys)
+        # up to this point values are the same when computed in octave with danelljans approach
 
         # store pre-computed scale filter cosine window
         # if mod(nScales,2) == 0
@@ -64,7 +65,7 @@ class DsstEstimator:
 
         # scale factors
         ss = np.arange(1, self.nScales + 1)
-        scale_factors = np.power(self.scale_step, np.subtract(np.rint(self.nScales / 2), ss))  # almost correct val? round error?
+        scaleFactors = np.power(self.scale_step, np.subtract(np.rint(self.nScales / 2), ss))  # almost correct val? round error?
 
         # compute the resize dimensions used for feature extraction in the scale
         # estimation
@@ -74,10 +75,11 @@ class DsstEstimator:
 
         scale_model_sz = np.floor(np.multiply(self.init_target_sz, scale_model_factor))
 
-        currentScaleFactor = 1
+        currentScaleFactor = 1 #TODO this is wrong here...
 
         # find maximum and minimum scales
-        im = self.img_files[1]
+        # TODO, this only needs to be done once?
+        im = self.img_files[0]
         min_scale_factor = np.power(self.scale_step,
                                     np.rint(np.log(np.amax(np.divide(5, sz))) / np.log(self.scale_step)))
 
@@ -94,7 +96,7 @@ class DsstEstimator:
 
             # extract the test sample feature map for the scale filter
             xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz,
-                                       currentScaleFactor * scale_factors, scale_window,
+                                       currentScaleFactor, scaleFactors, scale_window,
                                        scale_model_sz)
 
             # calculate the correlation response of the scale filter
@@ -109,15 +111,20 @@ class DsstEstimator:
             # update the scale
             # currentScaleFactor = currentScaleFactor * scale_factors[recovered_scale]  # TODO
             currentScaleFactor = currentScaleFactor * scale_response[recovered_scale] # TODO is this right?
+            # scale Factors are definitly wrong, scale factor between 1 and 2 frame is 0.15...
             if currentScaleFactor < min_scale_factor:
                 currentScaleFactor = min_scale_factor
             elif currentScaleFactor > max_scale_factor:
                 currentScaleFactor = max_scale_factor
 
         # extract the training sample feature map for the scale filter
-        xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz,
-                                    currentScaleFactor * scale_factors, scale_window,
-                                    scale_model_sz)
+        xs = self.get_scale_sample(im,
+                                   frame.predicted_position,
+                                   self.base_target_sz,
+                                   currentScaleFactor,
+                                   scaleFactors,
+                                   scale_window,
+                                   scale_model_sz)
 
         # calculate the scale filter update
         xsf = np.fft.fft2(xs)
@@ -138,7 +145,9 @@ class DsstEstimator:
 
         return target_sz
 
-    def get_scale_sample(self, im, pos, base_target_sz, scaleFactors, scale_window, scale_model_sz):
+    def get_scale_sample(self, im, pos, base_target_sz, currentScaleFactor, scale_factors, scale_window, scale_model_sz):
+
+        scaleFactors = currentScaleFactor * scale_factors
 
         # Extracts a sample for the scale filter at the current
         # location and scale.
