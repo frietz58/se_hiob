@@ -101,16 +101,16 @@ class DsstEstimator:
 
             # calculate the correlation response of the scale filter
             xsf = np.fft.fft2(xs)
-            scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(self.sf_num, xsf), 1),
-                                                            (self.sf_den + self.lam))))
+            scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(self.sf_num, xsf), axis=0),
+                                                            (self.sf_den + self.lam)))) #TODO oh i think im summing on the wrong axis...
 
             # find the maximum scale response
             # recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
-            recovered_scale = np.where(scale_response == np.amax(scale_response))[0][0]
+            recovered_scale = np.where(scale_response == np.amax(scale_response))[0][0] #TODO should this be column index?
 
             # update the scale
             # currentScaleFactor = currentScaleFactor * scale_factors[recovered_scale]  # TODO
-            currentScaleFactor = currentScaleFactor * scale_response[recovered_scale] # TODO is this right?
+            currentScaleFactor = currentScaleFactor * scaleFactors[recovered_scale] # TODO is this right?
             # scale Factors are definitly wrong, scale factor between 1 and 2 frame is 0.15...
             if currentScaleFactor < min_scale_factor:
                 currentScaleFactor = min_scale_factor
@@ -129,7 +129,7 @@ class DsstEstimator:
         # calculate the scale filter update
         xsf = np.fft.fft2(xs)
         new_sf_num = np.multiply(ysf, np.conj(xsf))
-        new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf)), 1)
+        new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf)), axis=0)
 
         if self.frame.number == 1:
             # first frame, train with a single image
