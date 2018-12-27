@@ -39,96 +39,103 @@ class DsstEstimator:
     def execute_scale_estimation(self, frame):
 
         self.frame = frame
+        im = self.img_files[frame.number]
+        #TODO this should be here rigth?
+        #self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+        #self.currentScaleFactor = 1
 
-        # target size at scale = 1
-        self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
         if frame.number == 1:
+            # target size at scale = 1
+            self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
             self.init_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
 
-        sz = np.floor(np.multiply(self.base_target_sz, (1 + self.padding)))
+            sz = np.floor(np.multiply(self.base_target_sz, (1 + self.padding)))
 
-        # desired scale filter output (gaussian shaped), bandwidth proportional to
-        # number of scales
-        scale_sigma = self.nScales / np.sqrt(33) * self.scale_sigma_factor
-        ss = np.subtract(np.arange(1, self.nScales + 1), np.ceil(33 / 2))
-        ys = np.exp(-0.5 * (np.power(ss, 2)) / scale_sigma ** 2)
-        ysf = np.fft.fft(ys)
-        # up to this point values are the same when computed in octave with danelljans approach
+            # desired scale filter output (gaussian shaped), bandwidth proportional to
+            # number of scales
+            scale_sigma = self.nScales / np.sqrt(33) * self.scale_sigma_factor
+            ss = np.subtract(np.arange(1, self.nScales + 1), np.ceil(33 / 2))
+            ys = np.exp(-0.5 * (np.power(ss, 2)) / scale_sigma ** 2)
+            self.ysf = np.fft.fft(ys)
+            # up to this point values are the same when computed in octave with danelljans approach
 
-        # store pre-computed scale filter cosine window
-        # if mod(nScales,2) == 0
-        if np.mod(self.nScales, 2) == 0:
-            scale_window = np.hanning(self.nScales + 1)
-            scale_window = scale_window[2: len(scale_window)]
-        else:
-            scale_window = np.hanning(self.nScales)  # correct val
+            # store pre-computed scale filter cosine window
+            # if mod(nScales,2) == 0
+            if np.mod(self.nScales, 2) == 0:
+                self.scale_window = np.hanning(self.nScales + 1)
+                self.scale_window = self.scale_window[2: len(self.scale_window)]
+            else:
+                self.scale_window = np.hanning(self.nScales)  # correct val
 
-        # scale factors
-        ss = np.arange(1, self.nScales + 1)
-        scaleFactors = np.power(self.scale_step, np.subtract(np.rint(self.nScales / 2), ss))  # almost correct val? round error?
+            # scale factors
+            ss = np.arange(1, self.nScales + 1)
+            self.scaleFactors = np.power(
+                self.scale_step,
+                np.subtract(np.rint(self.nScales / 2), ss))  # almost correct val? round error?
 
-        # compute the resize dimensions used for feature extraction in the scale
-        # estimation
-        scale_model_factor = 1
-        if np.prod(self.init_target_sz) > self.scale_model_max_area:
-            scale_model_factor = np.sqrt(self.scale_model_max_area / np.prod(self.init_target_sz))
+            # compute the resize dimensions used for feature extraction in the scale
+            # estimation
+            scale_model_factor = 1
+            if np.prod(self.init_target_sz) > self.scale_model_max_area:
+                scale_model_factor = np.sqrt(self.scale_model_max_area / np.prod(self.init_target_sz))
 
-        scale_model_sz = np.floor(np.multiply(self.init_target_sz, scale_model_factor))
+            self.scale_model_sz = np.floor(np.multiply(self.init_target_sz, scale_model_factor))
 
-        currentScaleFactor = 1 #TODO this is wrong here...
+            self.currentScaleFactor = 1
 
-        # find maximum and minimum scales
-        # TODO, this only needs to be done once?
-        im = self.img_files[0]
-        min_scale_factor = np.power(self.scale_step,
-                                    np.rint(np.log(np.amax(np.divide(5, sz))) / np.log(self.scale_step)))
+            # TODO current are 0.1 and 15.3, seems wrong
+            # find maximum and minimum scales
+            im = self.img_files[0]
+            self.min_scale_factor = 0.9
+            self.max_scale_factor = 1.1
 
-        max_scale_factor = np.power(
-            self.scale_step,
-            np.floor(
-                np.divide(
-                    np.log(min(np.divide([im.shape[0], im.shape[1]], self.base_target_sz))),
-                    np.log(self.scale_step))))
+            #self.min_scale_factor = np.power(
+            #    self.scale_step,
+            #    np.rint(np.log(np.amax(np.divide(5, sz))) / np.log(self.scale_step)))
 
-        im = self.img_files[frame.number]
+            #self.max_scale_factor = np.power(
+            #    self.scale_step,
+            #    np.floor(
+            #        np.divide(
+            #            np.log(min(np.divide([im.shape[0], im.shape[1]], self.base_target_sz))),
+            #            np.log(self.scale_step))))
 
         if self.frame.number > 1:
 
             # extract the test sample feature map for the scale filter
             xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz,
-                                       currentScaleFactor, scaleFactors, scale_window,
-                                       scale_model_sz)
+                                       self.currentScaleFactor, self.scaleFactors, self.scale_window,
+                                       self.scale_model_sz)
 
             # calculate the correlation response of the scale filter
             xsf = np.fft.fft2(xs)
             scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(self.sf_num, xsf), axis=0),
-                                                            (self.sf_den + self.lam)))) #TODO oh i think im summing on the wrong axis...
+                                                            (self.sf_den + self.lam))))
 
             # find the maximum scale response
             # recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
-            recovered_scale = np.where(scale_response == np.amax(scale_response))[0][0] #TODO should this be column index?
+            recovered_scale = np.argmax(scale_response)
 
             # update the scale
-            # currentScaleFactor = currentScaleFactor * scale_factors[recovered_scale]  # TODO
-            currentScaleFactor = currentScaleFactor * scaleFactors[recovered_scale] # TODO is this right?
-            # scale Factors are definitly wrong, scale factor between 1 and 2 frame is 0.15...
-            if currentScaleFactor < min_scale_factor:
-                currentScaleFactor = min_scale_factor
-            elif currentScaleFactor > max_scale_factor:
-                currentScaleFactor = max_scale_factor
+            self.currentScaleFactor = self.currentScaleFactor * self.scaleFactors[recovered_scale]
 
-        # extract the training sample feature map for the scale filter
+            if self.currentScaleFactor < self.min_scale_factor:
+                self.currentScaleFactor = self.min_scale_factor
+            elif self.currentScaleFactor > self.max_scale_factor:
+                self.currentScaleFactor = self.max_scale_factor
+
+        # extract the training sample feature map for the scale filter, with the predicted size
         xs = self.get_scale_sample(im,
                                    frame.predicted_position,
                                    self.base_target_sz,
-                                   currentScaleFactor,
-                                   scaleFactors,
-                                   scale_window,
-                                   scale_model_sz)
+                                   self.currentScaleFactor,
+                                   self.scaleFactors,
+                                   self.scale_window,
+                                   self.scale_model_sz)
 
         # calculate the scale filter update
         xsf = np.fft.fft2(xs)
-        new_sf_num = np.multiply(ysf, np.conj(xsf))
+        new_sf_num = np.multiply(self.ysf, np.conj(xsf))
         new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf)), axis=0)
 
         if self.frame.number == 1:
@@ -140,8 +147,8 @@ class DsstEstimator:
             self.sf_den = (1 - self.learning_rate) * self.sf_den + self.learning_rate * new_sf_den
             self.sf_num = (1 - self.learning_rate) * self.sf_num + self.learning_rate * new_sf_num
 
-        logger.info("currentScaleFactor {0}".format(currentScaleFactor))
-        target_sz = np.floor(np.multiply(self.base_target_sz, currentScaleFactor))
+        logger.info("currentScaleFactor {0}".format(self.currentScaleFactor))
+        target_sz = np.floor(np.multiply(self.base_target_sz, self.currentScaleFactor))
 
         return target_sz
 
