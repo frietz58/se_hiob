@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
 import logging
+from PIL import Image
+import matplotlib.pyplot as plt
 logger = logging.getLogger(__name__)
 
 
@@ -41,8 +43,8 @@ class DsstEstimator:
         self.frame = frame
         im = self.img_files[frame.number]
         #TODO this should be here rigth?
-        #self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
-        #self.currentScaleFactor = 1
+        self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+        self.currentScaleFactor = 1
 
         if frame.number == 1:
             # target size at scale = 1
@@ -53,11 +55,10 @@ class DsstEstimator:
 
             # desired scale filter output (gaussian shaped), bandwidth proportional to
             # number of scales
-            scale_sigma = self.nScales / np.sqrt(33) * self.scale_sigma_factor
+            scale_sigma = self.nScales / np.sqrt(self.nScales) * self.scale_sigma_factor
             ss = np.subtract(np.arange(1, self.nScales + 1), np.ceil(33 / 2))
             ys = np.exp(-0.5 * (np.power(ss, 2)) / scale_sigma ** 2)
             self.ysf = np.fft.fft(ys)
-            # up to this point values are the same when computed in octave with danelljans approach
 
             # store pre-computed scale filter cosine window
             # if mod(nScales,2) == 0
@@ -83,12 +84,12 @@ class DsstEstimator:
 
             self.currentScaleFactor = 1
 
-            # TODO current are 0.1 and 15.3, seems wrong
             # find maximum and minimum scales
             im = self.img_files[0]
             self.min_scale_factor = 0.9
             self.max_scale_factor = 1.1
 
+            # TODO current are 0.1 and 15.3, seems wrong
             #self.min_scale_factor = np.power(
             #    self.scale_step,
             #    np.rint(np.log(np.amax(np.divide(5, sz))) / np.log(self.scale_step)))
@@ -103,8 +104,12 @@ class DsstEstimator:
         if self.frame.number > 1:
 
             # extract the test sample feature map for the scale filter
-            xs = self.get_scale_sample(im, frame.predicted_position, self.base_target_sz,
-                                       self.currentScaleFactor, self.scaleFactors, self.scale_window,
+            xs = self.get_scale_sample(im,
+                                       frame.predicted_position,
+                                       self.base_target_sz,
+                                       self.currentScaleFactor,
+                                       self.scaleFactors,
+                                       self.scale_window,
                                        self.scale_model_sz)
 
             # calculate the correlation response of the scale filter
@@ -114,7 +119,12 @@ class DsstEstimator:
 
             # find the maximum scale response
             # recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
+
+            scale_response = np.multiply(scale_response, self.scale_window) #TODO i think this makes sense?
+
             recovered_scale = np.argmax(scale_response)
+
+            logger.info("factor response {0}".format(self.scaleFactors[recovered_scale]))
 
             # update the scale
             self.currentScaleFactor = self.currentScaleFactor * self.scaleFactors[recovered_scale]
@@ -186,12 +196,27 @@ class DsstEstimator:
 
             # extract image
             # im_patch = (im[ys, xs])  # TODO is this right?
+            #im_patch = im[
+            #           int(ys - np.floor(patch_sz[0] / 2)):
+            #           int(ys - np.floor(patch_sz[0] / 2) + patch_sz[0]),
+            #           int(xs - np.floor(patch_sz[1] / 2)):
+            #           int(xs - np.floor(patch_sz[1] / 2) + patch_sz[1])
+            #           ]
+
             im_patch = im[
-                       int(ys - np.floor(patch_sz[0] / 2)):
-                       int(ys - np.floor(patch_sz[0] / 2) + patch_sz[0]),
-                       int(xs - np.floor(patch_sz[1] / 2)):
-                       int(xs - np.floor(patch_sz[1] / 2) + patch_sz[1])
-                       ]
+                int(self.frame.predicted_position.center[1] - np.floor(patch_sz[1] / 2)):
+                int(self.frame.predicted_position.center[1] + np.ceil(patch_sz[1] / 2)),
+                int(self.frame.predicted_position.center[0] - np.floor(patch_sz[0] / 2)):
+                int(self.frame.predicted_position.center[0] + np.ceil(patch_sz[0] / 2))
+            ]
+
+            # img patch debugging, can be removed later
+            if s == 16:
+                img = Image.fromarray(im_patch)
+                name = 'im_patches/' + str(self.frame.number) + '_' + str(pos.x) + 'd' + str(pos.y) + '.jpeg'
+                img.save(name)
+                #img.show()
+
 
             # resize image to model size
             # im_patch_resized = cv2.resize(im_patch, scale_model_sz)
