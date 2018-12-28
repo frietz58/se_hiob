@@ -27,6 +27,7 @@ class DsstEstimator:
         self.frame = None
         self.sf_den = None
         self.sf_num = None
+        self.response_history = np.zeros([33, 100])
 
     def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, scale_model_max, learning_rate):
 
@@ -42,6 +43,7 @@ class DsstEstimator:
 
         self.frame = frame
         im = self.img_files[frame.number]
+
         #TODO this should be here rigth?
         self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
         self.currentScaleFactor = 1
@@ -56,7 +58,7 @@ class DsstEstimator:
             # desired scale filter output (gaussian shaped), bandwidth proportional to
             # number of scales
             scale_sigma = self.nScales / np.sqrt(self.nScales) * self.scale_sigma_factor
-            ss = np.subtract(np.arange(1, self.nScales + 1), np.ceil(33 / 2))
+            ss = np.subtract(np.arange(1, self.nScales + 1), np.ceil(self.nScales / 2))
             ys = np.exp(-0.5 * (np.power(ss, 2)) / scale_sigma ** 2)
             self.ysf = np.fft.fft(ys)
 
@@ -72,7 +74,7 @@ class DsstEstimator:
             ss = np.arange(1, self.nScales + 1)
             self.scaleFactors = np.power(
                 self.scale_step,
-                np.subtract(np.rint(self.nScales / 2), ss))  # almost correct val? round error?
+                np.subtract(np.rint(self.nScales / 2), ss))
 
             # compute the resize dimensions used for feature extraction in the scale
             # estimation
@@ -86,6 +88,7 @@ class DsstEstimator:
 
             # find maximum and minimum scales
             im = self.img_files[0]
+
             self.min_scale_factor = 0.9
             self.max_scale_factor = 1.1
 
@@ -114,25 +117,28 @@ class DsstEstimator:
 
             # calculate the correlation response of the scale filter
             xsf = np.fft.fft2(xs)
-            scale_response = np.real(np.fft.ifftn(np.divide(np.sum(np.multiply(self.sf_num, xsf), axis=0),
-                                                            (self.sf_den + self.lam))))
+            scale_response = np.real(np.fft.ifftn(np.divide(
+                np.sum(np.multiply(self.sf_num, xsf), axis=0),
+                (self.sf_den + self.lam))))
 
             # find the maximum scale response
             # recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
 
-            scale_response = np.multiply(scale_response, self.scale_window) #TODO i think this makes sense?
-
             recovered_scale = np.argmax(scale_response)
+
+            self.response_history[:, frame.number] = scale_response
 
             logger.info("factor response {0}".format(self.scaleFactors[recovered_scale]))
 
             # update the scale
-            self.currentScaleFactor = self.currentScaleFactor * self.scaleFactors[recovered_scale]
+            self.currentScaleFactor = self.currentScaleFactor * np.flip(self.scaleFactors)[recovered_scale]
 
-            if self.currentScaleFactor < self.min_scale_factor:
-                self.currentScaleFactor = self.min_scale_factor
-            elif self.currentScaleFactor > self.max_scale_factor:
-                self.currentScaleFactor = self.max_scale_factor
+
+            #TODO currently disabled to see if it catches some outlier values
+            #if self.currentScaleFactor < self.min_scale_factor:
+            #    self.currentScaleFactor = self.min_scale_factor
+            #elif self.currentScaleFactor > self.max_scale_factor:
+            #    self.currentScaleFactor = self.max_scale_factor
 
         # extract the training sample feature map for the scale filter, with the predicted size
         xs = self.get_scale_sample(im,
@@ -147,6 +153,7 @@ class DsstEstimator:
         xsf = np.fft.fft2(xs)
         new_sf_num = np.multiply(self.ysf, np.conj(xsf))
         new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf)), axis=0)
+
 
         if self.frame.number == 1:
             # first frame, train with a single image
@@ -171,6 +178,9 @@ class DsstEstimator:
 
         nScales = len(scaleFactors)
         first = True
+
+        # just a test
+        # base_target_sz = np.multiply(base_target_sz, currentScaleFactor)
 
         for s in range(nScales):
             patch_sz = np.floor(np.multiply(base_target_sz, scaleFactors[s]))
@@ -202,13 +212,32 @@ class DsstEstimator:
             #           int(xs - np.floor(patch_sz[1] / 2)):
             #           int(xs - np.floor(patch_sz[1] / 2) + patch_sz[1])
             #           ]
+            y0 = int(self.frame.predicted_position.center[1] - np.rint(patch_sz[1] / 2))
+            y1 = int(self.frame.predicted_position.center[1] + np.rint(patch_sz[1] / 2))
+            x0 = int(self.frame.predicted_position.center[0] - np.rint(patch_sz[0] / 2))
+            x1 = int(self.frame.predicted_position.center[0] + np.rint(patch_sz[0] / 2))
 
-            im_patch = im[
-                int(self.frame.predicted_position.center[1] - np.floor(patch_sz[1] / 2)):
-                int(self.frame.predicted_position.center[1] + np.ceil(patch_sz[1] / 2)),
-                int(self.frame.predicted_position.center[0] - np.floor(patch_sz[0] / 2)):
-                int(self.frame.predicted_position.center[0] + np.ceil(patch_sz[0] / 2))
-            ]
+            if y0 < 0:
+                y0 = 0
+            if y0 > im.shape[0]:
+                y0 = im.shape[0]
+
+            if y1 < 0:
+                y1 = 0
+            if y1 > im.shape[0]:
+                y1 = im.shape[0]
+
+            if x0 < 0:
+                x0 = 0
+            if x0 > im.shape[1]:
+                x0 = im.shape[1]
+
+            if x1 < 0:
+                x1 = 0
+            if x1 > im.shape[1]:
+                x1 = im.shape[1]
+
+            im_patch = im[y0:y1, x0:x1]
 
             # img patch debugging, can be removed later
             if s == 16:
@@ -244,7 +273,8 @@ class DsstEstimator:
         # out becomes a matrix, where each column is the hog feature vector at a different scale lvl
         return out
 
-    def test(self):
+    @staticmethod
+    def test():
         print("Module import works")
 
 
