@@ -27,7 +27,7 @@ class DsstEstimator:
         self.frame = None
         self.sf_den = None
         self.sf_num = None
-        self.response_history = np.zeros([33, 100])
+        self.response_history = np.zeros([33, 1000])
 
     def setup(self, n_scales, scale_step, scale_sigma_factor, img_files, scale_model_max, learning_rate):
 
@@ -45,13 +45,13 @@ class DsstEstimator:
         im = self.img_files[frame.number]
 
         #TODO this should be here rigth?
-        self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+        self.base_target_sz = [frame.previous_position.width, frame.previous_position.height]
         self.currentScaleFactor = 1
 
         if frame.number == 1:
             # target size at scale = 1
-            self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
-            self.init_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+            self.base_target_sz = [frame.previous_position.width, frame.previous_position.height]
+            self.init_target_sz = [frame.previous_position.width, frame.previous_position.height]
 
             sz = np.floor(np.multiply(self.base_target_sz, (1 + self.padding)))
 
@@ -72,9 +72,7 @@ class DsstEstimator:
 
             # scale factors
             ss = np.arange(1, self.nScales + 1)
-            self.scaleFactors = np.power(
-                self.scale_step,
-                np.subtract(np.rint(self.nScales / 2), ss))
+            self.scaleFactors = np.power(self.scale_step, (np.ceil(self.nScales/2) - ss))
 
             # compute the resize dimensions used for feature extraction in the scale
             # estimation
@@ -131,7 +129,7 @@ class DsstEstimator:
             logger.info("factor response {0}".format(self.scaleFactors[recovered_scale]))
 
             # update the scale
-            self.currentScaleFactor = self.currentScaleFactor * np.flip(self.scaleFactors)[recovered_scale]
+            self.currentScaleFactor = self.currentScaleFactor * self.scaleFactors[recovered_scale]
 
 
             #TODO currently disabled to see if it catches some outlier values
@@ -165,13 +163,13 @@ class DsstEstimator:
             self.sf_num = (1 - self.learning_rate) * self.sf_num + self.learning_rate * new_sf_num
 
         logger.info("currentScaleFactor {0}".format(self.currentScaleFactor))
-        target_sz = np.floor(np.multiply(self.base_target_sz, self.currentScaleFactor))
+        target_sz = np.rint(np.multiply(self.base_target_sz, self.currentScaleFactor))
 
         return target_sz
 
     def get_scale_sample(self, im, pos, base_target_sz, currentScaleFactor, scale_factors, scale_window, scale_model_sz):
 
-        scaleFactors = currentScaleFactor * scale_factors
+        scaleFactors = currentScaleFactor * scale_factors # todo isnt this always the same as in self?
 
         # Extracts a sample for the scale filter at the current
         # location and scale.
@@ -243,7 +241,7 @@ class DsstEstimator:
             if s == 16:
                 img = Image.fromarray(im_patch)
                 name = 'im_patches/' + str(self.frame.number) + '_' + str(pos.x) + 'd' + str(pos.y) + '.jpeg'
-                img.save(name)
+                #img.save(name)
                 #img.show()
 
 

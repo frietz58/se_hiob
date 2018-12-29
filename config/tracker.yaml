@@ -122,6 +122,10 @@ scale_estimator:
 # which samples shall be tracked? Accepts samples, data sets, and data collections
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
+##  - finn/BikerStatic
+  - tb100/Biker
+##  - tb100/Surfer
+##  - tb100/Girl
 #  - ros/nico/vision/videoStream
 #  - nico_recordings/banana
 #  - nico_recordings/cube
@@ -130,9 +134,6 @@ tracking:
 #  - nico_recordings/tomato_and_carrot.1
 #  - nico_recordings/tomato_and_carrot.2
 #  - tb100/BlurCar1
-##  - tb100/Biker
- - tb100/Surfer
-##  - tb100/Girl
 #  - tb100/David
 #  - tb100/Panda
 #  - tb100/Basketball
