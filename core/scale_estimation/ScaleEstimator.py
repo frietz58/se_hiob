@@ -7,16 +7,16 @@ Created on 2018-11-17
 
 import numpy as np
 from PIL import Image
-import concurrent
 import logging
 import scipy.stats as st
 import cv2
-from multiprocessing import Pool
 from .matlab_dsst import DsstEstimator
+from .custom_dsst import CustomDsst
+from ..Rect import Rect
 
 from matplotlib import pyplot as plt
-
-from ..Rect import Rect
+from multiprocessing import Pool
+import concurrent
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,7 @@ class ScaleEstimator:
         self.configuration = None
         self.econf = None
         self.dsst = DsstEstimator()
+        self.custom_dsst = CustomDsst()
 
         self.frame = None
         self.tracker = None
@@ -94,6 +95,13 @@ class ScaleEstimator:
                         scale_model_max=self.scale_model_max,
                         learning_rate=self.learning_rate)
 
+        self.custom_dsst.configure(n_scales=self.number_scales,
+                                   scale_step=self.scale_factor,
+                                   scale_sigma_factor=self.scale_sigma_factor,
+                                   img_files=self.sample.cv2_img_cache,
+                                   learning_rate=self.learning_rate)
+        self.custom_dsst.initial_calculations()
+
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
         :param frame: the current frame in which the best position has already been calculated
@@ -132,6 +140,7 @@ class ScaleEstimator:
 
         elif self.approach == 'dsst':
             logger.info("starting scale estimation. Approach: DSST")
+
             size = self.dsst.execute_scale_estimation(frame)
             frame.predicted_position = Rect(frame.predicted_position.x,
                                             frame.predicted_position.y,
@@ -143,6 +152,18 @@ class ScaleEstimator:
             self.correlation_score_helper(scaled_samples)
             final_candidate = frame.predicted_position
             """
+            logger.info("finished scale estimation")
+
+        elif self.approach == "custom_dsst":
+            logger.info("starting scale estimation. Approach: DSST")
+
+            size = self.custom_dsst.dsst(frame)
+            frame.predicted_position = Rect(frame.predicted_position.x,
+                                            frame.predicted_position.y,
+                                            size[0],
+                                            size[1])
+            final_candidate = frame.predicted_position
+
             logger.info("finished scale estimation")
 
         else:
@@ -194,6 +215,9 @@ class ScaleEstimator:
             filter = np.divide(output_in_f, patch_in_f)
 
             self.scaled_filters.append({'factor': 1, 'filter': filter, 'size': (scaled_width, scaled_height)})
+
+        elif self.approach == "custom_dsst":
+            self.custom_dsst.extract_scale_sample(frame, use_gt=True)
 
         elif self.approach == 'dsst':
 
