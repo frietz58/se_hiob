@@ -45,13 +45,13 @@ class DsstEstimator:
         im = self.img_files[frame.number]
 
         #TODO this should be here rigth?
-        self.base_target_sz = [frame.previous_position.width, frame.previous_position.height]
+        self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
         self.currentScaleFactor = 1
 
         if frame.number == 1:
             # target size at scale = 1
-            self.base_target_sz = [frame.previous_position.width, frame.previous_position.height]
-            self.init_target_sz = [frame.previous_position.width, frame.previous_position.height]
+            self.base_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
+            self.init_target_sz = [frame.predicted_position.width, frame.predicted_position.height]
 
             sz = np.floor(np.multiply(self.base_target_sz, (1 + self.padding)))
 
@@ -68,7 +68,7 @@ class DsstEstimator:
                 self.scale_window = np.hanning(self.nScales + 1)
                 self.scale_window = self.scale_window[2: len(self.scale_window)]
             else:
-                self.scale_window = np.hanning(self.nScales)  # correct val
+                self.scale_window = np.hanning(self.nScales)
 
             # scale factors
             ss = np.arange(1, self.nScales + 1)
@@ -115,13 +115,12 @@ class DsstEstimator:
 
             # calculate the correlation response of the scale filter
             xsf = np.fft.fft2(xs)
+
             scale_response = np.real(np.fft.ifftn(np.divide(
                 np.sum(np.multiply(self.sf_num, xsf), axis=0),
                 (self.sf_den + self.lam))))
 
             # find the maximum scale response
-            # recovered_scale = np.nonzero(scale_response == np.amax(scale_response))
-
             recovered_scale = np.argmax(scale_response)
 
             self.response_history[:, frame.number] = scale_response
@@ -132,13 +131,13 @@ class DsstEstimator:
             self.currentScaleFactor = self.currentScaleFactor * self.scaleFactors[recovered_scale]
 
 
-            #TODO currently disabled to see if it catches some outlier values
-            #if self.currentScaleFactor < self.min_scale_factor:
-            #    self.currentScaleFactor = self.min_scale_factor
-            #elif self.currentScaleFactor > self.max_scale_factor:
-            #    self.currentScaleFactor = self.max_scale_factor
+            if self.currentScaleFactor < self.min_scale_factor:
+                self.currentScaleFactor = self.min_scale_factor
+            elif self.currentScaleFactor > self.max_scale_factor:
+                self.currentScaleFactor = self.max_scale_factor
 
         # extract the training sample feature map for the scale filter, with the predicted size
+        # now the best response should be at factor 1
         xs = self.get_scale_sample(im,
                                    frame.predicted_position,
                                    self.base_target_sz,
@@ -152,15 +151,18 @@ class DsstEstimator:
         new_sf_num = np.multiply(self.ysf, np.conj(xsf))
         new_sf_den = np.sum(np.multiply(xsf, np.conj(xsf)), axis=0)
 
+        self.sf_den = new_sf_den
+        self.sf_num = new_sf_num
 
-        if self.frame.number == 1:
-            # first frame, train with a single image
-            self.sf_den = new_sf_den
-            self.sf_num = new_sf_num
-        else:
-            # subsequent frames, update the model
-            self.sf_den = (1 - self.learning_rate) * self.sf_den + self.learning_rate * new_sf_den
-            self.sf_num = (1 - self.learning_rate) * self.sf_num + self.learning_rate * new_sf_num
+
+        #if self.frame.number == 1:
+        #    # first frame, train with a single image
+        #    self.sf_den = new_sf_den
+        #    self.sf_num = new_sf_num
+        #else:
+        #    # subsequent frames, update the model
+        #    self.sf_den = np.add((1 - self.learning_rate) * self.sf_den, self.learning_rate * new_sf_den)
+        #    self.sf_num = np.add((1 - self.learning_rate) * self.sf_num, self.learning_rate * new_sf_num)
 
         logger.info("currentScaleFactor {0}".format(self.currentScaleFactor))
         target_sz = np.rint(np.multiply(self.base_target_sz, self.currentScaleFactor))
@@ -169,7 +171,7 @@ class DsstEstimator:
 
     def get_scale_sample(self, im, pos, base_target_sz, currentScaleFactor, scale_factors, scale_window, scale_model_sz):
 
-        scaleFactors = currentScaleFactor * scale_factors # todo isnt this always the same as in self?
+        scaleFactors = currentScaleFactor * scale_factors
 
         # Extracts a sample for the scale filter at the current
         # location and scale.
@@ -179,6 +181,13 @@ class DsstEstimator:
 
         # just a test
         # base_target_sz = np.multiply(base_target_sz, currentScaleFactor)
+        prev_im = self.img_files[self.frame.number - 1]
+        prev = prev_im[
+               self.frame.previous_position.y: self.frame.previous_position.y + self.frame.previous_position.height,
+               self.frame.previous_position.x: self.frame.previous_position.x + self.frame.previous_position.width]
+        img = Image.fromarray(prev)
+        name = 'im_patches/' + str(self.frame.number) + '/prev.jpeg'
+        #img.save(name)
 
         for s in range(nScales):
             patch_sz = np.floor(np.multiply(base_target_sz, scaleFactors[s]))
@@ -238,21 +247,18 @@ class DsstEstimator:
             im_patch = im[y0:y1, x0:x1]
 
             # img patch debugging, can be removed later
-            if s == 16:
-                img = Image.fromarray(im_patch)
-                name = 'im_patches/' + str(self.frame.number) + '_' + str(pos.x) + 'd' + str(pos.y) + '.jpeg'
-                #img.save(name)
-                #img.show()
-
+            img = Image.fromarray(im_patch)
+            name = 'im_patches/' + str(self.frame.number) + '/ ' + str(s) + ' ' + str(scaleFactors[s]) + '.jpeg'
+            #img.save(name)
 
             # resize image to model size
             # im_patch_resized = cv2.resize(im_patch, scale_model_sz)
             # im_patch_resized = cv2.resize(im_patch, (int(scale_model_sz[0]), int(scale_model_sz[1])))
-            im_patch_resized = cv2.resize(im_patch, (32, 32))
+            im_patch_resized = cv2.resize(im_patch, (64, 64))
 
             # extract scale features
             # winSize = (int(scale_model_sz[0]), int(scale_model_sz[1]))
-            winSize = (32, 32)
+            winSize = (64, 64)
             blockSize = (16, 16)
             blockStride = (8, 8)
             cellSize = (4, 4)
@@ -269,6 +275,7 @@ class DsstEstimator:
             out[:, s] = np.multiply(temp_hog.flatten(), scale_window[s])
 
         # out becomes a matrix, where each column is the hog feature vector at a different scale lvl
+        # this is further manipulated by the scale window, which punished the further the bigger the scale factor is
         return out
 
     @staticmethod
