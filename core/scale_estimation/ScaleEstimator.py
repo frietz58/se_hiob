@@ -279,7 +279,7 @@ class ScaleEstimator:
 
         logger.info("created %s scaled candidates", len(scaled_predictions))
 
-        # append current prediction aswell, so that the array can be evaluated and that its possible,
+        # append current prediction as well, so that the array can be evaluated and that its possible,
         # that no changes in scale are necessary.
         scaled_predictions.append(current_prediction)
 

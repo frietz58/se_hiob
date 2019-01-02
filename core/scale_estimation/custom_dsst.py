@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import logging
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +119,7 @@ class CustomDsst:
                 out = np.zeros((np.size(temp_hog), self.number_scales))
 
             out[:, i] = np.multiply(temp_hog.flatten(), self.scale_window[i])
+            # out[:, i] = temp_hog.flatten()
 
         # if initial frame, calculate num and den here, otherwise in main part of algorithm
         if use_gt:
@@ -134,6 +136,7 @@ class CustomDsst:
         approach = "dsst"
 
         self.frame = frame
+        self.frame_history.append(self.frame)  # for own idea...
         base_target_size = (self.frame.predicted_position.width, self.frame.predicted_position.height)
 
         # extract sample for current frame
@@ -144,17 +147,22 @@ class CustomDsst:
 
         # extract features from previews frames to compare to
         if approach == "own":
-            avg_target = np.zeros((1296, 33))
+            avg_target = np.zeros(1296)
+            first = True
             for i in range(0, len(self.frame_history)):
 
                 # ignore the current frame, only build avg model from past frames
                 if i == 0:
                     continue
 
+                # only build the avg over the last 5 frames, to stay up to date and avoid computational sink
+                if i == 5:
+                    break
+
                 # build average target, older samples decaying
                 punisher = (1 - self.learning_rate) ** i
-                prev_img = self.img_files[-i]
-                prev_frame = self.frame_history[-i]
+                prev_img = self.img_files[self.frame.number - i]
+                prev_frame = self.frame_history[-i]#TODO WRONG!
                 prev_patch = prev_img[
                              prev_frame.predicted_position.y:
                              prev_frame.predicted_position.y + prev_frame.predicted_position.height,
@@ -162,8 +170,15 @@ class CustomDsst:
                              prev_frame.predicted_position.x + prev_frame.predicted_position.width
                              ]
                 resized_patch = cv2.resize(prev_patch, (32, 32))
+                resized_img = Image.fromarray(resized_patch)
+                #resized_img.show()
                 hog = self.hog_vector(resized_patch)
                 punished_hog = np.multiply(hog, punisher)
+
+                if first:
+                    avg_target = np.zeros(np.shape(hog))
+                    first = False
+
                 avg_target = np.add(avg_target, punished_hog)
 
             avg_target = np.divide(avg_target, len(self.frame_history))
@@ -188,10 +203,10 @@ class CustomDsst:
             print("here")
 
         # prevent outliers to distort the scale
-        #if scale_factor < self.min_scale_factor:
-        #    scale_factor = self.min_scale_factor
-        #elif scale_factor > self.max_scale_factor:
-        #    scale_factor = self.max_scale_factor
+        if scale_factor < self.min_scale_factor:
+            scale_factor = self.min_scale_factor
+        elif scale_factor > self.max_scale_factor:
+            scale_factor = self.max_scale_factor
 
         logger.info("estimated scale {0}".format(scale_factor))
 
@@ -210,7 +225,6 @@ class CustomDsst:
         self.num = new_num
         self.den = new_den
 
-        self.frame_history.append(self.frame)
         return new_target_size
 
     @staticmethod
