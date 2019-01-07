@@ -155,14 +155,14 @@ class DsstEstimator:
         self.sf_num = new_sf_num
 
 
-        #if self.frame.number == 1:
-        #    # first frame, train with a single image
-        #    self.sf_den = new_sf_den
-        #    self.sf_num = new_sf_num
-        #else:
-        #    # subsequent frames, update the model
-        #    self.sf_den = np.add((1 - self.learning_rate) * self.sf_den, self.learning_rate * new_sf_den)
-        #    self.sf_num = np.add((1 - self.learning_rate) * self.sf_num, self.learning_rate * new_sf_num)
+        if self.frame.number == 1:
+            # first frame, train with a single image
+            self.sf_den = new_sf_den
+            self.sf_num = new_sf_num
+        else:
+            # subsequent frames, update the model
+            self.sf_den = np.add((1 - self.learning_rate) * self.sf_den, self.learning_rate * new_sf_den)
+            self.sf_num = np.add((1 - self.learning_rate) * self.sf_num, self.learning_rate * new_sf_num)
 
         logger.info("currentScaleFactor {0}".format(self.currentScaleFactor))
         target_sz = np.rint(np.multiply(self.base_target_sz, self.currentScaleFactor))

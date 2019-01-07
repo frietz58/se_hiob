@@ -12,6 +12,7 @@ import scipy.stats as st
 import cv2
 from .matlab_dsst import DsstEstimator
 from .custom_dsst import CustomDsst
+from .eco import Eco
 from ..Rect import Rect
 
 from matplotlib import pyplot as plt
@@ -158,6 +159,7 @@ class ScaleEstimator:
             logger.info("starting scale estimation. Approach: DSST")
 
             size = self.custom_dsst.dsst(frame)
+            #TODO for debuggin use GT
             frame.predicted_position = Rect(frame.predicted_position.x,
                                             frame.predicted_position.y,
                                             size[0],

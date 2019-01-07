@@ -20,6 +20,7 @@ class CustomDsst:
         # run time
         self.img_frames = None
         self.scale_factors = None
+        self.current_scale_factor = None
         self.min_scale_factor = None
         self.max_scale_factor = None
         self.frame = None
@@ -29,6 +30,7 @@ class CustomDsst:
         self.num = None
         self.den = None
         self.frame_history = []
+        self.response_history = []
 
     def configure(self, n_scales, scale_step, scale_sigma_factor, img_files, learning_rate):
         self.number_scales = n_scales
@@ -39,13 +41,18 @@ class CustomDsst:
         self.learning_rate = learning_rate
 
     def initial_calculations(self):
+
+        self.response_history = np.zeros((33, len(self.img_files)))
+
         # scale factors
         ss = np.arange(1, self.number_scales + 1)
         self.scale_factors = np.power(self.scale_step, (np.ceil(self.number_scales / 2) - ss))
 
+        self.current_scale_factor = 1
+
         # TODO dynamic depending on scale step and number scales
-        self.min_scale_factor = 0.9
-        self.max_scale_factor = 1.1
+        self.min_scale_factor = 0.95
+        self.max_scale_factor = 1.05
 
         # store pre-computed scale filter cosine window
         if np.mod(self.number_scales, 2) == 0:
@@ -65,18 +72,20 @@ class CustomDsst:
         self.frame = frame
         im = self.img_files[frame.number]
 
+
         # if initial frame use annotated
-        if use_gt:
+        if True:
             base_target_size = (self.frame.ground_truth.width, self.frame.ground_truth.height)
         else:
             base_target_size = (self.frame.predicted_position.width, self.frame.predicted_position.height)
 
         # create an image patch for every scale lvl
         for i in range(self.number_scales):
+
             patch_size = np.rint(np.multiply(base_target_size, self.scale_factors[i]))
 
             # if initial frame use annotated
-            if use_gt:
+            if True:
                 y0 = int(self.frame.ground_truth.center[1] - np.rint(patch_size[1] / 2))
                 y1 = int(self.frame.ground_truth.center[1] + np.rint(patch_size[1] / 2))
                 x0 = int(self.frame.ground_truth.center[0] - np.rint(patch_size[0] / 2))
@@ -109,7 +118,11 @@ class CustomDsst:
                 x1 = im.shape[1]
 
             img_patch = im[y0:y1, x0:x1]
-            img_patch_resized = cv2.resize(img_patch, (32, 32))
+            img_patch_resized = cv2.resize(img_patch, (16, 16))
+
+            if i == 0 or i == 16 or i == 32:
+                patch_img = Image.fromarray(img_patch_resized)
+                #patch_img.show()
 
             # extract the hog features
             temp_hog = self.hog_vector(img_patch_resized)
@@ -119,7 +132,7 @@ class CustomDsst:
                 out = np.zeros((np.size(temp_hog), self.number_scales))
 
             out[:, i] = np.multiply(temp_hog.flatten(), self.scale_window[i])
-            # out[:, i] = temp_hog.flatten()
+            #out[:, i] = np.multiply(temp_hog[:, 0], self.scale_window[i])
 
         # if initial frame, calculate num and den here, otherwise in main part of algorithm
         if use_gt:
@@ -138,16 +151,17 @@ class CustomDsst:
         self.frame = frame
         self.frame_history.append(self.frame)  # for own idea...
         base_target_size = (self.frame.predicted_position.width, self.frame.predicted_position.height)
+        #self.current_scale_factor = 1
 
         # extract sample for current frame
         sample = self.extract_scale_sample(self.frame)
 
-        # calculate scale factor by comparing current sample to previous sample
+        # calculate scale factor by comparing current sample to model
         f_sample = np.fft.fft2(sample)
 
         # extract features from previews frames to compare to
         if approach == "own":
-            avg_target = np.zeros(1296)
+            avg_target = np.zeros(64)
             first = True
             for i in range(0, len(self.frame_history)):
 
@@ -162,7 +176,7 @@ class CustomDsst:
                 # build average target, older samples decaying
                 punisher = (1 - self.learning_rate) ** i
                 prev_img = self.img_files[self.frame.number - i]
-                prev_frame = self.frame_history[-i]#TODO WRONG!
+                prev_frame = self.frame_history[-i]
                 prev_patch = prev_img[
                              prev_frame.predicted_position.y:
                              prev_frame.predicted_position.y + prev_frame.predicted_position.height,
@@ -195,22 +209,20 @@ class CustomDsst:
             print("no matching implementation")
 
         real_part = np.real(np.fft.ifftn(scale_response))
+        self.response_history[:, self.frame.number] = real_part
 
         recovered_scale = np.argmax(real_part)
-        scale_factor = self.scale_factors[recovered_scale]
+        scale_change = self.scale_factors[recovered_scale]
 
-        if scale_factor < 0.9 or scale_factor > 1.1:
-            print("here")
+        # prevent outliers from distorting the scale
+        if scale_change < self.min_scale_factor:
+            scale_change = self.min_scale_factor
+        elif scale_change > self.max_scale_factor:
+            scale_change = self.max_scale_factor
 
-        # prevent outliers to distort the scale
-        if scale_factor < self.min_scale_factor:
-            scale_factor = self.min_scale_factor
-        elif scale_factor > self.max_scale_factor:
-            scale_factor = self.max_scale_factor
+        logger.info("estimated scale {0}".format(scale_change))
 
-        logger.info("estimated scale {0}".format(scale_factor))
-
-        new_target_size = np.rint(np.multiply(base_target_size, scale_factor))
+        new_target_size = np.rint(np.multiply(base_target_size, scale_change))
 
         # update the model
         new_num = np.add(
@@ -225,17 +237,25 @@ class CustomDsst:
         self.num = new_num
         self.den = new_den
 
+        if self.frame.number == len(self.img_files) - 2:
+            print("look at response history")
+
         return new_target_size
 
     @staticmethod
-    def hog_vector(img_patch_resized):
-        win_size = (32, 32)
-        block_size = (16, 16)
-        block_stride = (8, 8)
-        cell_size = (4, 4)
-        n_bins = 9
-        hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, n_bins)
-        temp_hog = hog.compute(img_patch_resized)
+    def hog_vector(img_patch_resized, use_man=False):
+
+        if use_man:
+            print("manual_feature extraction")
+
+        else:
+            win_size = (16, 16)
+            block_size = (4, 4)
+            block_stride = (4, 4)
+            cell_size = (2, 2)
+            n_bins = 9
+            hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, n_bins)
+            temp_hog = hog.compute(img_patch_resized)
 
         return temp_hog
 
