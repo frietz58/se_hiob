@@ -110,7 +110,7 @@ class DsstEstimator:
 
             # update the scale
             # currentScaleFactor = currentScaleFactor * scale_factors[recovered_scale]  # TODO
-            currentScaleFactor = currentScaleFactor * scaleFactors[recovered_scale] # TODO is this right?
+            currentScaleFactor = currentScaleFactor * scaleFactors…[recovered_scale] # TODO is this right?
             # scale Factors are definitly wrong, scale factor between 1 and 2 frame is 0.15...
             if currentScaleFactor < min_scale_factor:
                 currentScaleFactor = min_scale_factor
