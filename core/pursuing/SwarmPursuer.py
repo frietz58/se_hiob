@@ -264,7 +264,7 @@ class SwarmPursuer(Pursuer):
         # if scaling is enabled, punish pixels with low feature rating
         punish_low = self.particle_scale_factor != 1.0
 
-        # This is just a mapping: [img_mask[x:y,a:b]]
+        # This is just a mapping: [img_mask[top:bot,left:right]]
         slices = [img_mask[round(pos.top / scale_factor[1]):round((pos.bottom - 1) / scale_factor[1]),
                   round(pos.left / scale_factor[0]):round((pos.right - 1) / scale_factor[0])] for pos in locs]
 
@@ -314,8 +314,6 @@ class SwarmPursuer(Pursuer):
         #print(log[2:])
 
         return frame.predicted_position
-
-
 
     @staticmethod
     def calculate_sum(mat, punish_low=False):

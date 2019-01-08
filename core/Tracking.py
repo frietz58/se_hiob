@@ -67,7 +67,6 @@ class Tracking(object):
         'tracking_evaluated',
     ]
 
-    #Finn Transitions werden wie methoden aufgerugen und gehen von der ersten in die letzte
     transitions = [
         ['commence_load_sample', 'created', 'loading_sample'],
         ['complete_load_sample', 'loading_sample', 'sample_loaded'],
