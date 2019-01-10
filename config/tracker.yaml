@@ -126,8 +126,8 @@ scale_estimator:
 tracking:
 ##  - finn/BikerStatic
 ##  - tb100/Biker
-##  - tb100/Surfer
-  - tb100/Girl
+  - tb100/Surfer
+##  - tb100/Girl
 ##  - tb100/BlurCar2
 ##  - tb100/Deer
 #  - ros/nico/vision/videoStream
