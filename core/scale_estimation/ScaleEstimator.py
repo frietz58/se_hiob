@@ -12,8 +12,9 @@ import scipy.stats as st
 import cv2
 from .matlab_dsst import DsstEstimator
 from .custom_dsst import CustomDsst
-from .eco import Eco
 from ..Rect import Rect
+from .candidates import CandidateApproach
+from .eco import Eco
 
 from matplotlib import pyplot as plt
 from multiprocessing import Pool
@@ -32,6 +33,7 @@ class ScaleEstimator:
         self.econf = None
         self.dsst = DsstEstimator()
         self.custom_dsst = CustomDsst()
+        self.candidate_approach = CandidateApproach()
 
         self.frame = None
         self.tracker = None
@@ -60,6 +62,7 @@ class ScaleEstimator:
         self.scale_sigma_factor = None
         self.lam = None
         self.scale_model_max = None
+        self.approach = None
 
     def setup(self, tracker=None, sample=None):
         self.tracker = tracker
@@ -67,7 +70,6 @@ class ScaleEstimator:
         self.sample = sample
 
         self.set_up_modules()
-
 
     def configure(self, configuration):
         self.econf = configuration['scale_estimator']
@@ -103,6 +105,8 @@ class ScaleEstimator:
                                    learning_rate=self.learning_rate)
         self.custom_dsst.initial_calculations()
 
+        self.candidate_approach.configure(self.econf)
+
     def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
         """
         :param frame: the current frame in which the best position has already been calculated
@@ -125,8 +129,13 @@ class ScaleEstimator:
         if self.approach == 'candidates':
             logger.info("starting scale estimation. Approach: Candidate Generation")
 
-            scaled_candidates = self.generate_scaled_candidates(frame)
-            final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
+            #scaled_candidates = self.generate_scaled_candidates(frame)
+            #final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
+
+            scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame)
+            final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
+                                                                                 feature_mask,
+                                                                                 mask_scale_factor)
 
             logger.info("finished scale estimation")
 
@@ -159,7 +168,7 @@ class ScaleEstimator:
             logger.info("starting scale estimation. Approach: DSST")
 
             size = self.custom_dsst.dsst(frame)
-            #TODO for debuggin use GT
+            # TODO for debuggin use GT
             frame.predicted_position = Rect(frame.predicted_position.x,
                                             frame.predicted_position.y,
                                             size[0],
@@ -255,7 +264,6 @@ class ScaleEstimator:
             self.dsst_denominator_b.append(b)
             """
 
-
         elif self.approach == 'candidates':
             # nothing needs to be done
             logger.info('')
@@ -292,7 +300,7 @@ class ScaleEstimator:
         :param scaled_candidates: the candidates based on the best position but scaled in widht and height
         :param feature_mask: the consolidated feature mask containing pixel values for how likely they belong to the
         object
-        :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI 
+        :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
         size, the cnn output is 48x48
         :param roi: the region of interest
         :return: the best scaled candidate, can also be the original, not scaled candidate
