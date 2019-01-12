@@ -286,11 +286,7 @@ class SwarmPursuer(Pursuer):
         frame.predicted_position = self.tracker.estimator.estimate_scale(
             frame=frame,
             feature_mask=img_mask,
-            mask_scale_factor=scale_factor,
-            roi=frame.roi)
-
-        #self.tracker.estimator.append_to_history(frame)
-
+            mask_scale_factor=scale_factor)
 
         # quality of prediction needs to be absolute, so we normalise it with
         # the "perfect" value this prediction would have:

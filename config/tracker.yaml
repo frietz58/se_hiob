@@ -99,9 +99,9 @@ scale_estimator:
   use_scale_estimation: True # enable or disable scale estimation
 
   #Determines which approach to use for scale estimation.
-  approach: 'candidates'
+  #approach: 'candidates'
   #approach: 'dsst'
-  #approach: 'custom_dsst'
+  approach: 'custom_dsst'
   #approach: 'mse'
 
   #dsst params:
@@ -110,6 +110,8 @@ scale_estimator:
   learning_rate: 0.025
   reg: 0.01
   scale_model_max: 512 #max area of the scale model on the image
+  scale_model_size: 16
+  padding: 1.0
 
   #mse params:
   scale_factor_range: [0.95, 1.05] # the range for which the number_scales are linspaced between
@@ -125,8 +127,9 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 ##  - finn/BikerStatic
+  - finn/dog1
 ##  - tb100/Biker
-  - tb100/Surfer
+##  - tb100/Surfer
 ##  - tb100/Girl
 ##  - tb100/BlurCar2
 ##  - tb100/Deer

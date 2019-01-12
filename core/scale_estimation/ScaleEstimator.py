@@ -63,6 +63,8 @@ class ScaleEstimator:
         self.lam = None
         self.scale_model_max = None
         self.approach = None
+        self.scale_model_size = None
+        self.padding = None
 
     def setup(self, tracker=None, sample=None):
         self.tracker = tracker
@@ -85,6 +87,8 @@ class ScaleEstimator:
         self.regularization = self.econf['reg']
         self.scale_sigma_factor = self.econf['scale_sigma_factor']
         self.scale_model_max = self.econf['scale_model_max']
+        self.scale_model_size = self.econf['scale_model_size']
+        self.padding = self.econf['padding']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -98,16 +102,11 @@ class ScaleEstimator:
                         scale_model_max=self.scale_model_max,
                         learning_rate=self.learning_rate)
 
-        self.custom_dsst.configure(n_scales=self.number_scales,
-                                   scale_step=self.scale_factor,
-                                   scale_sigma_factor=self.scale_sigma_factor,
-                                   img_files=self.sample.cv2_img_cache,
-                                   learning_rate=self.learning_rate)
-        self.custom_dsst.initial_calculations()
+        self.custom_dsst.configure(self.econf, img_files=self.sample.cv2_img_cache)
 
         self.candidate_approach.configure(self.econf)
 
-    def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
+    def estimate_scale(self, frame, feature_mask, mask_scale_factor):
         """
         :param frame: the current frame in which the best position has already been calculated
         :param feature_mask: he consolidated feature mask containing pixel values for how likely they belong to the
@@ -228,7 +227,7 @@ class ScaleEstimator:
             self.scaled_filters.append({'factor': 1, 'filter': filter, 'size': (scaled_width, scaled_height)})
 
         elif self.approach == "custom_dsst":
-            self.custom_dsst.extract_scale_sample(frame, use_gt=True)
+            self.custom_dsst.handle_initial_frame(frame=frame)
 
         elif self.approach == 'dsst':
 

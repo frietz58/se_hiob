@@ -6,3 +6,6 @@ samples:
     - name: BikerStatic
       attributes: [FM, LR, MB, OCC, OPR, OV, SV]
       actual_frames: 50
+    - name: dog1
+      attributes: [OCC, OPR, OV, SV]
+      actual_frames: 855
