@@ -291,7 +291,6 @@ class SwarmPursuer(Pursuer):
         # quality of prediction needs to be absolute, so we normalise it with
         # the "perfect" value this prediction would have:
         perfect_quality = 1
-        #print(quals[best_arg], perfect_quality)
         frame.prediction_quality = max(
             0.0, min(1.0, quals[best_arg] / perfect_quality))
         logger.info("Prediction: %s, quality: %f",

@@ -99,9 +99,9 @@ scale_estimator:
   use_scale_estimation: True # enable or disable scale estimation
 
   #Determines which approach to use for scale estimation.
-  #approach: 'candidates'
+  approach: 'candidates'
   #approach: 'dsst'
-  approach: 'custom_dsst'
+  #approach: 'custom_dsst'
   #approach: 'mse'
 
   #dsst params:
@@ -121,14 +121,15 @@ scale_estimator:
   inner_punish_factor: 0.01 # the factor with which the inner punish score gets multiplied to decrease its impact
   outer_punish_threshold: 0.5 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
   number_scales: 33 # number of scaled candidates to generate
+  max_scale_difference: 0.05 #max value the scale may change between two frames
 
 # = tracking = 
 # which samples shall be tracked? Accepts samples, data sets, and data collections
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 ##  - finn/BikerStatic
-  - finn/dog1
-##  - tb100/Biker
+##  - finn/dog1
+  - tb100/Biker
 ##  - tb100/Surfer
 ##  - tb100/Girl
 ##  - tb100/BlurCar2
