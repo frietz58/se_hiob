@@ -29,6 +29,8 @@ class CandidateApproach:
         """
 
         self.number_scales = configuration['number_scales']
+        if np.mod(self.number_scales, 2) == 0:
+            raise ValueError("Number of Scales needs to be odd!")
         self.inner_punish_threshold = configuration['inner_punish_threshold']
         self.inner_punish_factor = configuration['inner_punish_factor']
         self.outer_punish_threshold = configuration['outer_punish_threshold']
@@ -37,6 +39,7 @@ class CandidateApproach:
 
     def generate_scaled_candidates(self, frame):
         """
+        generates the candidates based on the predicted position but at different scale levels
         :param frame: the current frame in which the best position has already been calculated
         :return: a list of scaled variations of the best predicted position
         """
@@ -63,6 +66,10 @@ class CandidateApproach:
 
     def evaluate_scaled_candidates(self, scaled_candidates, feature_mask, mask_scale_factor):
         """
+        evaluates the candidates of different sizes. this is done by getting the values on the feature mask for each
+        candidate and punishing the rating of the candidate for not containing high values (aka strong probability
+        of feature belonging to target) and for containing small values.  If the overall prediction has low values, the
+        scale wont be changed. Each candidate also gets punished more for having a factor further away from 1.
         :param scaled_candidates: the candidates based on the best position but scaled in widht and height
         :param feature_mask: the consolidated feature mask containing pixel values for how likely they belong to the
         object
@@ -85,20 +92,33 @@ class CandidateApproach:
         evaluated_candidates = []
 
         for single_sum, candidate in zip(candidate_sums, scaled_candidates):
-            evaluated_candidates.append(self.rate_scaled_candidate(single_sum,
-                                                                   candidate,
-                                                                   mask_scale_factor,
-                                                                   feature_mask))
+            try:
+                evaluated_candidates.append(self.rate_scaled_candidate(
+                    single_sum,
+                    candidate,
+                    mask_scale_factor,
+                    feature_mask))
+            except ValueError:
+                # handcraft the results, so that the scale will not change when the prediction is bad
+                # number scales is always odd, therefor we now that factor 1 is in the middle
+                if evaluated_candidates.__len__() == (self.number_scales - 1) / 2:
+                    evaluated_candidates.append(1)
+                # in every other case when we are not at factor 1, append 0. Like this, when multiplied with the scale
+                # window, 1 will be the best factor and scale wont be changed.
+                else:
+                    evaluated_candidates.append(0)
 
-        # TODO maybe include scale window here? so none 1 factor candidates values get punished?
+        # hanning scale window to punish punish factors there further they are away from  1
+        scale_window = np.hanning(self.number_scales)
+        punished_candidates = np.multiply(evaluated_candidates, scale_window)
 
         # find unique candidates and calculate corresponding average scale factors (because low resolution of feature
         # mask, different different scale lvls will have same result, causing np.argmax to return the first match,
         # distorting the scale prediction)
-        self.get_unique_candidates(evaluated_candidates)
+        # self.get_unique_candidates(evaluated_candidates)
 
         # recover the scale change factor
-        scale_change = self.unique_factors[np.argmax(self.unique_candidates)]
+        scale_change = self.scale_factors[np.argmax(punished_candidates)]
 
         # make sure the area doesnt change too much
         limited_factor = self.limit_scale_change(scale_change, keep_original=True)
@@ -120,30 +140,52 @@ class CandidateApproach:
         :return: the quality of the candidate based on its size
         """
 
-        # Calculate a score that punishes the candidate for containing pixel values < x
-        inner_punish = np.where(feature_mask[
+        # check highest value on feature map, calculate threshold values accordingly
+        # (its possible that every prediction value is smaller than value for the inner threshold, in which case every
+        # rating becomes 0, when everything in the quality output is 0, np.argmax will return 0 aswell, thus the
+        # scale prediction fails
+        max_val = np.amax(feature_mask)
+        if max_val < self.inner_punish_threshold:
+            raise ValueError('Highest probability is smaller than threshold')
+
+        # punish candidate for containing values smaller than threshold
+        # get the candidate on representation on the feature mask
+        candidate_on_mask = feature_mask[
                         round(candidate.top / mask_scale_factor[1]):
                         round((candidate.bottom - 1) / mask_scale_factor[1]),
                         round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] < self.inner_punish_threshold)
+                        round((candidate.right - 1) / mask_scale_factor[0])]
 
-        inner_punish_sum = np.sum(inner_punish) * self.inner_punish_factor
+        # get the filter that checks where the condition applies
+        mask_filter = candidate_on_mask < self.inner_punish_threshold
 
-        # Calculate a score that punishes the candidate for not containing pixel values > x
-        outer_punish = np.sum([np.where(feature_mask > self.outer_punish_threshold)])
+        # apply filter to get feature values
+        feature_values = candidate_on_mask[mask_filter]
 
-        inner_helper = np.where(feature_mask[
-                        round(candidate.top / mask_scale_factor[1]):
-                        round((candidate.bottom - 1) / mask_scale_factor[1]),
-                        round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] > self.outer_punish_threshold)
+        # sum values up to get inner punish score
+        inner_punish_sum = np.sum(feature_values)
 
-        inner_helper_sum = np.sum(inner_helper)
-        outer_punish_sum = outer_punish - inner_helper_sum
-        # TODO make this without the helper (only take the values that are bigger and not in the candidate...)
+        # calculate a score that punishes the candidate for not containing values bigger than threshold
+        # filter for all values that are bigger than threshold
+        outer_mask_filter = feature_mask > self.outer_punish_threshold
+
+        # get the values of the filter
+        outer_values = feature_mask[outer_mask_filter]
+
+        # find the values that are bigger but within the candidate (we dont want to punish those)
+        on_candidate_filter = candidate_on_mask > self.outer_punish_threshold
+
+        # get the values
+        on_candidate_values = candidate_on_mask[on_candidate_filter]
+
+        # sum both values up and subtract the values that are bigger but within the candidate
+        outer_punish_sum = np.sum(outer_values) - np.sum(on_candidate_values)
 
         # Evaluate the candidate
         quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
+
+        if quality_of_candidate == 0:
+            raise ValueError("Quality of candidate is 0, this should not happen")
 
         return quality_of_candidate
 

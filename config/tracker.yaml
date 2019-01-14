@@ -117,9 +117,9 @@ scale_estimator:
   scale_factor_range: [0.95, 1.05] # the range for which the number_scales are linspaced between
 
   # candidate params:
-  inner_punish_threshold: 0.05 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
+  inner_punish_threshold: 0.3 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   inner_punish_factor: 0.01 # the factor with which the inner punish score gets multiplied to decrease its impact
-  outer_punish_threshold: 0.5 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
+  outer_punish_threshold: 0.3 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
   number_scales: 33 # number of scaled candidates to generate
   max_scale_difference: 0.05 #max value the scale may change between two frames
 
