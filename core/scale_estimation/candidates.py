@@ -79,6 +79,7 @@ class CandidateApproach:
         """
 
         # Apply the scaled candidates to the feature mask like mask[top:bottom,width:height]
+        # TODO does it make sense here to always use the base candidate??
         pixel_values = [feature_mask[
                         round(pos.top / mask_scale_factor[1]):
                         round((pos.bottom - 1) / mask_scale_factor[1]),
