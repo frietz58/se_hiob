@@ -95,10 +95,12 @@ class CandidateApproach:
         for single_sum, candidate in zip(candidate_sums, scaled_candidates):
             try:
                 evaluated_candidates.append(self.rate_scaled_candidate(
-                    single_sum,
-                    candidate,
-                    mask_scale_factor,
-                    feature_mask))
+                    candidate_sum=single_sum,
+                    candidate=candidate,
+                    mask_scale_factor=mask_scale_factor,
+                    feature_mask=feature_mask,
+                    use_sum=False,
+                    candidate_sums=candidate_sums))
             except ValueError:
                 # handcraft the results, so that the scale will not change when the prediction is bad
                 # number scales is always odd, therefor we now that factor 1 is in the middle
@@ -108,7 +110,7 @@ class CandidateApproach:
                 # window, 1 will be the best factor and scale wont be changed.
                 else:
                     evaluated_candidates.append(0)
-
+        # TODO Idea: dont use scale window, find average factor over all the best values...
         # hanning scale window to punish punish factors there further they are away from  1
         scale_window = np.hanning(self.number_scales)
         punished_candidates = np.multiply(evaluated_candidates, scale_window)
@@ -130,13 +132,14 @@ class CandidateApproach:
 
         return Rect(self.frame.predicted_position.x, self.frame.predicted_position.y, new_w, new_h)
 
-    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask):
+    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask, use_sum, candidate_sums):
         """
         :param candidate_sum: the summed up pixel values of the candidate
         :param candidate: the current candidate
         :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
         size, the cnn output is 48x48
         :param feature_mask: the consolidated feature mask containing pixel values for how likely they belong to the
+        :param use_sum: if true use pixel sum of candidate for calculating the score, otherwise just inner/outer punish
         object
         :return: the quality of the candidate based on its size
         """
@@ -183,7 +186,12 @@ class CandidateApproach:
         outer_punish_sum = np.sum(outer_values) - np.sum(on_candidate_values)
 
         # Evaluate the candidate
-        quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
+        if use_sum:
+            quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
+        else:
+            quality_of_candidate = candidate_sums[16] - (inner_punish_sum + outer_punish_sum)
+            print("inner_sum: {0}, outer_sum {1}".format(inner_punish_sum, outer_punish_sum))
+            # TODO see why its not growing on biker
 
         if quality_of_candidate == 0:
             raise ValueError("Quality of candidate is 0, this should not happen")
