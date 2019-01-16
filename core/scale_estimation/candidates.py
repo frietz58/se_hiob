@@ -290,3 +290,4 @@ class CandidateApproach:
             curve[neg_loc] = val
 
         self.manual_scale_window = curve
+        # testing new branch
