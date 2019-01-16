@@ -19,8 +19,6 @@ class CandidateApproach:
         # run time
         self.frame = None
         self.scale_factors = None
-        self.unique_candidates = []
-        self.unique_factors = []
 
     def configure(self, configuration):
         """
@@ -110,7 +108,10 @@ class CandidateApproach:
                 # window, 1 will be the best factor and scale wont be changed.
                 else:
                     evaluated_candidates.append(0)
+
         # TODO Idea: dont use scale window, find average factor over all the best values...
+
+
         # hanning scale window to punish punish factors there further they are away from  1
         scale_window = np.hanning(self.number_scales)
         punished_candidates = np.multiply(evaluated_candidates, scale_window)
@@ -118,7 +119,9 @@ class CandidateApproach:
         # find unique candidates and calculate corresponding average scale factors (because low resolution of feature
         # mask, different different scale lvls will have same result, causing np.argmax to return the first match,
         # distorting the scale prediction)
-        # self.get_unique_candidates(evaluated_candidates)
+        unique_candidates, avg_factors = self.get_unique_candidates(evaluated_candidates)
+
+        best_avg_factor = avg_factors[np.argmax(unique_candidates)]
 
         # recover the scale change factor
         scale_change = self.scale_factors[np.argmax(punished_candidates)]
@@ -127,8 +130,8 @@ class CandidateApproach:
         limited_factor = self.limit_scale_change(scale_change, keep_original=True)
 
         # return Rect(scaled_candidates[scale_change])
-        new_w = round(self.frame.predicted_position.w * limited_factor)
-        new_h = round(self.frame.predicted_position.h * limited_factor)
+        new_w = round(self.frame.predicted_position.w * best_avg_factor)
+        new_h = round(self.frame.predicted_position.h * best_avg_factor)
 
         return Rect(self.frame.predicted_position.x, self.frame.predicted_position.y, new_w, new_h)
 
@@ -230,24 +233,27 @@ class CandidateApproach:
         because the feature map has a low resolution, candidates at different scale factors might end up with the exact
         same quality score, which is calculated with the pixel values on the feature map. Therefor it is necessary to
         find the distinct candidates and calculate the corresponding scale factors, otherwise working with np.argmax
-        will return the first match, which would in almost every case return a scale factor that is actually to high
+        will return the first match, which would in almost every case return a scale factor that is to high
         :param candidates: the non-distinct candidate list
         :return: sets distinct candidates corresponding scale factors
         """
 
-        # reset class variables
-        self.unique_candidates = []
-        self.unique_factors = []
-
         # find the candidates with different pixel values and qualities
-        unique_candidates = np.unique(candidates)
+        #unique_candidates = np.unique(candidates)
+
+        unique_candidates = []
+
+        for candidate in candidates:
+            if candidate not in unique_candidates:
+                unique_candidates.append(candidate)
+
+        avg_factors = []
 
         # find the indices of the same candidates and get average scale factor for the unique candidate
         for candidate in unique_candidates:
             indices = np.where(candidates == candidate)
 
-            avg_scale_factor = np.sum(self.scale_factors[indices]) / indices[0].__len__()
-            self.unique_candidates.append(candidate)
-            self.unique_factors.append(avg_scale_factor)
-        # TODO doesn't contain factor 1 now...
-        logger.info(self.unique_factors)
+            avg_scale_factor = np.sum(self.scale_factors[indices]) / np.shape(indices)[0]
+            avg_factors.append(avg_scale_factor)
+
+        return unique_candidates, avg_factors
