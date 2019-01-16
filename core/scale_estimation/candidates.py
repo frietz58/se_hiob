@@ -15,10 +15,13 @@ class CandidateApproach:
         self.outer_punish_threshold = None
         self.scale_step = None
         self.max_scale_change = None
+        self.scale_window_step_size = None
 
         # run time
         self.frame = None
         self.scale_factors = None
+        self.manual_scale_window = ()
+        self.hanning_scale_window = None
 
     def configure(self, configuration):
         """
@@ -34,6 +37,10 @@ class CandidateApproach:
         self.outer_punish_threshold = configuration['outer_punish_threshold']
         self.scale_step = configuration['scale_factor']
         self.max_scale_change = configuration['max_scale_difference']
+        self.scale_window_step_size = configuration['scale_window_step_size']
+
+        self.calc_manual_scale_window(step_size=self.scale_window_step_size)
+        self.hanning_scale_window = np.hanning(self.number_scales)
 
     def generate_scaled_candidates(self, frame):
         """
@@ -77,7 +84,7 @@ class CandidateApproach:
         """
 
         # Apply the scaled candidates to the feature mask like mask[top:bottom,width:height]
-        # TODO does it make sense here to always use the base candidate??
+        # TODO only pixel value form candidate with factors 1 is used, we dont need rest
         pixel_values = [feature_mask[
                         round(pos.top / mask_scale_factor[1]):
                         round((pos.bottom - 1) / mask_scale_factor[1]),
@@ -109,29 +116,28 @@ class CandidateApproach:
                 else:
                     evaluated_candidates.append(0)
 
-        # TODO Idea: dont use scale window, find average factor over all the best values...
-
-
-        # hanning scale window to punish punish factors there further they are away from  1
-        scale_window = np.hanning(self.number_scales)
-        punished_candidates = np.multiply(evaluated_candidates, scale_window)
-
         # find unique candidates and calculate corresponding average scale factors (because low resolution of feature
-        # mask, different different scale lvls will have same result, causing np.argmax to return the first match,
+        # mask, different different scale factors will have same result, causing np.argmax to return the first match,
         # distorting the scale prediction)
         unique_candidates, avg_factors = self.get_unique_candidates(evaluated_candidates)
 
+        # best avg approach has the problem of not containing 1, thus always changing scale. Didnt come up with a
+        # smart solution yet... TODO
         best_avg_factor = avg_factors[np.argmax(unique_candidates)]
+
+        # use either hanning or manual scale window to punish the candidates depending of their factor
+        # IMPORTANT also makes them unique, which is import for the np.argmax later
+        punished_candidates = np.multiply(evaluated_candidates, self.manual_scale_window)
 
         # recover the scale change factor
         scale_change = self.scale_factors[np.argmax(punished_candidates)]
 
         # make sure the area doesnt change too much
-        limited_factor = self.limit_scale_change(scale_change, keep_original=True)
+        limited_factor = self.limit_scale_change(scale_change, keep_original=False)
 
         # return Rect(scaled_candidates[scale_change])
-        new_w = round(self.frame.predicted_position.w * best_avg_factor)
-        new_h = round(self.frame.predicted_position.h * best_avg_factor)
+        new_w = round(self.frame.predicted_position.w * limited_factor)
+        new_h = round(self.frame.predicted_position.h * limited_factor)
 
         return Rect(self.frame.predicted_position.x, self.frame.predicted_position.y, new_w, new_h)
 
@@ -193,8 +199,7 @@ class CandidateApproach:
             quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
         else:
             quality_of_candidate = candidate_sums[16] - (inner_punish_sum + outer_punish_sum)
-            print("inner_sum: {0}, outer_sum {1}".format(inner_punish_sum, outer_punish_sum))
-            # TODO see why its not growing on biker
+            # print("inner_sum: {0}, outer_sum {1}".format(inner_punish_sum, outer_punish_sum))
 
         if quality_of_candidate == 0:
             raise ValueError("Quality of candidate is 0, this should not happen")
@@ -239,8 +244,6 @@ class CandidateApproach:
         """
 
         # find the candidates with different pixel values and qualities
-        #unique_candidates = np.unique(candidates)
-
         unique_candidates = []
 
         for candidate in candidates:
@@ -253,7 +256,37 @@ class CandidateApproach:
         for candidate in unique_candidates:
             indices = np.where(candidates == candidate)
 
-            avg_scale_factor = np.sum(self.scale_factors[indices]) / np.shape(indices)[0]
+            avg_scale_factor = np.sum(self.scale_factors[indices]) / np.shape(indices)[1]
             avg_factors.append(avg_scale_factor)
 
         return unique_candidates, avg_factors
+
+    def calc_manual_scale_window(self, step_size):
+        """
+        create a hanning like window except it only decrease from 1 at the center by the stepsize in each direction
+        :param step_size: the step to decrease from one per iteration
+        :return: a list containing the hanning like curve
+        """
+
+        # initialize with zeros
+        curve = [0] * self.number_scales
+
+        if np.mod(len(curve), 2) == 0:
+            raise ValueError('Number of Candidate (from configuration) needs to be odd!')
+
+        # place 1 at the  (number scales is always odd)
+        center = int((len(curve) - 1) / 2)
+        curve[center] = 1
+
+        # calculate the curve
+        for i in range(1, int((len(curve) - 1) / 2) + 1):
+
+            val = np.around(1 - (step_size * i), decimals=3)
+
+            pos_loc = center + i
+            neg_loc = center - i
+
+            curve[pos_loc] = val
+            curve[neg_loc] = val
+
+        self.manual_scale_window = curve
