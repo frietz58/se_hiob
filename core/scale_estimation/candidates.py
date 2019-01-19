@@ -157,6 +157,8 @@ class CandidateApproach:
         # (its possible that every prediction value is smaller than value for the inner threshold, in which case every
         # rating becomes 0, when everything in the quality output is 0, np.argmax will return 0 aswell, thus the
         # scale prediction fails
+        # TODO just realized that it can still happen that all rating are negative, in which case the argmax also
+        #  returns 0, def needs a fix! Also i should look at the candidate, not the entire feature map here...
         max_val = np.amax(feature_mask)
         if max_val < self.inner_punish_threshold:
             raise ValueError('Highest probability is smaller than threshold')

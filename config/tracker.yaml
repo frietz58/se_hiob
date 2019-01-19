@@ -130,7 +130,7 @@ scale_estimator:
 tracking:
 ##  - finn/BikerStatic
 ##  - finn/dog1
-  - tb100/Biker
+##  - tb100/Biker
 ##  - tb100/Surfer
 ##  - tb100/Girl
 ##  - tb100/BlurCar2
@@ -138,6 +138,7 @@ tracking:
 ##  - tb100/BlurBody
 ##  - tb100/Dog1
 ##  - tb100/Walking
+  - tb100/CarScale
 #  - ros/nico/vision/videoStream
 #  - nico_recordings/banana
 #  - nico_recordings/cube
