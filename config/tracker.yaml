@@ -99,9 +99,9 @@ scale_estimator:
   use_scale_estimation: True # enable or disable scale estimation
 
   #Determines which approach to use for scale estimation.
-  approach: 'candidates'
+  #approach: 'candidates'
   #approach: 'dsst'
-  #approach: 'custom_dsst'
+  approach: 'custom_dsst'
   #approach: 'mse'
 
   #dsst params:
