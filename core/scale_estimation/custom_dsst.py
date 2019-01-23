@@ -182,9 +182,8 @@ class CustomDsst:
             y0, y1, x0, x1 = self.check_oob(y0=y0, y1=y1, x0=x0, x1=x1, im=im)
 
             img_patch = im[y0:y1, x0:x1]
-            cv2.imshow('test', img_patch)
             # TODO change axis??
-            img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
+            img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[1]), int(self.scale_model_size[0])))
 
             # extract the hog features
             temp_hog = self.hog_vector(img_patch_resized)
@@ -199,7 +198,7 @@ class CustomDsst:
 
     def hog_vector(self, img_patch_resized):
         # win_size = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
-        winSize = (self.static_model_size, self.static_model_size)
+        winSize = (self.scale_model_size[1], self.scale_model_size[0])
         blockSize = (4, 4)  # for illumination: large block = local changes less significant
         blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
         cellSize = (4, 4)  # defines how big the features are that get extracted
