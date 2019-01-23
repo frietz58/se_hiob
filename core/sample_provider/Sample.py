@@ -155,8 +155,8 @@ class Sample(object):
         stream = io.BytesIO(data)
 
         nparr = np.fromstring(data, np.uint8)
-        #img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        img_np = cv2.imdecode(nparr, 0)
+        img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        #img_np = cv2.imdecode(nparr, 0)
 
         return img_np
 

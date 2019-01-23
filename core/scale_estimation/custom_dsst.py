@@ -79,7 +79,13 @@ class CustomDsst:
         if np.prod(self.init_target_size) > self.scale_model_max_area:
             self.scale_model_factor = np.sqrt(np.divide(self.scale_model_max_area, np.prod(self.init_target_size)))
 
-        self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
+        # self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
+
+        # find a size that is closest to multiple of 4 (dsst uses that as bin size)
+        x_dim = self.get_closest_match(base=4, val=self.init_target_size[0])
+        y_dim = self.get_closest_match(base=4, val=self.init_target_size[1])
+
+        self.scale_model_size = [x_dim, y_dim]
 
         self.current_scale_factor = 1
 
@@ -176,7 +182,9 @@ class CustomDsst:
             y0, y1, x0, x1 = self.check_oob(y0=y0, y1=y1, x0=x0, x1=x1, im=im)
 
             img_patch = im[y0:y1, x0:x1]
-            img_patch_resized = cv2.resize(img_patch, (int(self.static_model_size), int(self.static_model_size)))
+            cv2.imshow('test', img_patch)
+            # TODO change axis??
+            img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
 
             # extract the hog features
             temp_hog = self.hog_vector(img_patch_resized)
@@ -191,12 +199,21 @@ class CustomDsst:
 
     def hog_vector(self, img_patch_resized):
         # win_size = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
-        win_size = (self.static_model_size, self.static_model_size)
-        block_size = (8, 8)  # TODO needs to be square?
-        block_stride = (4, 4)
-        cell_size = (4, 4)
-        n_bins = 9
-        hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, n_bins)
+        winSize = (self.static_model_size, self.static_model_size)
+        blockSize = (4, 4)  # for illumination: large block = local changes less significant
+        blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
+        cellSize = (4, 4)  # defines how big the features are that get extracted
+        nbins = 9  # number of bins in histogram
+        derivAperture = 1  # shouldn't be relevant
+        winSigma = -1.  # shouldn't be relevant
+        histogramNormType = 0  # shouldn't be relevant
+        L2HysThreshold = 0.2  # shouldn't be relevant
+        gammaCorrection = 1  # shouldn't be relevant
+        nlevels = 64
+        signedGradients = True  # 0 - 360 deg = True, 0 - 180 = false
+
+        hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma,
+                                histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradients)
 
         temp_hog = hog.compute(img_patch_resized)
 
@@ -227,3 +244,11 @@ class CustomDsst:
 
         return y0, y1, x0, x1
 
+    @staticmethod
+    def get_closest_match(base, val):
+        # create a list of multiples
+        multiples = []
+        for i in range(1, 100):
+            multiples.append(base * i)
+
+        return min(multiples, key=lambda x:abs(x-val))
