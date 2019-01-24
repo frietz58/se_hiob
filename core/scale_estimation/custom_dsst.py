@@ -3,6 +3,7 @@ import cv2
 import logging
 from math import gcd
 from PIL import Image
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class CustomDsst:
         self.learning_rate = None
         self.scale_model_size = None
         self.padding = None
+        self.static_model_size = None
 
         # run time
         self.img_frames = None
@@ -121,13 +123,18 @@ class CustomDsst:
             elif self.current_scale_factor > self.max_scale_factor:
                 self.current_scale_factor = self.max_scale_factor
 
+            logger.info("curren_scale_factor: {0}".format(self.current_scale_factor))
+
         # extract training sample for current frame, with updated scale
         sample = self.extract_scale_sample(self.frame)
 
         # calculate scale filter update
         f_sample = np.fft.fft2(sample)
         new_num = np.multiply(self.ysf, np.conj(f_sample))
-        new_den = np.sum(np.multiply(f_sample, np.conj(f_sample)), axis=0)
+        # maybe np.real(np.multiply()? without real min is index 18, with real its index 15,
+        # which is equiv to matlab with index 16 (both 1 left to where 1 would be)
+        new_den = np.sum(np.real(np.multiply(f_sample, np.conj(f_sample))), axis=0)
+        # new_den = np.sum(np.multiply(f_sample, np.conj(f_sample)), axis=0)
 
         if frame.number == 1:
             # if initial frame, train on image
@@ -167,6 +174,28 @@ class CustomDsst:
             patch_size = np.floor(np.multiply(self.base_target_size, scale_factors[i]))
 
             # if initial frame use annotated
+            #if self.frame.number == 1:
+            if True: # TODO just for debugging
+                xs = np.add(np.floor(self.frame.ground_truth.center[0]),
+                            np.arange(1, patch_size[0] + 1)) - np.floor(patch_size[0] / 2)
+                ys = np.add(np.floor(self.frame.ground_truth.center[1]),
+                            np.arange(1, patch_size[1] + 1)) - np.floor(patch_size[1]/2)
+
+                # for later indexing, needs to be slices of ints
+                xs = xs.astype(int)
+                ys = ys.astype(int)
+
+            else:
+                xs = np.add(np.floor(self.frame.predicted_position.center[0]),
+                            np.arange(1, patch_size[0] + 1)) - np.floor(patch_size[0] / 2)
+                ys = np.add(np.floor(self.frame.predicted_position.center[1]),
+                            np.arange(1, patch_size[1] + 1)) - np.floor(patch_size[1] / 2)
+
+                # for later indexing, needs to be slices of ints
+                xs = xs.astype(int)
+                ys = ys.astype(int)
+
+            # if initial frame use annotated
             if self.frame.number == 1:
                 y0 = int(self.frame.ground_truth.center[1] - np.floor(patch_size[1] / 2))
                 y1 = int(self.frame.ground_truth.center[1] + np.floor(patch_size[1] / 2))
@@ -181,9 +210,22 @@ class CustomDsst:
             # check for out of bounds
             y0, y1, x0, x1 = self.check_oob(y0=y0, y1=y1, x0=x0, x1=x1, im=im)
 
+            xs[xs < 1] = 1
+            ys[ys < 1] = 1
+            xs[xs > np.shape(im)[0]] = np.shape(im)[0]
+            ys[ys > np.shape(im)[1]] = np.shape(im)[1]
+
             img_patch = im[y0:y1, x0:x1]
-            # TODO change axis??
-            img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[1]), int(self.scale_model_size[0])))
+
+            img_patch = im[ys, :]
+            img_patch = img_patch[:, xs]
+
+            img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
+            #img_patch_resized = cv2.resize(img_patch, (24, 16))
+
+            # just for displaying:
+            # plt.imshow(img_patch_resized)
+            # plt.savefig('resized_patch' + str(i) )
 
             # extract the hog features
             temp_hog = self.hog_vector(img_patch_resized)
@@ -197,8 +239,8 @@ class CustomDsst:
         return out
 
     def hog_vector(self, img_patch_resized):
-        # win_size = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
-        winSize = (self.scale_model_size[1], self.scale_model_size[0])
+        winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
+        # winSize = (self.scale_model_size[1], self.scale_model_size[0])
         blockSize = (4, 4)  # for illumination: large block = local changes less significant
         blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
         cellSize = (4, 4)  # defines how big the features are that get extracted
@@ -250,4 +292,4 @@ class CustomDsst:
         for i in range(1, 100):
             multiples.append(base * i)
 
-        return min(multiples, key=lambda x:abs(x-val))
+        return min(multiples, key=lambda x: abs(x-val))

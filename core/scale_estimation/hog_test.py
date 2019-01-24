@@ -3,11 +3,9 @@ import numpy as np
 
 img = cv2.imread('biker0001.jpg')
 
-resized_img = cv2.resize(img, (20, 20))
+resized_img = cv2.resize(img, (24, 16))
 
-
-
-winSize = (20, 20)
+winSize = (24, 16)
 blockSize = (4, 4)
 blockStride = (2, 2)
 cellSize = (4, 4)
