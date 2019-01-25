@@ -129,6 +129,7 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 ##  - finn/BikerStatic
+##  - finn/Biker3f
 ##  - finn/dog1
 ##  - tb100/Biker
 ##  - tb100/Surfer
@@ -138,6 +139,7 @@ tracking:
 ##  - tb100/BlurBody
 ##  - tb100/Dog1
   - tb100/Walking
+##  - tb100/CarScale
 #  - ros/nico/vision/videoStream
 #  - nico_recordings/banana
 #  - nico_recordings/cube

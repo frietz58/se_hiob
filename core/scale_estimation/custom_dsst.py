@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
 import logging
+import os
+import scipy.io
 from math import gcd
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -81,11 +83,11 @@ class CustomDsst:
         if np.prod(self.init_target_size) > self.scale_model_max_area:
             self.scale_model_factor = np.sqrt(np.divide(self.scale_model_max_area, np.prod(self.init_target_size)))
 
-        # self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
+        self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
 
         # find a size that is closest to multiple of 4 (dsst uses that as bin size)
-        x_dim = self.get_closest_match(base=4, val=self.init_target_size[0])
-        y_dim = self.get_closest_match(base=4, val=self.init_target_size[1])
+        x_dim = self.get_closest_match(base=4, val=self.scale_model_size[0])
+        y_dim = self.get_closest_match(base=4, val=self.scale_model_size[1])
 
         self.scale_model_size = [x_dim, y_dim]
 
@@ -96,6 +98,7 @@ class CustomDsst:
         self.max_scale_factor = 13.6528
 
     def dsst(self, frame):
+        os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
 
         self.frame = frame
 
@@ -105,8 +108,12 @@ class CustomDsst:
             # extract the test sample for the feature map for the scale filter
             sample = self.extract_scale_sample(frame=self.frame)
 
+            name = 'CarScaleTest' + str(self.frame.number - 1) + '.mat'
+            sample = scipy.io.loadmat(name)['xs']
+
             # calculate the correlation response
-            f_sample = np.fft.fft2(sample)
+            f_sample = np.fft.fft(sample)
+
             scale_response = np.divide(
                 np.sum(np.multiply(self.num, f_sample), axis=0),
                 (self.den + self.lam))
@@ -116,7 +123,7 @@ class CustomDsst:
             recovered_scale = np.argmax(real_part)
 
             # update the scale
-            self.current_scale_factor = self.scale_factors[recovered_scale]
+            self.current_scale_factor = self.current_scale_factor * self.scale_factors[recovered_scale]
 
             if self.current_scale_factor < self.min_scale_factor:
                 self.current_scale_factor = self.min_scale_factor
@@ -128,13 +135,14 @@ class CustomDsst:
         # extract training sample for current frame, with updated scale
         sample = self.extract_scale_sample(self.frame)
 
+        name = 'CarScaleTrain' + str(self.frame.number - 1) + '.mat'
+        sample = scipy.io.loadmat(name)['xs']
+
         # calculate scale filter update
-        f_sample = np.fft.fft2(sample)
+        f_sample = np.fft.fft(sample)
+
         new_num = np.multiply(self.ysf, np.conj(f_sample))
-        # maybe np.real(np.multiply()? without real min is index 18, with real its index 15,
-        # which is equiv to matlab with index 16 (both 1 left to where 1 would be)
         new_den = np.sum(np.real(np.multiply(f_sample, np.conj(f_sample))), axis=0)
-        # new_den = np.sum(np.multiply(f_sample, np.conj(f_sample)), axis=0)
 
         if frame.number == 1:
             # if initial frame, train on image
@@ -144,12 +152,11 @@ class CustomDsst:
             # update the model
             new_num = np.add(
                 np.multiply((1 - self.learning_rate), self.num),
-                np.multiply(self.learning_rate, np.multiply(np.conj(self.ysf), f_sample)))
+                np.multiply(self.learning_rate, new_num))
 
             new_den = np.add(
                 np.multiply((1 - self.learning_rate), self.den),
-                np.sum(np.multiply(self.learning_rate, np.multiply(np.conj(f_sample), f_sample)), axis=0)
-            )
+                np.multiply(self.learning_rate, new_den))
 
             self.num = new_num
             self.den = new_den
@@ -174,8 +181,7 @@ class CustomDsst:
             patch_size = np.floor(np.multiply(self.base_target_size, scale_factors[i]))
 
             # if initial frame use annotated
-            #if self.frame.number == 1:
-            if True: # TODO just for debugging
+            if self.frame.number == 1:
                 xs = np.add(np.floor(self.frame.ground_truth.center[0]),
                             np.arange(1, patch_size[0] + 1)) - np.floor(patch_size[0] / 2)
                 ys = np.add(np.floor(self.frame.ground_truth.center[1]),
@@ -195,33 +201,17 @@ class CustomDsst:
                 xs = xs.astype(int)
                 ys = ys.astype(int)
 
-            # if initial frame use annotated
-            if self.frame.number == 1:
-                y0 = int(self.frame.ground_truth.center[1] - np.floor(patch_size[1] / 2))
-                y1 = int(self.frame.ground_truth.center[1] + np.floor(patch_size[1] / 2))
-                x0 = int(self.frame.ground_truth.center[0] - np.floor(patch_size[0] / 2))
-                x1 = int(self.frame.ground_truth.center[0] + np.floor(patch_size[0] / 2))
-            else:
-                y0 = int(self.frame.predicted_position.center[1] - np.floor(patch_size[1] / 2))
-                y1 = int(self.frame.predicted_position.center[1] + np.floor(patch_size[1] / 2))
-                x0 = int(self.frame.predicted_position.center[0] - np.floor(patch_size[0] / 2))
-                x1 = int(self.frame.predicted_position.center[0] + np.floor(patch_size[0] / 2))
 
             # check for out of bounds
-            y0, y1, x0, x1 = self.check_oob(y0=y0, y1=y1, x0=x0, x1=x1, im=im)
-
             xs[xs < 1] = 1
             ys[ys < 1] = 1
             xs[xs > np.shape(im)[0]] = np.shape(im)[0]
             ys[ys > np.shape(im)[1]] = np.shape(im)[1]
 
-            img_patch = im[y0:y1, x0:x1]
-
             img_patch = im[ys, :]
             img_patch = img_patch[:, xs]
 
             img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
-            #img_patch_resized = cv2.resize(img_patch, (24, 16))
 
             # just for displaying:
             # plt.imshow(img_patch_resized)
@@ -240,7 +230,6 @@ class CustomDsst:
 
     def hog_vector(self, img_patch_resized):
         winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
-        # winSize = (self.scale_model_size[1], self.scale_model_size[0])
         blockSize = (4, 4)  # for illumination: large block = local changes less significant
         blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
         cellSize = (4, 4)  # defines how big the features are that get extracted
