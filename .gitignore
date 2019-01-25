@@ -6,4 +6,6 @@ argparse
 asyncio
 logging
 transitions
+*.png
+core/scale_estimation/*.mat
 **/.*.swp

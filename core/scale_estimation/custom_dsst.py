@@ -1,8 +1,11 @@
 import numpy as np
 import cv2
 import logging
+import os
+import scipy.io
 from math import gcd
 from PIL import Image
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +22,7 @@ class CustomDsst:
         self.learning_rate = None
         self.scale_model_size = None
         self.padding = None
+        self.static_model_size = None
 
         # run time
         self.img_frames = None
@@ -41,7 +45,7 @@ class CustomDsst:
         self.scale_model_max_area = None
 
     def configure(self, conf, img_files):
-        self.number_scales = conf['number_scales']
+        self.number_scales = conf['dsst_number_scales']
         self.scale_step = conf['scale_factor']
         self.scale_sigma_factor = conf['scale_sigma_factor']
         self.img_files = img_files
@@ -81,6 +85,12 @@ class CustomDsst:
 
         self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
 
+        # find a size that is closest to multiple of 4 (dsst uses that as bin size)
+        x_dim = self.get_closest_match(base=4, val=self.scale_model_size[0])
+        y_dim = self.get_closest_match(base=4, val=self.scale_model_size[1])
+
+        self.scale_model_size = [x_dim, y_dim]
+
         self.current_scale_factor = 1
 
         # TODO dynamic
@@ -97,8 +107,13 @@ class CustomDsst:
             # extract the test sample for the feature map for the scale filter
             sample = self.extract_scale_sample(frame=self.frame)
 
+            # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
+            # name = 'CarScaleTest' + str(self.frame.number - 1) + '.mat'
+            # sample = scipy.io.loadmat(name)['xs']
+
             # calculate the correlation response
-            f_sample = np.fft.fft2(sample)
+            f_sample = np.fft.fft(sample)
+
             scale_response = np.divide(
                 np.sum(np.multiply(self.num, f_sample), axis=0),
                 (self.den + self.lam))
@@ -108,20 +123,27 @@ class CustomDsst:
             recovered_scale = np.argmax(real_part)
 
             # update the scale
-            self.current_scale_factor = self.scale_factors[recovered_scale]
+            self.current_scale_factor = self.current_scale_factor * self.scale_factors[recovered_scale]
 
             if self.current_scale_factor < self.min_scale_factor:
                 self.current_scale_factor = self.min_scale_factor
             elif self.current_scale_factor > self.max_scale_factor:
                 self.current_scale_factor = self.max_scale_factor
 
+            logger.info("curren_scale_factor: {0}".format(self.current_scale_factor))
+
         # extract training sample for current frame, with updated scale
         sample = self.extract_scale_sample(self.frame)
 
+        # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
+        # name = 'CarScaleTrain' + str(self.frame.number - 1) + '.mat'
+        # sample = scipy.io.loadmat(name)['xs']
+
         # calculate scale filter update
-        f_sample = np.fft.fft2(sample)
+        f_sample = np.fft.fft(sample)
+
         new_num = np.multiply(self.ysf, np.conj(f_sample))
-        new_den = np.sum(np.multiply(f_sample, np.conj(f_sample)), axis=0)
+        new_den = np.sum(np.real(np.multiply(f_sample, np.conj(f_sample))), axis=0)
 
         if frame.number == 1:
             # if initial frame, train on image
@@ -131,12 +153,11 @@ class CustomDsst:
             # update the model
             new_num = np.add(
                 np.multiply((1 - self.learning_rate), self.num),
-                np.multiply(self.learning_rate, np.multiply(np.conj(self.ysf), f_sample)))
+                np.multiply(self.learning_rate, new_num))
 
             new_den = np.add(
                 np.multiply((1 - self.learning_rate), self.den),
-                np.sum(np.multiply(self.learning_rate, np.multiply(np.conj(f_sample), f_sample)), axis=0)
-            )
+                np.multiply(self.learning_rate, new_den))
 
             self.num = new_num
             self.den = new_den
@@ -162,21 +183,39 @@ class CustomDsst:
 
             # if initial frame use annotated
             if self.frame.number == 1:
-                y0 = int(self.frame.ground_truth.center[1] - np.floor(patch_size[1] / 2))
-                y1 = int(self.frame.ground_truth.center[1] + np.floor(patch_size[1] / 2))
-                x0 = int(self.frame.ground_truth.center[0] - np.floor(patch_size[0] / 2))
-                x1 = int(self.frame.ground_truth.center[0] + np.floor(patch_size[0] / 2))
+                xs = np.add(np.floor(self.frame.ground_truth.center[0]),
+                            np.arange(1, patch_size[0] + 1)) - np.floor(patch_size[0] / 2)
+                ys = np.add(np.floor(self.frame.ground_truth.center[1]),
+                            np.arange(1, patch_size[1] + 1)) - np.floor(patch_size[1]/2)
+
+                # for later indexing, needs to be slices of ints
+                xs = xs.astype(int)
+                ys = ys.astype(int)
+
             else:
-                y0 = int(self.frame.predicted_position.center[1] - np.floor(patch_size[1] / 2))
-                y1 = int(self.frame.predicted_position.center[1] + np.floor(patch_size[1] / 2))
-                x0 = int(self.frame.predicted_position.center[0] - np.floor(patch_size[0] / 2))
-                x1 = int(self.frame.predicted_position.center[0] + np.floor(patch_size[0] / 2))
+                xs = np.add(np.floor(self.frame.predicted_position.center[0]),
+                            np.arange(1, patch_size[0] + 1)) - np.floor(patch_size[0] / 2)
+                ys = np.add(np.floor(self.frame.predicted_position.center[1]),
+                            np.arange(1, patch_size[1] + 1)) - np.floor(patch_size[1] / 2)
+
+                # for later indexing, needs to be slices of ints
+                xs = xs.astype(int)
+                ys = ys.astype(int)
 
             # check for out of bounds
-            y0, y1, x0, x1 = self.check_oob(y0=y0, y1=y1, x0=x0, x1=x1, im=im)
+            xs[xs < 1] = 1
+            ys[ys < 1] = 1
+            xs[xs > np.shape(im)[0]] = np.shape(im)[0]
+            ys[ys > np.shape(im)[1]] = np.shape(im)[1]
 
-            img_patch = im[y0:y1, x0:x1]
-            img_patch_resized = cv2.resize(img_patch, (int(self.static_model_size), int(self.static_model_size)))
+            img_patch = im[ys, :]
+            img_patch = img_patch[:, xs]
+
+            img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
+
+            # just for displaying:
+            # plt.imshow(img_patch_resized)
+            # plt.savefig('resized_patch' + str(i) )
 
             # extract the hog features
             temp_hog = self.hog_vector(img_patch_resized)
@@ -190,40 +229,31 @@ class CustomDsst:
         return out
 
     def hog_vector(self, img_patch_resized):
-        # win_size = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
-        win_size = (self.static_model_size, self.static_model_size)
-        block_size = (8, 8)  # TODO needs to be square?
-        block_stride = (4, 4)
-        cell_size = (4, 4)
-        n_bins = 9
-        hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, n_bins)
+        winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
+        blockSize = (4, 4)  # for illumination: large block = local changes less significant
+        blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
+        cellSize = (4, 4)  # defines how big the features are that get extracted
+        nbins = 9  # number of bins in histogram
+        derivAperture = 1  # shouldn't be relevant
+        winSigma = -1.  # shouldn't be relevant
+        histogramNormType = 0  # shouldn't be relevant
+        L2HysThreshold = 0.2  # shouldn't be relevant
+        gammaCorrection = 1  # shouldn't be relevant
+        nlevels = 64
+        signedGradients = True  # 0 - 360 deg = True, 0 - 180 = false
+
+        hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma,
+                                histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradients)
 
         temp_hog = hog.compute(img_patch_resized)
 
         return temp_hog
 
     @staticmethod
-    def check_oob(y0, y1, x0, x1, im):
+    def get_closest_match(base, val):
+        # create a list of multiples
+        multiples = []
+        for i in range(1, 100):
+            multiples.append(base * i)
 
-        if y0 < 0:
-            y0 = 0
-        if y0 > im.shape[0]:
-            y0 = im.shape[0]
-
-        if y1 < 0:
-            y1 = 0
-        if y1 > im.shape[0]:
-            y1 = im.shape[0]
-
-        if x0 < 0:
-            x0 = 0
-        if x0 > im.shape[1]:
-            x0 = im.shape[1]
-
-        if x1 < 0:
-            x1 = 0
-        if x1 > im.shape[1]:
-            x1 = im.shape[1]
-
-        return y0, y1, x0, x1
-
+        return min(multiples, key=lambda x: abs(x-val))

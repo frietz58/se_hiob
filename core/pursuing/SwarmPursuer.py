@@ -196,7 +196,11 @@ class SwarmPursuer(Pursuer):
         mask[mask < 0.0] = 0.0
 
         #print("a", mask.max(), mask.min(), np.average(mask))
-        img_size = [frame.size[1], frame.size[0]]
+        # check rgb vs gray format
+        if len(frame.size) == 3:
+            img_size = [frame.size[2], frame.size[1]]
+        elif len(frame.size) == 2:
+            img_size = [frame.size[1], frame.size[2]]
 
         #ps.append(time.time())  # 2
 

@@ -107,7 +107,8 @@ class Sample(object):
             cv2_images.append(cv2_img)
             images.append(im)
 
-        self.capture_size = tuple(reversed(images[0].shape[:-1]))
+        # self.capture_size = tuple(reversed(images[0].shape[:-1]))
+        self.capture_size = tuple(reversed(images[0].shape))
 
         if self.last_frame is None:
             self.last_frame = len(self.img_paths) + 1
