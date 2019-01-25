@@ -45,7 +45,7 @@ class CustomDsst:
         self.scale_model_max_area = None
 
     def configure(self, conf, img_files):
-        self.number_scales = conf['number_scales']
+        self.number_scales = conf['dsst_number_scales']
         self.scale_step = conf['scale_factor']
         self.scale_sigma_factor = conf['scale_sigma_factor']
         self.img_files = img_files
@@ -98,7 +98,6 @@ class CustomDsst:
         self.max_scale_factor = 13.6528
 
     def dsst(self, frame):
-        os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
 
         self.frame = frame
 
@@ -108,8 +107,9 @@ class CustomDsst:
             # extract the test sample for the feature map for the scale filter
             sample = self.extract_scale_sample(frame=self.frame)
 
-            name = 'CarScaleTest' + str(self.frame.number - 1) + '.mat'
-            sample = scipy.io.loadmat(name)['xs']
+            # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
+            # name = 'CarScaleTest' + str(self.frame.number - 1) + '.mat'
+            # sample = scipy.io.loadmat(name)['xs']
 
             # calculate the correlation response
             f_sample = np.fft.fft(sample)
@@ -135,8 +135,9 @@ class CustomDsst:
         # extract training sample for current frame, with updated scale
         sample = self.extract_scale_sample(self.frame)
 
-        name = 'CarScaleTrain' + str(self.frame.number - 1) + '.mat'
-        sample = scipy.io.loadmat(name)['xs']
+        # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
+        # name = 'CarScaleTrain' + str(self.frame.number - 1) + '.mat'
+        # sample = scipy.io.loadmat(name)['xs']
 
         # calculate scale filter update
         f_sample = np.fft.fft(sample)
@@ -201,7 +202,6 @@ class CustomDsst:
                 xs = xs.astype(int)
                 ys = ys.astype(int)
 
-
             # check for out of bounds
             xs[xs < 1] = 1
             ys[ys < 1] = 1
@@ -248,31 +248,6 @@ class CustomDsst:
         temp_hog = hog.compute(img_patch_resized)
 
         return temp_hog
-
-    @staticmethod
-    def check_oob(y0, y1, x0, x1, im):
-
-        if y0 < 0:
-            y0 = 0
-        if y0 > im.shape[0]:
-            y0 = im.shape[0]
-
-        if y1 < 0:
-            y1 = 0
-        if y1 > im.shape[0]:
-            y1 = im.shape[0]
-
-        if x0 < 0:
-            x0 = 0
-        if x0 > im.shape[1]:
-            x0 = im.shape[1]
-
-        if x1 < 0:
-            x1 = 0
-        if x1 > im.shape[1]:
-            x1 = im.shape[1]
-
-        return y0, y1, x0, x1
 
     @staticmethod
     def get_closest_match(base, val):

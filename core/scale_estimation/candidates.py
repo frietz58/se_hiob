@@ -29,7 +29,7 @@ class CandidateApproach:
         :param configuration: the configuration file
         """
 
-        self.number_scales = configuration['number_scales']
+        self.number_scales = configuration['c_number_scales']
         if np.mod(self.number_scales, 2) == 0:
             raise ValueError("Number of Scales needs to be odd!")
         self.inner_punish_threshold = configuration['inner_punish_threshold']

@@ -37,7 +37,6 @@ class SimpleSroiGenerator(SroiGenerator):
         self.build_tf_model(size)
 
     def generate_sroi(self, frame):
-
         the_bbox = self.get_bbox(frame)
         self.tracker.session.run(
             [self.cache_sroi],
@@ -47,34 +46,67 @@ class SimpleSroiGenerator(SroiGenerator):
             })
 
     def get_bbox(self, frame):
-        bbox = np.array([
-            frame.roi.y / frame.size[1],
-            frame.roi.x / frame.size[0],
-            (frame.roi.y + frame.roi.height) / frame.size[1],
-            (frame.roi.x + frame.roi.width) / frame.size[0]])
+        # if rgb or gray image format
+        if len(frame.size) == 3:
+            bbox = np.array([
+                frame.roi.y / frame.size[2],
+                frame.roi.x / frame.size[1],
+                (frame.roi.y + frame.roi.height) / frame.size[2],
+                (frame.roi.x + frame.roi.width) / frame.size[1]])
+        elif len(frame.size) == 2:
+            bbox = np.array([
+                frame.roi.y / frame.size[1],
+                frame.roi.x / frame.size[0],
+                (frame.roi.y + frame.roi.height) / frame.size[1],
+                (frame.roi.x + frame.roi.width) / frame.size[0]])
         return bbox
 
     def build_tf_model(self, shape):
         logger.info("build model started")
         start_time = time.time()
-        self.input_placeholder = tf.placeholder(
-            dtype=tf.uint8,
-            shape=[shape[1], shape[0], 3],
-            name='input_placeholder')
-        im = tf.reshape(self.input_placeholder, [1, shape[1], shape[0], 3])
 
-        self.bbox_placeholder = tf.placeholder(
-            dtype=tf.float32, shape=[4], name='bbox_ph')
-        bbox = tf.reshape(self.bbox_placeholder, [1, 4])
+        if len(shape) == 3:  # if rgb
+            self.input_placeholder = tf.placeholder(
+                dtype=tf.uint8,
+                shape=[shape[2], shape[1], 3],
+                name='input_placeholder')
+            im = tf.reshape(self.input_placeholder, [1, shape[2], shape[1], 3])
 
-        generated_sroi_tensor = tf.image.crop_and_resize(
-            im,
-            bbox,
-            [0],
-            self.sroi_size)
-        self.generated_sroi = tf.get_variable('sroi',
-                                              shape=(1, self.sroi_size[1], self.sroi_size[0], 3),
-                                              initializer=tf.zeros_initializer())
+            self.bbox_placeholder = tf.placeholder(
+                dtype=tf.float32, shape=[4], name='bbox_ph')
+            bbox = tf.reshape(self.bbox_placeholder, [1, 4])
+
+            generated_sroi_tensor = tf.image.crop_and_resize(
+                im,
+                bbox,
+                [0],
+                self.sroi_size)
+
+            self.generated_sroi = tf.get_variable('sroi',
+                                                  shape=(1, self.sroi_size[1], self.sroi_size[0], 3),
+                                                  initializer=tf.zeros_initializer())
+
+        elif len(shape) == 2:  # if gray
+            self.input_placeholder = tf.placeholder(
+                dtype=tf.uint8,
+                shape=[shape[1], shape[0], 1],
+                name='input_placeholder')
+            im = tf.reshape(self.input_placeholder, [1, shape[1], shape[0], 1])
+
+            self.bbox_placeholder = tf.placeholder(
+                dtype=tf.float32, shape=[4], name='bbox_ph')
+            bbox = tf.reshape(self.bbox_placeholder, [1, 4])
+
+            generated_sroi_tensor = tf.image.crop_and_resize(
+                im,
+                bbox,
+                [0],
+                self.sroi_size)
+
+            self.generated_sroi = tf.get_variable('sroi',
+                                                  shape=(1, self.sroi_size[1], self.sroi_size[0], 1),
+                                                  initializer=tf.zeros_initializer())
+
         self.cache_sroi = self.generated_sroi.assign(generated_sroi_tensor)
         logger.info("build model finished %ds", time.time() - start_time)
 
