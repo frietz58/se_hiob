@@ -9,7 +9,8 @@ import numpy as np
 parser = argparse.ArgumentParser(description="Evaluates matlab dsst results. the matlab workspace needs to be exported"
                                              "after tracking, the variables, ie the predicted positions and size, can"
                                              " than be accessed from the mat file. Mostly copy paste from the "
-                                             "evaluation module from hiobs core.")
+                                             "evaluation module from hiobs core. Example usage: 'python3 eval_mat.py "
+                                             "-pts /home/finn/PycharmProjects/code-git/HIOB/core/Walking_dsst_results.mat'")
 
 parser.add_argument("-pts", "--path", help="Absolute path to the .mat file from the workspace at the end of tracking")
 args = parser.parse_args()
