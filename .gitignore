@@ -8,5 +8,7 @@ logging
 transitions
 **/.*.swp
 *.png
-core/scale_estimation/*.mat
+*.mat
+core/*_dsst_results
+core/scale_estimation/mats
 

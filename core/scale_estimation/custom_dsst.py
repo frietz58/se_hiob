@@ -107,7 +107,7 @@ class CustomDsst:
             # extract the test sample for the feature map for the scale filter
             sample = self.extract_scale_sample(frame=self.frame)
 
-            # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
+            # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation/mats')
             # name = 'CarScaleTest' + str(self.frame.number - 1) + '.mat'
             # sample = scipy.io.loadmat(name)['xs']
 

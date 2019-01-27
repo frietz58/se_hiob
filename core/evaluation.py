@@ -165,7 +165,7 @@ def do_tracking_evaluation(tracking):
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
 
-    #Size Plot:
+    # size Plot:
     figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
     figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
     f = plt.figure()
