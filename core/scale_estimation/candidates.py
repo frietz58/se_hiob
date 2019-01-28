@@ -142,12 +142,18 @@ class CandidateApproach:
         # update the scale
         self.current_scale_factor = limited_factor
 
-        # return Rect(scaled_candidates[scale_change])
+        # calc new width and height
         new_w = round(self.base_target_size[0] * self.current_scale_factor)
         new_h = round(self.base_target_size[1] * self.current_scale_factor)
 
-        # TODO use center no absolute predicted position, otherwise scaled prediction is not centered
-        return Rect(self.frame.predicted_position.x, self.frame.predicted_position.y, new_w, new_h)
+        # adjust x and y pos so that the box remains centered when height/width change
+        old_x = self.frame.predicted_position.center[0]
+        old_y = self.frame.predicted_position.center[1]
+
+        new_x = int(old_x - np.rint(new_w/2))
+        new_y = int(old_y - np.rint(new_h/2))
+
+        return Rect(new_x, new_y, new_w, new_h)
 
     def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask, use_sum, candidate_sums):
         """
@@ -212,6 +218,7 @@ class CandidateApproach:
             # print("inner_sum: {0}, outer_sum {1}".format(inner_punish_sum, outer_punish_sum))
 
         if quality_of_candidate == 0:
+            # TODO does this make sense here???
             raise ValueError("Quality of candidate is 0, this should not happen")
 
         return quality_of_candidate
