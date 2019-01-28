@@ -22,6 +22,8 @@ class CandidateApproach:
         self.scale_factors = None
         self.manual_scale_window = ()
         self.hanning_scale_window = None
+        self.base_target_size = None
+        self.current_scale_factor = 1
 
     def configure(self, configuration):
         """
@@ -42,6 +44,14 @@ class CandidateApproach:
         self.calc_manual_scale_window(step_size=self.scale_window_step_size)
         self.hanning_scale_window = np.hanning(self.number_scales)
 
+    def handle_initial_frame(self, frame):
+        self.frame = frame
+        self.base_target_size = [self.frame.ground_truth.w, self.frame.ground_truth.h]
+        self.current_scale_factor = 1
+
+        ss = np.arange(1, self.number_scales + 1)
+        self.scale_factors = np.power(self.scale_step, (np.ceil(self.number_scales / 2) - ss))
+
     def generate_scaled_candidates(self, frame):
         """
         generates the candidates based on the predicted position but at different scale levels
@@ -52,18 +62,19 @@ class CandidateApproach:
         self.frame = frame
         scaled_predictions = []
 
-        ss = np.arange(1, self.number_scales + 1)
-        self.scale_factors = np.power(self.scale_step, (np.ceil(self.number_scales / 2) - ss))
+        # calculate the current scale factors
+        scale_factors = np.multiply(self.scale_factors, self.current_scale_factor)
 
         # Generate n scaled candidates
         for i in range(self.number_scales):
 
-            scale_factor = self.scale_factors[i]
+            # TODO also centering here
+            scale_factor = scale_factors[i]
             scaled_box = Rect(
                 frame.predicted_position.x,
                 frame.predicted_position.y,
-                frame.predicted_position.w * scale_factor,
-                frame.predicted_position.h * scale_factor)
+                np.floor(self.base_target_size[0] * scale_factor),
+                np.floor(self.base_target_size[1] * scale_factor))
 
             scaled_predictions.append(scaled_box)
 
@@ -123,7 +134,7 @@ class CandidateApproach:
 
         # best avg approach has the problem of not containing 1, thus always changing scale. Didnt come up with a
         # smart solution yet... TODO
-        best_avg_factor = avg_factors[np.argmax(unique_candidates)]
+        # best_avg_factor = avg_factors[np.argmax(unique_candidates)]
 
         # use either hanning or manual scale window to punish the candidates depending of their factor
         # IMPORTANT also makes them unique, which is import for the np.argmax later
@@ -132,13 +143,25 @@ class CandidateApproach:
         # recover the scale change factor
         scale_change = self.scale_factors[np.argmax(punished_candidates)]
 
-        # make sure the area doesnt change too much
-        limited_factor = self.limit_scale_change(scale_change, keep_original=False)
+        # update the scale
+        # self.current_scale_factor = self.current_scale_factor * self.scale_factors[np.argmax(punished_candidates)]
+
+        # correct scale factor if it changed too much
+        limited_factor = self.limit_scale_change(
+            old=self.current_scale_factor,
+            new=self.current_scale_factor * self.scale_factors[np.argmax(punished_candidates)],
+            max_change_percentage=self.max_scale_change,
+            keep_original=False
+        )
+
+        # update the scale
+        self.current_scale_factor = limited_factor
 
         # return Rect(scaled_candidates[scale_change])
-        new_w = round(self.frame.predicted_position.w * limited_factor)
-        new_h = round(self.frame.predicted_position.h * limited_factor)
+        new_w = round(self.base_target_size[0] * self.current_scale_factor)
+        new_h = round(self.base_target_size[1] * self.current_scale_factor)
 
+        # TODO use center no absolute predicted position, otherwise scaled prediction is not centered
         return Rect(self.frame.predicted_position.x, self.frame.predicted_position.y, new_w, new_h)
 
     def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask, use_sum, candidate_sums):
@@ -208,30 +231,33 @@ class CandidateApproach:
 
         return quality_of_candidate
 
-    def limit_scale_change(self, factor, keep_original=False):
+    @staticmethod
+    def limit_scale_change(old, new, max_change_percentage, keep_original=False):
         """
         limits the scale change between two frames to a configured threshold
-        :param factor: the predicted scale change factor for the target size at factor 1
+        :param old: the current scale factor still from the previous frames
+        :param new: the new predicted scale factor, which is to be limited
+        :param max_change_percentage: the percentage value of which the scale is allowed to change each frame
         :param keep_original: for debugging, can be passed with the function call so that the predicted factor will
             always be used
         :return: if factors out of threshold, threshold factor, otherwise normal factor
         """
 
         # make sure area didn't change too much, correcting scale factor
-        if factor > 1 + self.max_scale_change:
-            output_factor = 1 + self.max_scale_change
-            logger.info("predicted scale change was {0}, reduced it to {1}".format(factor, output_factor))
-        elif factor < 1 - self.max_scale_change:
-            output_factor = 1 - self.max_scale_change
-            logger.info("predicted scale change was {0}, increased it  to {1}".format(factor, output_factor))
+        if new > old + max_change_percentage:
+            output_factor = old + max_change_percentage
+            logger.info("predicted scale change was {0}, reduced it to {1}".format(new, output_factor))
+        elif new < old - max_change_percentage:
+            output_factor = old - max_change_percentage
+            logger.info("predicted scale change was {0}, increased it  to {1}".format(new, output_factor))
         else:
-            output_factor = factor
-            logger.info("predicted scale change was {0}".format(factor))
+            output_factor = new
+            logger.info("predicted scale change was {0}".format(output_factor))
 
         # for debugging
         if keep_original:
-            logger.info("final output factor: {0}".format(factor))
-            output_factor = factor
+            logger.info("final output factor: {0}".format(new))
+            output_factor = new
 
         return output_factor
 

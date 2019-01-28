@@ -80,7 +80,7 @@ class ScaleEstimator:
         self.inner_punish_threshold = self.econf['inner_punish_threshold']
         self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
-        self.number_scales = self.econf['number_scales']
+        # self.number_scales = self.econf['number_scales']
         self.scale_factor_range = self.econf['scale_factor_range']
         self.scale_factor = self.econf['scale_factor']
         self.learning_rate = self.econf['learning_rate']
@@ -265,7 +265,7 @@ class ScaleEstimator:
 
         elif self.approach == 'candidates':
             # nothing needs to be done
-            logger.info('')
+            self.candidate_approach.handle_initial_frame(frame)
 
     def create_2d_gaussian_kernel(self, kernlen, nsig):
         """Returns a 2D Gaussian kernel array."""
