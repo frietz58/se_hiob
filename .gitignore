@@ -7,5 +7,6 @@ asyncio
 logging
 transitions
 *.png
-core/scale_estimation/*.mat
+*.mat
+*_dsst_results
 **/.*.swp

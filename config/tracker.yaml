@@ -99,9 +99,9 @@ scale_estimator:
   use_scale_estimation: True # enable or disable scale estimation
 
   #Determines which approach to use for scale estimation.
-  #approach: 'candidates'
+  approach: 'candidates'
   #approach: 'dsst'
-  approach: 'custom_dsst'
+  #approach: 'custom_dsst'
   #approach: 'mse'
 
   #dsst params:
@@ -133,13 +133,13 @@ tracking:
 ##  - finn/Biker3f
 ##  - finn/dog1
 ##  - tb100/Biker
- - tb100/Surfer
+##  - tb100/Surfer
 ##  - tb100/Girl
 ##  - tb100/BlurCar2
 ##  - tb100/Deer
 ##  - tb100/BlurBody
 ##  - tb100/Dog1
-##  - tb100/Walking
+  - tb100/Walking
 ##  - tb100/CarScale
 ##  - tb100/Car1
 #  - ros/nico/vision/videoStream
