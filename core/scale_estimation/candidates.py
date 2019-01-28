@@ -127,24 +127,9 @@ class CandidateApproach:
                 else:
                     evaluated_candidates.append(0)
 
-        # find unique candidates and calculate corresponding average scale factors (because low resolution of feature
-        # mask, different different scale factors will have same result, causing np.argmax to return the first match,
-        # distorting the scale prediction)
-        unique_candidates, avg_factors = self.get_unique_candidates(evaluated_candidates)
-
-        # best avg approach has the problem of not containing 1, thus always changing scale. Didnt come up with a
-        # smart solution yet... TODO
-        # best_avg_factor = avg_factors[np.argmax(unique_candidates)]
-
         # use either hanning or manual scale window to punish the candidates depending of their factor
         # IMPORTANT also makes them unique, which is import for the np.argmax later
         punished_candidates = np.multiply(evaluated_candidates, self.manual_scale_window)
-
-        # recover the scale change factor
-        scale_change = self.scale_factors[np.argmax(punished_candidates)]
-
-        # update the scale
-        # self.current_scale_factor = self.current_scale_factor * self.scale_factors[np.argmax(punished_candidates)]
 
         # correct scale factor if it changed too much
         limited_factor = self.limit_scale_change(
@@ -318,4 +303,3 @@ class CandidateApproach:
             curve[neg_loc] = val
 
         self.manual_scale_window = curve
-        # testing new branch
