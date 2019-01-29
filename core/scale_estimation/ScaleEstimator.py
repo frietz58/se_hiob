@@ -128,9 +128,6 @@ class ScaleEstimator:
         if self.approach == 'candidates':
             logger.info("starting scale estimation. Approach: Candidate Generation")
 
-            #scaled_candidates = self.generate_scaled_candidates(frame)
-            #final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
-
             scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame)
             final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
                                                                                  feature_mask,

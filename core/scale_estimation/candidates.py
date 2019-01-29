@@ -16,6 +16,7 @@ class CandidateApproach:
         self.scale_step = None
         self.max_scale_change = None
         self.scale_window_step_size = None
+        self.change_aspect_ration = True
 
         # run time
         self.frame = None
@@ -60,23 +61,61 @@ class CandidateApproach:
         """
 
         self.frame = frame
-        scaled_predictions = []
 
         # calculate the current scale factors
         scale_factors = np.multiply(self.scale_factors, self.current_scale_factor)
 
-        # Generate n scaled candidates
-        for i in range(self.number_scales):
+        #  only change scale, keep aspect ration through tracking
+        if not self.change_aspect_ration:
 
-            # TODO also centering here
-            scale_factor = scale_factors[i]
-            scaled_box = Rect(
-                frame.predicted_position.x,
-                frame.predicted_position.y,
-                np.floor(self.base_target_size[0] * scale_factor),
-                np.floor(self.base_target_size[1] * scale_factor))
+            # init scaled predictions 2d array. 0 for scaled width, 1 for scaled height
+            scaled_predictions = []
 
-            scaled_predictions.append(scaled_box)
+            # Generate n scaled candidates
+            for i in range(self.number_scales):
+                scale_factor = scale_factors[i]
+                scaled_box = Rect(
+                    frame.predicted_position.x,
+                    frame.predicted_position.y,
+                    np.floor(self.base_target_size[0] * scale_factor),
+                    np.floor(self.base_target_size[1] * scale_factor))
+
+                scaled_predictions.append(scaled_box)
+
+        # create patches with flexible aspect ratio
+        elif self.change_aspect_ration:
+
+            # init scaled predictions 2d array. 0 for scaled width, 1 for scaled height
+            scaled_predictions = [[], []]
+
+            # Generate 2 * n scaled candidates
+            for i in range(self.number_scales):
+                scale_factor = scale_factors[i]
+
+                # calc new width and height
+                new_w = round(self.base_target_size[0] * scale_factor)
+                new_h = round(self.base_target_size[1] * scale_factor)
+
+                # adjust x and y pos so that the box remains centered when height/width change
+                old_x = self.frame.predicted_position.center[0]
+                old_y = self.frame.predicted_position.center[1]
+
+                new_x = int(old_x - np.rint(new_w / 2))
+                new_y = int(old_y - np.rint(new_h / 2))
+
+                scaled_width_box = Rect(
+                    new_x,
+                    new_y,
+                    new_w,
+                    self.frame.predicted_position.h)
+                scaled_predictions[0].append(scaled_width_box)
+
+                scaled_height_box = Rect(
+                    new_x,
+                    new_y,
+                    self.frame.predicted_position.w,
+                    new_h)
+                scaled_predictions[1].append(scaled_height_box)
 
         return scaled_predictions
 
@@ -93,22 +132,29 @@ class CandidateApproach:
         size, the cnn output is 48x48
         :return: the best scaled candidate, can also be the original, not scaled candidate
         """
+        # TODO i dont use this anymore
+        # get pixel value of candidates at scaled lvl 1
+        if self.change_aspect_ration:
 
-        # Apply the scaled candidates to the feature mask like mask[top:bottom,width:height]
-        # TODO only pixel value form candidate with factors 1 is used, we dont need rest
-        pixel_values = [feature_mask[
-                        round(pos.top / mask_scale_factor[1]):
-                        round((pos.bottom - 1) / mask_scale_factor[1]),
-                        round(pos.left / mask_scale_factor[0]):
-                        round((pos.right - 1) / mask_scale_factor[0])] for pos in scaled_candidates]
+            base_candidate_rect = scaled_candidates[0][16]
+            base_candidate_val = [feature_mask[
+                                  round(base_candidate_rect.top / mask_scale_factor[1]):
+                                  round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
+                                  round(base_candidate_rect.left / mask_scale_factor[0]):
+                                  round((base_candidate_rect.right - 1) / mask_scale_factor[0])]]
 
-        # Sum up the values from the candidates
-        candidate_sums = list(map(np.sum, pixel_values))
+        else:
+            base_candidate_rect = scaled_candidates[16]
+            base_candidate_val = np.sum([feature_mask[
+                                  round(base_candidate_rect.top / mask_scale_factor[1]):
+                                  round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
+                                  round(base_candidate_rect.left / mask_scale_factor[0]):
+                                  round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
 
         # Evaluate each candidate based on its size
         evaluated_candidates = []
 
-        for single_sum, candidate in zip(candidate_sums, scaled_candidates):
+        for single_sum, candidate in zip(base_candidate_val, scaled_candidates):
             try:
                 evaluated_candidates.append(self.rate_scaled_candidate(
                     candidate_sum=single_sum,
@@ -116,7 +162,7 @@ class CandidateApproach:
                     mask_scale_factor=mask_scale_factor,
                     feature_mask=feature_mask,
                     use_sum=False,
-                    candidate_sums=candidate_sums))
+                    base_candidate_sum=base_candidate_val))
             except ValueError:
                 # handcraft the results, so that the scale will not change when the prediction is bad
                 # number scales is always odd, therefor we now that factor 1 is in the middle
@@ -150,12 +196,13 @@ class CandidateApproach:
         old_x = self.frame.predicted_position.center[0]
         old_y = self.frame.predicted_position.center[1]
 
+        # TODO implement center at top not here...
         new_x = int(old_x - np.rint(new_w/2))
         new_y = int(old_y - np.rint(new_h/2))
 
         return Rect(new_x, new_y, new_w, new_h)
 
-    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask, use_sum, candidate_sums):
+    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask, use_sum, base_candidate_sum):
         """
         :param candidate_sum: the summed up pixel values of the candidate
         :param candidate: the current candidate
@@ -211,10 +258,11 @@ class CandidateApproach:
         outer_punish_sum = np.sum(outer_values) - np.sum(on_candidate_values)
 
         # Evaluate the candidate
+        # TODO bad var name also do i want this actually
         if use_sum:
             quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
         else:
-            quality_of_candidate = candidate_sums[16] - (inner_punish_sum + outer_punish_sum)
+            quality_of_candidate = base_candidate_sum - (inner_punish_sum + outer_punish_sum)
             # print("inner_sum: {0}, outer_sum {1}".format(inner_punish_sum, outer_punish_sum))
 
         if quality_of_candidate == 0:
