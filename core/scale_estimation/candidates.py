@@ -25,6 +25,8 @@ class CandidateApproach:
         self.hanning_scale_window = None
         self.base_target_size = None
         self.current_scale_factor = 1
+        self.current_width_factor = 1
+        self.current_height_factor = 1
 
     def configure(self, configuration):
         """
@@ -55,18 +57,20 @@ class CandidateApproach:
 
     def generate_scaled_candidates(self, frame):
         """
-        generates the candidates based on the predicted position but at different scale levels
+        generates the candidates based on the predicted position but at different scale levels. Depending on the
+        settings in the configuration, either candidates will only be scaled, or will be scaled along x or y axis
+        separately. In the later case the best values for x and y axis will be found, resulting in a prediction that
+        can adapt to changes in the aspect ration.
         :param frame: the current frame in which the best position has already been calculated
         :return: a list of scaled variations of the best predicted position
         """
 
         self.frame = frame
 
-        # calculate the current scale factors
-        scale_factors = np.multiply(self.scale_factors, self.current_scale_factor)
-
-        #  only change scale, keep aspect ration through tracking
+        # only change scale, keep aspect ration through tracking
         if not self.change_aspect_ration:
+            # calculate the current scale factors
+            scale_factors = np.multiply(self.scale_factors, self.current_scale_factor)
 
             # init scaled predictions 2d array. 0 for scaled width, 1 for scaled height
             scaled_predictions = []
@@ -85,16 +89,21 @@ class CandidateApproach:
         # create patches with flexible aspect ratio
         elif self.change_aspect_ration:
 
+            # calculate the current scale factors
+            width_scale_factors = np.multiply(self.scale_factors, self.current_width_factor)
+            height_scale_factors = np.multiply(self.scale_factors, self.current_height_factor)
+
             # init scaled predictions 2d array. 0 for scaled width, 1 for scaled height
             scaled_predictions = [[], []]
 
             # Generate 2 * n scaled candidates
             for i in range(self.number_scales):
-                scale_factor = scale_factors[i]
+                width_scale_factor = width_scale_factors[i]
+                height_scale_factor = height_scale_factors[i]
 
                 # calc new width and height
-                new_w = round(self.base_target_size[0] * scale_factor)
-                new_h = round(self.base_target_size[1] * scale_factor)
+                new_w = round(self.base_target_size[0] * width_scale_factor)
+                new_h = round(self.base_target_size[1] * height_scale_factor)
 
                 # adjust x and y pos so that the box remains centered when height/width change
                 old_x = self.frame.predicted_position.center[0]
@@ -132,17 +141,37 @@ class CandidateApproach:
         size, the cnn output is 48x48
         :return: the best scaled candidate, can also be the original, not scaled candidate
         """
-        # TODO i dont use this anymore
-        # get pixel value of candidates at scaled lvl 1
+        # if changes aspect ration
         if self.change_aspect_ration:
 
+            # Evaluate each candidate based on its size
+            evaluated_candidates = [[], []]
+
+            # get pixel value of candidates at scaled lvl 1
             base_candidate_rect = scaled_candidates[0][16]
-            base_candidate_val = [feature_mask[
+            base_candidate_val = np.sum([feature_mask[
                                   round(base_candidate_rect.top / mask_scale_factor[1]):
                                   round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
                                   round(base_candidate_rect.left / mask_scale_factor[0]):
-                                  round((base_candidate_rect.right - 1) / mask_scale_factor[0])]]
+                                  round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
 
+            for width_candidate in scaled_candidates[0]:
+                evaluated_candidates[0].append(self.rate_scaled_candidate(
+                    candidate=width_candidate,
+                    feature_mask=feature_mask,
+                    mask_scale_factor=mask_scale_factor,
+                    base_candidate_sum=base_candidate_val
+                ))
+
+            for height_candidate in scaled_candidates[1]:
+                evaluated_candidates[1].append(self.rate_scaled_candidate(
+                    candidate=height_candidate,
+                    feature_mask=feature_mask,
+                    mask_scale_factor=mask_scale_factor,
+                    base_candidate_sum=base_candidate_val
+                ))
+
+        # if keep aspect ration the same
         else:
             base_candidate_rect = scaled_candidates[16]
             base_candidate_val = np.sum([feature_mask[
@@ -151,66 +180,85 @@ class CandidateApproach:
                                   round(base_candidate_rect.left / mask_scale_factor[0]):
                                   round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
 
-        # Evaluate each candidate based on its size
-        evaluated_candidates = []
+            # Evaluate each candidate based on its size
+            evaluated_candidates = []
 
-        for single_sum, candidate in zip(base_candidate_val, scaled_candidates):
-            try:
-                evaluated_candidates.append(self.rate_scaled_candidate(
-                    candidate_sum=single_sum,
-                    candidate=candidate,
-                    mask_scale_factor=mask_scale_factor,
-                    feature_mask=feature_mask,
-                    use_sum=False,
-                    base_candidate_sum=base_candidate_val))
-            except ValueError:
-                # handcraft the results, so that the scale will not change when the prediction is bad
-                # number scales is always odd, therefor we now that factor 1 is in the middle
-                if evaluated_candidates.__len__() == (self.number_scales - 1) / 2:
-                    evaluated_candidates.append(1)
-                # in every other case when we are not at factor 1, append 0. Like this, when multiplied with the scale
-                # window, 1 will be the best factor and scale wont be changed.
-                else:
-                    evaluated_candidates.append(0)
+            for candidate in scaled_candidates:
+                try:
+                    evaluated_candidates.append(self.rate_scaled_candidate(
+                        candidate=candidate,
+                        mask_scale_factor=mask_scale_factor,
+                        feature_mask=feature_mask,
+                        base_candidate_sum=base_candidate_val))
+                except ValueError:
+                    # handcraft the results, so that the scale will not change when the prediction is bad
+                    # number scales is always odd, therefor we now that factor 1 is in the middle
+                    if evaluated_candidates.__len__() == (self.number_scales - 1) / 2:
+                        evaluated_candidates.append(1)
+                    # in every other case when we are not at factor 1, append 0. Like this, when multiplied with the scale
+                    # window, 1 will be the best factor and scale wont be changed.
+                    else:
+                        evaluated_candidates.append(0)
 
         # use either hanning or manual scale window to punish the candidates depending of their factor
         # IMPORTANT also makes them unique, which is import for the np.argmax later
-        punished_candidates = np.multiply(evaluated_candidates, self.manual_scale_window)
+        if self.change_aspect_ration:
+            punished_width_candidate_scores = np.multiply(evaluated_candidates[0], self.manual_scale_window)
+            punished_height_candidate_scores = np.multiply(evaluated_candidates[1], self.manual_scale_window)
 
-        # correct scale factor if it changed too much
-        limited_factor = self.limit_scale_change(
-            old=self.current_scale_factor,
-            new=self.current_scale_factor * self.scale_factors[np.argmax(punished_candidates)],
-            max_change_percentage=self.max_scale_change,
-            keep_original=False
-        )
+            limited_width_factor = self.limit_scale_change(
+                old=self.current_width_factor,
+                new=self.current_width_factor * self.scale_factors[np.argmax(punished_width_candidate_scores)],
+                max_change_percentage=self.max_scale_change
+            )
 
-        # update the scale
-        self.current_scale_factor = limited_factor
+            limited_height_factor = self.limit_scale_change(
+                old=self.current_height_factor,
+                new=self.current_height_factor * self.scale_factors[np.argmax(punished_height_candidate_scores)],
+                max_change_percentage=self.max_scale_change
+            )
 
-        # calc new width and height
-        new_w = round(self.base_target_size[0] * self.current_scale_factor)
-        new_h = round(self.base_target_size[1] * self.current_scale_factor)
+            # update the aspect raio
+            self.current_width_factor = limited_width_factor
+            self.current_height_factor = limited_height_factor
+
+            # calc new width and height
+            new_w = round(self.base_target_size[0] * self.current_width_factor)
+            new_h = round(self.base_target_size[1] * self.current_height_factor)
+
+        else:
+
+            punished_candidates = np.multiply(evaluated_candidates, self.manual_scale_window)
+
+            # correct scale factor if it changed too much
+            limited_factor = self.limit_scale_change(
+                old=self.current_scale_factor,
+                new=self.current_scale_factor * self.scale_factors[np.argmax(punished_candidates)],
+                max_change_percentage=self.max_scale_change,
+            )
+
+            # update the scale
+            self.current_scale_factor = limited_factor
+
+            # calc new width and height
+            new_w = round(self.base_target_size[0] * self.current_scale_factor)
+            new_h = round(self.base_target_size[1] * self.current_scale_factor)
 
         # adjust x and y pos so that the box remains centered when height/width change
         old_x = self.frame.predicted_position.center[0]
         old_y = self.frame.predicted_position.center[1]
 
-        # TODO implement center at top not here...
         new_x = int(old_x - np.rint(new_w/2))
         new_y = int(old_y - np.rint(new_h/2))
 
         return Rect(new_x, new_y, new_w, new_h)
 
-    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask, use_sum, base_candidate_sum):
+    def rate_scaled_candidate(self, candidate, mask_scale_factor, feature_mask, base_candidate_sum):
         """
-        :param candidate_sum: the summed up pixel values of the candidate
         :param candidate: the current candidate
         :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
         size, the cnn output is 48x48
         :param feature_mask: the consolidated feature mask containing pixel values for how likely they belong to the
-        :param use_sum: if true use pixel sum of candidate for calculating the score, otherwise just inner/outer punish
-        object
         :return: the quality of the candidate based on its size
         """
 
@@ -258,12 +306,7 @@ class CandidateApproach:
         outer_punish_sum = np.sum(outer_values) - np.sum(on_candidate_values)
 
         # Evaluate the candidate
-        # TODO bad var name also do i want this actually
-        if use_sum:
-            quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
-        else:
-            quality_of_candidate = base_candidate_sum - (inner_punish_sum + outer_punish_sum)
-            # print("inner_sum: {0}, outer_sum {1}".format(inner_punish_sum, outer_punish_sum))
+        quality_of_candidate = base_candidate_sum - (inner_punish_sum + outer_punish_sum)
 
         if quality_of_candidate == 0:
             # TODO does this make sense here???
@@ -272,14 +315,12 @@ class CandidateApproach:
         return quality_of_candidate
 
     @staticmethod
-    def limit_scale_change(old, new, max_change_percentage, keep_original=False):
+    def limit_scale_change(old, new, max_change_percentage):
         """
         limits the scale change between two frames to a configured threshold
         :param old: the current scale factor still from the previous frames
         :param new: the new predicted scale factor, which is to be limited
         :param max_change_percentage: the percentage value of which the scale is allowed to change each frame
-        :param keep_original: for debugging, can be passed with the function call so that the predicted factor will
-            always be used
         :return: if factors out of threshold, threshold factor, otherwise normal factor
         """
 
@@ -293,11 +334,6 @@ class CandidateApproach:
         else:
             output_factor = new
             logger.info("predicted scale change was {0}".format(output_factor))
-
-        # for debugging
-        if keep_original:
-            logger.info("final output factor: {0}".format(new))
-            output_factor = new
 
         return output_factor
 
