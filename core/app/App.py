@@ -255,7 +255,6 @@ class App:
                 'adjusted_overlap_plot': self.adjusted_overlap_plotter.get_image(),
                 'lost_plot': self.lost_plotter.get_image(),
                 'size_plot': self.size_plotter.get_image()
-                #'fourier_image': tracking.get_frame_fourier_image()
             }
             self.feed_queue(entry)
             if "save_images" in self.conf and self.conf["save_images"]:

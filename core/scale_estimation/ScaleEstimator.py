@@ -128,9 +128,6 @@ class ScaleEstimator:
         if self.approach == 'candidates':
             logger.info("starting scale estimation. Approach: Candidate Generation")
 
-            #scaled_candidates = self.generate_scaled_candidates(frame)
-            #final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
-
             scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame)
             final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
                                                                                  feature_mask,
@@ -187,6 +184,9 @@ class ScaleEstimator:
         :param frame: the 0th frame
         :return:
         """
+        if not self.use_scale_estimation:
+            return None
+
         self.frame = frame
         self.sample = sample
 
@@ -265,7 +265,7 @@ class ScaleEstimator:
 
         elif self.approach == 'candidates':
             # nothing needs to be done
-            logger.info('')
+            self.candidate_approach.handle_initial_frame(frame)
 
     def create_2d_gaussian_kernel(self, kernlen, nsig):
         """Returns a 2D Gaussian kernel array."""
