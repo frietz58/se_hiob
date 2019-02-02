@@ -184,6 +184,9 @@ class ScaleEstimator:
         :param frame: the 0th frame
         :return:
         """
+        if not self.use_scale_estimation:
+            return None
+
         self.frame = frame
         self.sample = sample
 

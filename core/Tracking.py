@@ -195,8 +195,6 @@ class Tracking(object):
         # for now, the initial frame is the current frame:
         self.current_frame = self.initial_frame
 
-        #FINN erstes Frame wird verarbeitet
-
         self.tracker.pursuer.set_initial_position(self.initial_frame.previous_position)
         self.tracker.roi_calculator.set_initial_position(self.initial_frame.previous_position)
         self.tracker.estimator.handle_initial_frame(self.current_frame, self.sample)
@@ -624,12 +622,14 @@ class Tracking(object):
             result['center_distance'] = gt.center_distance(p)
             result['relative_center_distance'] = gt.relative_center_distance(p)
             result['adjusted_overlap_score'] = gt.adjusted_overlap_score(p)
-            result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
+            result['gt_size_score'] = gt.width * gt.height * 0.1
+            result['size_score'] = frame.predicted_position.width * frame.predicted_position.height * 0.1
         else:
             result['overlap_score'] = None
             result['center_distance'] = None
             result['relative_center_distance'] = None
             result['adjusted_overlap_score'] = None
+            result['gt_size_score'] = None
             result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
         frame.result = result
         frame.complete_evaluation()

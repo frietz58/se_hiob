@@ -16,7 +16,7 @@ class CandidateApproach:
         self.scale_step = None
         self.max_scale_change = None
         self.scale_window_step_size = None
-        self.change_aspect_ration = True
+        self.change_aspect_ration = None
 
         # run time
         self.frame = None
@@ -43,6 +43,7 @@ class CandidateApproach:
         self.scale_step = configuration['scale_factor']
         self.max_scale_change = configuration['max_scale_difference']
         self.scale_window_step_size = configuration['scale_window_step_size']
+        self.change_aspect_ration = configuration['c_change_aspect_ratio']
 
         self.calc_manual_scale_window(step_size=self.scale_window_step_size)
         self.hanning_scale_window = np.hanning(self.number_scales)
