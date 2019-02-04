@@ -80,8 +80,6 @@ class ScaleEstimator:
         self.inner_punish_threshold = self.econf['inner_punish_threshold']
         self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
-        # self.number_scales = self.econf['number_scales']
-        self.scale_factor_range = self.econf['scale_factor_range']
         self.scale_factor = self.econf['scale_factor']
         self.learning_rate = self.econf['learning_rate']
         self.regularization = self.econf['reg']

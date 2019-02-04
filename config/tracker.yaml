@@ -96,7 +96,7 @@ tracking_conf:
   shuffle: false
 
 scale_estimator:
-  use_scale_estimation: False  # Enable or disable scale estimation
+  use_scale_estimation: True  # Enable or disable scale estimation
 
   # Determines which approach to use for scale estimation.
   approach: 'candidates'
@@ -112,11 +112,8 @@ scale_estimator:
   padding: 1.0
   dsst_number_scales: 33 # number of scaled candidates to generate
 
-  #mse params:
-  scale_factor_range: [0.95, 1.05] # the range for which the number_scales are linspaced between
-
   # candidate params:
-  c_change_aspect_ratio: False # if False aspect ratio will remain the same throught tracking
+  c_change_aspect_ratio: True # if False aspect ratio will remain the same throught tracking
   inner_punish_threshold: 0.3 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   inner_punish_factor: 0.01 # the factor with which the inner punish score gets multiplied to decrease its impact
   outer_punish_threshold: 0.3 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
@@ -130,19 +127,19 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 # == non gray tb100 sequences ==
-  - tb100/Basketball
-  - tb100/Biker
-  - tb100/Bird1
-  - tb100/BlurBody
-  - tb100/BlurCar2
-  - tb100/BlurFace
-  - tb100/BlurOwl
+#  - tb100/Basketball
+#  - tb100/Biker
+#  - tb100/Bird1
+#  - tb100/BlurBody
+#  - tb100/BlurCar2
+#  - tb100/BlurFace
+#  - tb100/BlurOwl
   - tb100/Bolt
-  - tb100/Box
-  - tb100/CarDark
-  - tb100/CarScale
-  - tb100/Couple
-  - tb100/Crowds
+#  - tb100/Box
+#  - tb100/CarDark
+#  - tb100/CarScale
+#  - tb100/Couple
+#  - tb100/Crowds
 ######  - tb100/David
 #  - tb100/Deer
 #  - tb100/Diving
@@ -162,7 +159,7 @@ tracking:
 #  - tb100/Shaking
 #  - tb100/Singer2
 #  - tb100/Skating1
-#  - tb100/Skating2
+######  - tb100/Skating2
 #  - tb100/Skiing
 #  - tb100/Soccer
 #  - tb100/Surfer
@@ -192,7 +189,7 @@ tracking:
 #  - tb100/Human5
 #  - tb100/Human7
 #  - tb100/Human8
-#  - tb100/Jogging
+######  - tb100/Jogging
 #  - tb100/KiteSurf
 #  - tb100/Lemming
 #  - tb100/Man
