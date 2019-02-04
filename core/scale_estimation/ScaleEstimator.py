@@ -65,6 +65,7 @@ class ScaleEstimator:
         self.approach = None
         self.scale_model_size = None
         self.padding = None
+        self.scale_estimation_threshold = None
 
     def setup(self, tracker=None, sample=None):
         self.tracker = tracker
@@ -87,6 +88,7 @@ class ScaleEstimator:
         self.scale_model_max = self.econf['scale_model_max']
         self.scale_model_size = self.econf['scale_model_size']
         self.padding = self.econf['padding']
+        self.scale_estimation_threshold = self.econf['scale_estimation_threshold']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -104,14 +106,14 @@ class ScaleEstimator:
 
         self.candidate_approach.configure(self.econf)
 
-    def estimate_scale(self, frame, feature_mask, mask_scale_factor):
+    def estimate_scale(self, frame, feature_mask, mask_scale_factor, prediction_quality):
         """
         :param frame: the current frame in which the best position has already been calculated
         :param feature_mask: he consolidated feature mask containing pixel values for how likely they belong to the
         object
         :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
         size, the cnn output is 48x48
-        :param roi: the region of interest
+        :param prediction_quality: the quality of the prediction for the current frame.
         :return: the best rated candidate
         """
 
@@ -121,6 +123,12 @@ class ScaleEstimator:
         # If scale estimation has been disabled in configuration, return unscaled bounding box
         if not self.use_scale_estimation:
             logger.critical("Scale Estimation is disabled, returning unchanged prediction")
+            return frame.predicted_position
+
+        # if the quality of the prediction is too low. return unscaled bounding box
+        if prediction_quality < self.scale_estimation_threshold:
+            logger.info("frame prediction quality is smaller than scale estimation threshold {0}, not changing"
+                        " the size".format(self.scale_estimation_threshold))
             return frame.predicted_position
 
         if self.approach == 'candidates':

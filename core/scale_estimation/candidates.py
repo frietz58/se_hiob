@@ -165,14 +165,15 @@ class CandidateApproach:
                         feature_mask=feature_mask,
                         mask_scale_factor=mask_scale_factor,
                         base_candidate_sum=base_candidate_val))
+                # should not happen because when only get here when the quality of the frame is higher than threshold
                 except ValueError:
                     # handcraft the results, so that the scale will not change when the prediction is bad
                     # number scales is always odd, therefor we now that factor 1 is in the middle
                     if evaluated_candidates[0].__len__() == (self.number_scales - 1) / 2:
-                        evaluated_candidates[0].append(1)
-                        logger.info("Probability Values on Heatmap too low, not changing size")
-                    else:
                         evaluated_candidates[0].append(0)
+                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
+                    else:
+                        evaluated_candidates[0].append(1)
 
             for height_candidate in scaled_candidates[1]:
                 try:
@@ -181,14 +182,15 @@ class CandidateApproach:
                         feature_mask=feature_mask,
                         mask_scale_factor=mask_scale_factor,
                         base_candidate_sum=base_candidate_val))
+                # should not happen because when only get here when the quality of the frame is higher than threshold
                 except ValueError:
                     # handcraft the results, so that the scale will not change when the prediction is bad
                     # number scales is always odd, therefor we now that factor 1 is in the middle
                     if evaluated_candidates[1].__len__() == (self.number_scales - 1) / 2:
-                        evaluated_candidates[1].append(1)
-                        logger.info("Probability Values on Heatmap too low, not changing size")
-                    else:
                         evaluated_candidates[1].append(0)
+                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
+                    else:
+                        evaluated_candidates[1].append(1)
 
         # if keep aspect ration the same
         else:
@@ -209,14 +211,15 @@ class CandidateApproach:
                         mask_scale_factor=mask_scale_factor,
                         feature_mask=feature_mask,
                         base_candidate_sum=base_candidate_val))
+                # should not happen because when only get here when the quality of the frame is higher than threshold
                 except ValueError:
                     # handcraft the results, so that the scale will not change when the prediction is bad
                     # number scales is always odd, therefor we now that factor 1 is in the middle
                     if evaluated_candidates.__len__() == (self.number_scales - 1) / 2:
-                        evaluated_candidates.append(1)
-                        logger.info("Probability Values on Heatmap too low, not changing size")
-                    else:
                         evaluated_candidates.append(0)
+                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
+                    else:
+                        evaluated_candidates.append(1)
 
         # use either hanning or manual scale window to punish the candidates depending of their factor
         # IMPORTANT also makes them unique, which is import for the np.argmax later
@@ -287,6 +290,7 @@ class CandidateApproach:
         # (its possible that every prediction value is smaller than value for the inner threshold, in which case every
         # rating becomes 0, when everything in the quality output is 0, np.argmax will return 0 aswell, thus the
         # scale prediction fails
+        #TODO also make this use the max of base candidate not entire feature mask...
         max_val = np.amax(feature_mask)
         if max_val < self.inner_punish_threshold:
             # TODO make custom error class

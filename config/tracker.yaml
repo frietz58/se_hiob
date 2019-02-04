@@ -97,6 +97,7 @@ tracking_conf:
 
 scale_estimator:
   use_scale_estimation: True  # Enable or disable scale estimation
+  scale_estimation_threshold: 0.1
 
   # Determines which approach to use for scale estimation.
   approach: 'candidates'
