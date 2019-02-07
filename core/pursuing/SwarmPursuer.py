@@ -287,11 +287,6 @@ class SwarmPursuer(Pursuer):
         best_arg = np.argmax(quals)
         frame.predicted_position = Rect(locs[best_arg])
 
-        frame.predicted_position = self.tracker.estimator.estimate_scale(
-            frame=frame,
-            feature_mask=img_mask,
-            mask_scale_factor=scale_factor)
-
         # quality of prediction needs to be absolute, so we normalise it with
         # the "perfect" value this prediction would have:
         perfect_quality = 1
@@ -299,6 +294,12 @@ class SwarmPursuer(Pursuer):
             0.0, min(1.0, quals[best_arg] / perfect_quality))
         logger.info("Prediction: %s, quality: %f",
                     frame.predicted_position, frame.prediction_quality)
+
+        frame.predicted_position = self.tracker.estimator.estimate_scale(
+            frame=frame,
+            feature_mask=img_mask,
+            mask_scale_factor=scale_factor,
+            prediction_quality=frame.prediction_quality)
 
         #ps.append(time.time())  # 9
 

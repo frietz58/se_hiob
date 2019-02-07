@@ -174,7 +174,7 @@ def do_tracking_evaluation(tracking):
     plt.xlabel("frame")
     plt.ylabel("size")
     plt.plot(dim, ss, 'r-', label='predicted size')
-    plt.plot(dim, gt_ss, 'g-', label='groundtruth size')
+    plt.plot(dim, gt_ss, 'g--', label='groundtruth size', alpha=0.7)
     plt.axhline(y=ss[0], color='c', linestyle=':', label='initial size')
     plt.legend(loc='best')
     plt.xlim(1, len(ss))

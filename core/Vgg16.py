@@ -7,6 +7,8 @@ import tensorflow as tf
 import time
 from collections import OrderedDict
 
+from .sample_provider.Sample import Sample
+
 logger = logging.getLogger(__name__)
 
 

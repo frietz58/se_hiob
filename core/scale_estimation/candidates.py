@@ -110,18 +110,19 @@ class CandidateApproach:
                 old_x = self.frame.predicted_position.center[0]
                 old_y = self.frame.predicted_position.center[1]
 
+                # TODO check oob
                 new_x = int(old_x - np.rint(new_w / 2))
                 new_y = int(old_y - np.rint(new_h / 2))
 
                 scaled_width_box = Rect(
                     new_x,
-                    new_y,
+                    old_y,
                     new_w,
                     self.frame.predicted_position.h)
                 scaled_predictions[0].append(scaled_width_box)
 
                 scaled_height_box = Rect(
-                    new_x,
+                    old_x,
                     new_y,
                     self.frame.predicted_position.w,
                     new_h)
@@ -151,26 +152,45 @@ class CandidateApproach:
             # get pixel value of candidates at scaled lvl 1
             base_candidate_rect = scaled_candidates[0][16]
             base_candidate_val = np.sum([feature_mask[
-                                  round(base_candidate_rect.top / mask_scale_factor[1]):
-                                  round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
-                                  round(base_candidate_rect.left / mask_scale_factor[0]):
-                                  round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
+                                         round(base_candidate_rect.top / mask_scale_factor[1]):
+                                         round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
+                                         round(base_candidate_rect.left / mask_scale_factor[0]):
+                                         round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
 
             for width_candidate in scaled_candidates[0]:
-                evaluated_candidates[0].append(self.rate_scaled_candidate(
-                    candidate=width_candidate,
-                    feature_mask=feature_mask,
-                    mask_scale_factor=mask_scale_factor,
-                    base_candidate_sum=base_candidate_val
-                ))
+                # TODO have this code block three times...
+                try:
+                    evaluated_candidates[0].append(self.rate_scaled_candidate(
+                        candidate=width_candidate,
+                        feature_mask=feature_mask,
+                        mask_scale_factor=mask_scale_factor,
+                        base_candidate_sum=base_candidate_val))
+                # should not happen because when only get here when the quality of the frame is higher than threshold
+                except ValueError:
+                    # handcraft the results, so that the scale will not change when the prediction is bad
+                    # number scales is always odd, therefor we now that factor 1 is in the middle
+                    if evaluated_candidates[0].__len__() == (self.number_scales - 1) / 2:
+                        evaluated_candidates[0].append(0)
+                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
+                    else:
+                        evaluated_candidates[0].append(1)
 
             for height_candidate in scaled_candidates[1]:
-                evaluated_candidates[1].append(self.rate_scaled_candidate(
-                    candidate=height_candidate,
-                    feature_mask=feature_mask,
-                    mask_scale_factor=mask_scale_factor,
-                    base_candidate_sum=base_candidate_val
-                ))
+                try:
+                    evaluated_candidates[1].append(self.rate_scaled_candidate(
+                        candidate=height_candidate,
+                        feature_mask=feature_mask,
+                        mask_scale_factor=mask_scale_factor,
+                        base_candidate_sum=base_candidate_val))
+                # should not happen because when only get here when the quality of the frame is higher than threshold
+                except ValueError:
+                    # handcraft the results, so that the scale will not change when the prediction is bad
+                    # number scales is always odd, therefor we now that factor 1 is in the middle
+                    if evaluated_candidates[1].__len__() == (self.number_scales - 1) / 2:
+                        evaluated_candidates[1].append(0)
+                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
+                    else:
+                        evaluated_candidates[1].append(1)
 
         # if keep aspect ration the same
         else:
@@ -191,15 +211,15 @@ class CandidateApproach:
                         mask_scale_factor=mask_scale_factor,
                         feature_mask=feature_mask,
                         base_candidate_sum=base_candidate_val))
+                # should not happen because when only get here when the quality of the frame is higher than threshold
                 except ValueError:
                     # handcraft the results, so that the scale will not change when the prediction is bad
                     # number scales is always odd, therefor we now that factor 1 is in the middle
                     if evaluated_candidates.__len__() == (self.number_scales - 1) / 2:
-                        evaluated_candidates.append(1)
-                    # in every other case when we are not at factor 1, append 0. Like this, when multiplied with the scale
-                    # window, 1 will be the best factor and scale wont be changed.
-                    else:
                         evaluated_candidates.append(0)
+                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
+                    else:
+                        evaluated_candidates.append(1)
 
         # use either hanning or manual scale window to punish the candidates depending of their factor
         # IMPORTANT also makes them unique, which is import for the np.argmax later
@@ -209,14 +229,16 @@ class CandidateApproach:
 
             limited_width_factor = self.limit_scale_change(
                 old=self.current_width_factor,
-                new=self.current_width_factor * self.scale_factors[np.argmax(punished_width_candidate_scores)],
-                max_change_percentage=self.max_scale_change
+                new=self.current_width_factor * self.scale_factors[np.argmin(punished_width_candidate_scores)],
+                max_change_percentage=self.max_scale_change,
+                axis='width'
             )
 
             limited_height_factor = self.limit_scale_change(
                 old=self.current_height_factor,
-                new=self.current_height_factor * self.scale_factors[np.argmax(punished_height_candidate_scores)],
-                max_change_percentage=self.max_scale_change
+                new=self.current_height_factor * self.scale_factors[np.argmin(punished_height_candidate_scores)],
+                max_change_percentage=self.max_scale_change,
+                axis='height'
             )
 
             # update the aspect raio
@@ -234,8 +256,9 @@ class CandidateApproach:
             # correct scale factor if it changed too much
             limited_factor = self.limit_scale_change(
                 old=self.current_scale_factor,
-                new=self.current_scale_factor * self.scale_factors[np.argmax(punished_candidates)],
+                new=self.current_scale_factor * self.scale_factors[np.argmin(punished_candidates)],
                 max_change_percentage=self.max_scale_change,
+                axis='scale factor'
             )
 
             # update the scale
@@ -267,10 +290,10 @@ class CandidateApproach:
         # (its possible that every prediction value is smaller than value for the inner threshold, in which case every
         # rating becomes 0, when everything in the quality output is 0, np.argmax will return 0 aswell, thus the
         # scale prediction fails
-        # TODO just realized that it can still happen that all rating are negative, in which case the argmax also
-        #  returns 0, def needs a fix! Also i should look at the candidate, not the entire feature map here...
+        #TODO also make this use the max of base candidate not entire feature mask...
         max_val = np.amax(feature_mask)
         if max_val < self.inner_punish_threshold:
+            # TODO make custom error class
             raise ValueError('Highest probability is smaller than threshold')
 
         # punish candidate for containing values smaller than threshold
@@ -307,34 +330,31 @@ class CandidateApproach:
         outer_punish_sum = np.sum(outer_values) - np.sum(on_candidate_values)
 
         # Evaluate the candidate
-        quality_of_candidate = base_candidate_sum - (inner_punish_sum + outer_punish_sum)
-
-        if quality_of_candidate == 0:
-            # TODO does this make sense here???
-            raise ValueError("Quality of candidate is 0, this should not happen")
+        quality_of_candidate = inner_punish_sum + outer_punish_sum
 
         return quality_of_candidate
 
     @staticmethod
-    def limit_scale_change(old, new, max_change_percentage):
+    def limit_scale_change(old, new, max_change_percentage, axis=None):
         """
         limits the scale change between two frames to a configured threshold
         :param old: the current scale factor still from the previous frames
         :param new: the new predicted scale factor, which is to be limited
         :param max_change_percentage: the percentage value of which the scale is allowed to change each frame
+        :param axis: only for logger message: height width of both
         :return: if factors out of threshold, threshold factor, otherwise normal factor
         """
 
         # make sure area didn't change too much, correcting scale factor
         if new > old + max_change_percentage:
             output_factor = old + max_change_percentage
-            logger.info("predicted scale change was {0}, reduced it to {1}".format(new, output_factor))
+            logger.info("predicted scale for {0} was {1}, reduced it to {2}".format(axis, new, output_factor))
         elif new < old - max_change_percentage:
             output_factor = old - max_change_percentage
-            logger.info("predicted scale change was {0}, increased it  to {1}".format(new, output_factor))
+            logger.info("predicted scale for {0} was {1}, increased it  to {2}".format(axis, new, output_factor))
         else:
             output_factor = new
-            logger.info("predicted scale change was {0}".format(output_factor))
+            logger.info("predicted scale for {0} is {1}".format(axis, output_factor))
 
         return output_factor
 
@@ -368,7 +388,7 @@ class CandidateApproach:
 
     def calc_manual_scale_window(self, step_size):
         """
-        create a hanning like window except it only decrease from 1 at the center by the stepsize in each direction
+        create a hanning like window except it only decrease from 1 at the center by the step_size in each direction
         :param step_size: the step to decrease from one per iteration
         :return: a list containing the hanning like curve
         """
@@ -386,7 +406,7 @@ class CandidateApproach:
         # calculate the curve
         for i in range(1, int((len(curve) - 1) / 2) + 1):
 
-            val = np.around(1 - (step_size * i), decimals=3)
+            val = np.around(1 + (step_size * i), decimals=3)
 
             pos_loc = center + i
             neg_loc = center - i
