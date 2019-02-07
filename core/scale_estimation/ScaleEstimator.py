@@ -65,6 +65,7 @@ class ScaleEstimator:
         self.approach = None
         self.scale_model_size = None
         self.padding = None
+        self.scale_estimation_threshold = None
 
     def setup(self, tracker=None, sample=None):
         self.tracker = tracker
@@ -80,8 +81,6 @@ class ScaleEstimator:
         self.inner_punish_threshold = self.econf['inner_punish_threshold']
         self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
-        # self.number_scales = self.econf['number_scales']
-        self.scale_factor_range = self.econf['scale_factor_range']
         self.scale_factor = self.econf['scale_factor']
         self.learning_rate = self.econf['learning_rate']
         self.regularization = self.econf['reg']
@@ -89,6 +88,7 @@ class ScaleEstimator:
         self.scale_model_max = self.econf['scale_model_max']
         self.scale_model_size = self.econf['scale_model_size']
         self.padding = self.econf['padding']
+        self.scale_estimation_threshold = self.econf['scale_estimation_threshold']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -106,14 +106,14 @@ class ScaleEstimator:
 
         self.candidate_approach.configure(self.econf)
 
-    def estimate_scale(self, frame, feature_mask, mask_scale_factor):
+    def estimate_scale(self, frame, feature_mask, mask_scale_factor, prediction_quality):
         """
         :param frame: the current frame in which the best position has already been calculated
         :param feature_mask: he consolidated feature mask containing pixel values for how likely they belong to the
         object
         :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
         size, the cnn output is 48x48
-        :param roi: the region of interest
+        :param prediction_quality: the quality of the prediction for the current frame.
         :return: the best rated candidate
         """
 
@@ -125,11 +125,14 @@ class ScaleEstimator:
             logger.critical("Scale Estimation is disabled, returning unchanged prediction")
             return frame.predicted_position
 
+        # if the quality of the prediction is too low. return unscaled bounding box
+        if prediction_quality < self.scale_estimation_threshold:
+            logger.info("frame prediction quality is smaller than scale estimation threshold {0}, not changing"
+                        " the size".format(self.scale_estimation_threshold))
+            return frame.predicted_position
+
         if self.approach == 'candidates':
             logger.info("starting scale estimation. Approach: Candidate Generation")
-
-            #scaled_candidates = self.generate_scaled_candidates(frame)
-            #final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
 
             scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame)
             final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
@@ -187,6 +190,9 @@ class ScaleEstimator:
         :param frame: the 0th frame
         :return:
         """
+        if not self.use_scale_estimation:
+            return None
+
         self.frame = frame
         self.sample = sample
 
@@ -265,7 +271,7 @@ class ScaleEstimator:
 
         elif self.approach == 'candidates':
             # nothing needs to be done
-            logger.info('')
+            self.candidate_approach.handle_initial_frame(frame)
 
     def create_2d_gaussian_kernel(self, kernlen, nsig):
         """Returns a 2D Gaussian kernel array."""

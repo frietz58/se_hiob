@@ -138,6 +138,7 @@ def do_tracking_evaluation(tracking):
     ov = np.empty(len(log))
     aov = np.empty(len(log))
     cf = np.empty(len(log))
+    gt_ss = np.empty(len(log))
     ss = np.empty(len(log))
     in20 = 0
     for n, l in enumerate(log):
@@ -149,6 +150,7 @@ def do_tracking_evaluation(tracking):
         ov[n] = r['overlap_score']
         aov[n] = r['adjusted_overlap_score']
         cf[n] = r['prediction_quality']
+        gt_ss[n] = r['gt_size_score']
         ss[n] = r['size_score']
 
     dim = np.arange(1, len(cd) + 1)
@@ -171,8 +173,10 @@ def do_tracking_evaluation(tracking):
     f = plt.figure()
     plt.xlabel("frame")
     plt.ylabel("size")
-    plt.axhline(y=ss[0], color='r', linestyle='--')
-    plt.plot(dim, ss, 'k', dim, ss, 'bo')
+    plt.plot(dim, ss, 'r-', label='predicted size')
+    plt.plot(dim, gt_ss, 'g--', label='groundtruth size', alpha=0.7)
+    plt.axhline(y=ss[0], color='c', linestyle=':', label='initial size')
+    plt.legend(loc='best')
     plt.xlim(1, len(ss))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)

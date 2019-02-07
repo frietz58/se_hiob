@@ -107,7 +107,7 @@ class CustomDsst:
             # extract the test sample for the feature map for the scale filter
             sample = self.extract_scale_sample(frame=self.frame)
 
-            # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation/mats')
+            # os.chdir('/home/finn/PycharmProjects/code-git/HIOB/core/scale_estimation')
             # name = 'CarScaleTest' + str(self.frame.number - 1) + '.mat'
             # sample = scipy.io.loadmat(name)['xs']
 
@@ -183,34 +183,33 @@ class CustomDsst:
 
             # if initial frame use annotated
             if self.frame.number == 1:
-                ys = np.add(np.floor(self.frame.ground_truth.center[0]),
+                xs = np.add(np.floor(self.frame.ground_truth.center[0]),
                             np.arange(1, patch_size[0] + 1)) - np.floor(patch_size[0] / 2)
-                xs = np.add(np.floor(self.frame.ground_truth.center[1]),
+                ys = np.add(np.floor(self.frame.ground_truth.center[1]),
                             np.arange(1, patch_size[1] + 1)) - np.floor(patch_size[1]/2)
 
                 # for later indexing, needs to be slices of ints
-                ys = ys.astype(int)
                 xs = xs.astype(int)
+                ys = ys.astype(int)
 
             else:
-                ys = np.add(np.floor(self.frame.predicted_position.center[0]),
+                xs = np.add(np.floor(self.frame.predicted_position.center[0]),
                             np.arange(1, patch_size[0] + 1)) - np.floor(patch_size[0] / 2)
-                xs = np.add(np.floor(self.frame.predicted_position.center[1]),
+                ys = np.add(np.floor(self.frame.predicted_position.center[1]),
                             np.arange(1, patch_size[1] + 1)) - np.floor(patch_size[1] / 2)
 
                 # for later indexing, needs to be slices of ints
-                ys = ys.astype(int)
                 xs = xs.astype(int)
+                ys = ys.astype(int)
 
             # check for out of bounds
-            ys[ys < 1] = 1
             xs[xs < 1] = 1
-            # use greater equal because zero index...
-            ys[ys >= np.shape(im)[1]] = np.shape(im)[1] - 1
-            xs[xs >= np.shape(im)[0]] = np.shape(im)[0] - 1
+            ys[ys < 1] = 1
+            xs[xs > np.shape(im)[0]] = np.shape(im)[0]
+            ys[ys > np.shape(im)[1]] = np.shape(im)[1]
 
-            img_patch = im[xs, :]
-            img_patch = img_patch[:, ys]
+            img_patch = im[ys, :]
+            img_patch = img_patch[:, xs]
 
             img_patch_resized = cv2.resize(img_patch, (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
 

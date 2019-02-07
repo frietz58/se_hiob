@@ -45,7 +45,6 @@ class Sample(object):
         self.initial_position = None
         self.frame_offset = None
         self.capture_size = None
-        self.gray_img = None
 
     def __repr__(self):
         return '<Sample {set_name}/{name},{frames}fs,{gt}>'.format(
@@ -105,18 +104,8 @@ class Sample(object):
             im = self.load_tb100_image(img_path)
             cv2_img = self.get_tb100_cv2_image(img_path)
 
-            # if image is gray, make it of shape [x,y,3] and just copy the gry value to every one of the 3, pretend
-            # like its rgb
-            #if len(im.shape) == 2:
-            if False:
-                # test_cell = np.full_like([0, 0, 0], im[0][0])
-                pseudo_rgb_im = np.zeros([im.shape[0], im.shape[1], 3])
-                for i in range(0, im.shape[0]):
-                    for j in range(0, im.shape[1]):
-                        pseudo_rgb_im[i, j, :] = np.full_like([0, 0, 0], im[i][j])
-            else:
-                cv2_images.append(cv2_img)
-                images.append(im)
+            cv2_images.append(cv2_img)
+            images.append(im)
 
         # self.capture_size = tuple(reversed(images[0].shape[:-1]))
         self.capture_size = tuple(reversed(images[0].shape))
@@ -159,6 +148,11 @@ class Sample(object):
     def load_tb100_image(self, img_path):
         data = self.zip_file.read(img_path)
         stream = io.BytesIO(data)
+        im = Image.open(stream)
+        if im.mode != "RGB":
+            # convert s/w to colour:
+            im = np.array(im.convert("RGB"))
+            return im
         im = np.array(Image.open(stream))
         return im
 

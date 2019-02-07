@@ -6,6 +6,9 @@ argparse
 asyncio
 logging
 transitions
+*.png
+*.mat
+*_dsst_results
 **/.*.swp
 *.png
 *.mat
