@@ -52,6 +52,11 @@ cudnn installation. Therefor go to your virtualenv python installation and add t
     export PYTHONPATH="/usr/local/cuda/lib64"
 ```
 
+Helpfull links
+https://github.com/tensorflow/tensorflow/issues/20271
+https://github.com/tensorflow/tensorflow/issues/22940
+https://askubuntu.com/questions/799184/how-can-i-install-cuda-on-ubuntu-16-04
+
 
 # for using your GPU and CUDA
     (hiob_env) $ cd HIOB
