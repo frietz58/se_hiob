@@ -47,8 +47,11 @@ a bit tricky though, especially if you want to install the custom graphics drive
 3. <b>Add cudnn to the virtualenv path.</b> Maybe this was just buggy for me, but after successful installation of cuda 9.0 and cudnn, tensorflow would not find my
 cudnn installation. Therefor go to your virtualenv python installation and add the following line to your activate file in /path_to_venv/bin/activate, right under the export PATH statement
 
+```
     export PYTHONPATH="/usr/local/cuda-9.0/lib64"
     export PYTHONPATH="/usr/local/cuda/lib64"
+```
+
 
 # for using your GPU and CUDA
     (hiob_env) $ cd HIOB
