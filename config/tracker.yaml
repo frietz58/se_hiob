@@ -127,6 +127,7 @@ scale_estimator:
 # which samples shall be tracked? Accepts samples, data sets, and data collections
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
+  - tb100/Dog1
 # == non gray tb100 sequences ==
 #  - tb100/Basketball
 #  - tb100/Biker
@@ -135,7 +136,7 @@ tracking:
 #  - tb100/BlurCar2
 #  - tb100/BlurFace
 #  - tb100/BlurOwl
-  - tb100/Bolt
+#  - tb100/Bolt
 #  - tb100/Box
 #  - tb100/CarDark
 #  - tb100/CarScale
