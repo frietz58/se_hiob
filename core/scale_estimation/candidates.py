@@ -27,6 +27,10 @@ class CandidateApproach:
         self.current_scale_factor = 1
         self.current_width_factor = 1
         self.current_height_factor = 1
+        self.width_scale_factors = []
+        self.height_scale_factors = []
+        self.limited_growth_times = []
+        self.limited_shrink_times = []
 
     def configure(self, configuration):
         """
@@ -91,16 +95,16 @@ class CandidateApproach:
         elif self.change_aspect_ration:
 
             # calculate the current scale factors
-            width_scale_factors = np.multiply(self.scale_factors, self.current_width_factor)
-            height_scale_factors = np.multiply(self.scale_factors, self.current_height_factor)
+            self.width_scale_factors = np.multiply(self.scale_factors, self.current_width_factor)
+            self.height_scale_factors = np.multiply(self.scale_factors, self.current_height_factor)
 
             # init scaled predictions 2d array. 0 for scaled width, 1 for scaled height
             scaled_predictions = [[], []]
 
             # Generate 2 * n scaled candidates
             for i in range(self.number_scales):
-                width_scale_factor = width_scale_factors[i]
-                height_scale_factor = height_scale_factors[i]
+                width_scale_factor = self.width_scale_factors[i]
+                height_scale_factor = self.height_scale_factors[i]
 
                 # calc new width and height
                 new_w = round(self.base_target_size[0] * width_scale_factor)
@@ -158,13 +162,12 @@ class CandidateApproach:
                                          round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
 
             for width_candidate in scaled_candidates[0]:
-                # TODO have this code block three times...
+                # TODO dont have this code block three times...
                 try:
                     evaluated_candidates[0].append(self.rate_scaled_candidate(
                         candidate=width_candidate,
                         feature_mask=feature_mask,
-                        mask_scale_factor=mask_scale_factor,
-                        base_candidate_sum=base_candidate_val))
+                        mask_scale_factor=mask_scale_factor))
                 # should not happen because when only get here when the quality of the frame is higher than threshold
                 except ValueError:
                     # handcraft the results, so that the scale will not change when the prediction is bad
@@ -180,8 +183,7 @@ class CandidateApproach:
                     evaluated_candidates[1].append(self.rate_scaled_candidate(
                         candidate=height_candidate,
                         feature_mask=feature_mask,
-                        mask_scale_factor=mask_scale_factor,
-                        base_candidate_sum=base_candidate_val))
+                        mask_scale_factor=mask_scale_factor))
                 # should not happen because when only get here when the quality of the frame is higher than threshold
                 except ValueError:
                     # handcraft the results, so that the scale will not change when the prediction is bad
@@ -209,8 +211,7 @@ class CandidateApproach:
                     evaluated_candidates.append(self.rate_scaled_candidate(
                         candidate=candidate,
                         mask_scale_factor=mask_scale_factor,
-                        feature_mask=feature_mask,
-                        base_candidate_sum=base_candidate_val))
+                        feature_mask=feature_mask))
                 # should not happen because when only get here when the quality of the frame is higher than threshold
                 except ValueError:
                     # handcraft the results, so that the scale will not change when the prediction is bad
@@ -277,7 +278,7 @@ class CandidateApproach:
 
         return Rect(new_x, new_y, new_w, new_h)
 
-    def rate_scaled_candidate(self, candidate, mask_scale_factor, feature_mask, base_candidate_sum):
+    def rate_scaled_candidate(self, candidate, mask_scale_factor, feature_mask):
         """
         :param candidate: the current candidate
         :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
@@ -334,8 +335,7 @@ class CandidateApproach:
 
         return quality_of_candidate
 
-    @staticmethod
-    def limit_scale_change(old, new, max_change_percentage, axis=None):
+    def limit_scale_change(self, old, new, max_change_percentage, axis=None):
         """
         limits the scale change between two frames to a configured threshold
         :param old: the current scale factor still from the previous frames
@@ -345,14 +345,26 @@ class CandidateApproach:
         :return: if factors out of threshold, threshold factor, otherwise normal factor
         """
 
+        # see if the factor has been limited 3 times in a row, indicating a currently strong change
+        if len(self.limited_growth_times) > 2:
+            self.max_scale_change += 0.02
+            logger.info("scale_factor has been reduced too often, new limit is {0}".format(self.max_scale_change))
+        elif len(self.limited_shrink_times) > 2:
+            self.max_scale_change += 0.02
+            logger.info("scale_factor has been increased too often, new limit is {0}".format(self.max_scale_change))
+
         # make sure area didn't change too much, correcting scale factor
         if new > old + max_change_percentage:
             output_factor = old + max_change_percentage
+            self.limited_growth_times.append(new)
             logger.info("predicted scale for {0} was {1}, reduced it to {2}".format(axis, new, output_factor))
         elif new < old - max_change_percentage:
             output_factor = old - max_change_percentage
+            self.limited_growth_times.append(new)
             logger.info("predicted scale for {0} was {1}, increased it  to {2}".format(axis, new, output_factor))
         else:
+            self.limited_growth_times = []
+            self.limited_shrink_times = []
             output_factor = new
             logger.info("predicted scale for {0} is {1}".format(axis, output_factor))
 

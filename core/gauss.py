@@ -75,8 +75,20 @@ def gen_gauss_mask(mask_size, gauss_pos, sigf=0.5):
     x1, y1 = gauss_pos[0:2]
     x2 = x1 + gauss_pos[2]
     y2 = y1 + gauss_pos[3]
-    #print(mask.shape, x1, y1, x2, y2)
-    mask[x1:x2, y1:y2] = m_pos
+
+    selection_shape = mask[x1:x2, y1:y2].shape
+    m_pos_shape = m_pos.shape
+
+    # this happens when y2 is bigger than mask size[1]. if mask.shape[1] == 25 and y2 = 27,
+    # mask[x1:x2, y1:y2] ends up being smaller than m_pos, which causes the broadcast in else to fail
+    if x2 > mask_size[0]:
+        diff = abs(mask_size[0] - x2)
+        mask[x1:x2, y1:y2] = m_pos.shape[:-diff, :]
+    elif y2 > mask_size[1]:
+        diff = abs(mask_size[1] - y2)
+        mask[x1:x2, y1:y2] = m_pos[:, :-diff]
+    else:
+        mask[x1:x2, y1:y2] = m_pos
     return mask
 
 """

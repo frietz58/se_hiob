@@ -122,7 +122,7 @@ class ScaleEstimator:
 
         # If scale estimation has been disabled in configuration, return unscaled bounding box
         if not self.use_scale_estimation:
-            logger.critical("Scale Estimation is disabled, returning unchanged prediction")
+            logger.info("Scale Estimation is disabled, returning unchanged prediction")
             return frame.predicted_position
 
         # if the quality of the prediction is too low. return unscaled bounding box
