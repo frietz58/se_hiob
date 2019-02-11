@@ -197,7 +197,10 @@ samples:
     - name: Ironman
       attributes: [BC, FM, IPR, IV, MB, OCC, OPR, OV, SV]
       actual_frames: 166
-    - name: Jogging
+    - name: Jogging1
+      attributes: [DEF, OCC, OPR]
+      actual_frames: 307
+    - name: Jogging2
       attributes: [DEF, OCC, OPR]
       actual_frames: 307
     - name: Jump
@@ -258,6 +261,9 @@ samples:
       attributes: [BC, DEF, IV, OCC, OPR, SV]
       actual_frames: 400
     - name: Skating2
+      attributes: [DEF, FM, OCC, OPR, SV]
+      actual_frames: 473
+    - name: Skating3
       attributes: [DEF, FM, OCC, OPR, SV]
       actual_frames: 473
     - name: Skiing
