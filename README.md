@@ -9,6 +9,13 @@ TODO: add link to the docker image of hiob_ros.
 
 The algorithm in HIOB is inspired by the [FCNT](https://github.com/scott89/FCNT) by *Wang et al* presented in their [ICCV 2015 paper](http://202.118.75.4/lu/Paper/ICCV2015/iccv15_lijun.pdf). The program code of HIOB is completely independet from the FCNT and has been written by us.
 
+# Citing
+If you use our work for your research, please consider citing us:
+
+TODO: bibtex
+
+TODO: second paper, when we have a bibtex entry.
+
 # Installation
 
 #### Using HIOB
@@ -47,8 +54,11 @@ a bit tricky though, especially if you want to install the custom graphics drive
 3. <b>Add cudnn to the virtualenv path.</b> Maybe this was just buggy for me, but after successful installation of cuda 9.0 and cudnn, tensorflow would not find my
 cudnn installation. Therefor go to your virtualenv python installation and add the following line to your activate file in /path_to_venv/bin/activate, right under the export PATH statement
 
+```
     export PYTHONPATH="/usr/local/cuda-9.0/lib64"
     export PYTHONPATH="/usr/local/cuda/lib64"
+```
+
 
 # for using your GPU and CUDA
     (hiob_env) $ cd HIOB
@@ -60,14 +70,13 @@ Install required packages:
 
     # for using your GPU and CUDA
     (hiob_env) $ cd HIOB
-    (hiob_env) $ pip install -r requirements.txt 
+    (hiob_env) $ pip install -r requirements.txt
 
 This installs a tensorflow build that requires a NVIDIA GPU and the CUDA machine learning library. You can alternatively use a tensorflow build that only uses the CPU. It should work, but it will not be fast. We supply a diffenrent requirements.txt for that:
 
     # alternatively for using your CPU only:
     (hiob_env) $ cd HIOB
     (hiob_env) $ pip install -r requirements_cpu.txt
-    
 
 # Run the demo
 HIOB comes with a simple demo script, that downloads a tracking sequence (~4.3MB) and starts the tracker on it. Inside your virtual environment and inside the HIOB directory, just run:
