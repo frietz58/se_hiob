@@ -71,24 +71,48 @@ def xxgen_gauss_mask(mask_size, gauss_pos, sigf=0.5):
 def gen_gauss_mask(mask_size, gauss_pos, sigf=0.5):
     #print("GAUSS:", mask_size, gauss_pos)
     mask = np.zeros(mask_size)
-    m_pos = gauss_dist(*gauss_pos[2:4], sigf=sigf)
+
+    # m_pos = gauss_dist(*gauss_pos[2:4], sigf=sigf)
+
+    #  if the prediction grows almost as big or bigger than entire frame, the generated gaus mask
+    #  also grows bigger than the mask size, which causes tracking to fail. this prevents that from happening
+    # if prediction only too wide
+    if gauss_pos[2] > mask_size[0] and gauss_pos[3] <= mask_size[1]:
+        m_pos = gauss_dist(*(mask_size[0], gauss_pos[3]), sigf=sigf)
+    # if prediction only too high
+    elif gauss_pos[3] > mask_size[1] and gauss_pos[2] <= mask_size[0]:
+        m_pos = gauss_dist(*(gauss_pos[2], mask_size[1]), sigf=sigf)
+    # if prediction too high and too wide
+    elif gauss_pos[3] > mask_size[1] and gauss_pos[2] > mask_size[0]:
+        m_pos = gauss_dist(*(mask_size[0], mask_size[1]), sigf=sigf)
+    # normal case
+    else:
+        m_pos = gauss_dist(*gauss_pos[2:4], sigf=sigf)
+
     x1, y1 = gauss_pos[0:2]
     x2 = x1 + gauss_pos[2]
     y2 = y1 + gauss_pos[3]
-
-    selection_shape = mask[x1:x2, y1:y2].shape
-    m_pos_shape = m_pos.shape
 
     # this happens when y2 is bigger than mask size[1]. if mask.shape[1] == 25 and y2 = 27,
     # mask[x1:x2, y1:y2] ends up being smaller than m_pos, which causes the broadcast in else to fail
     if x2 > mask_size[0]:
         diff = abs(mask_size[0] - x2)
-        mask[x1:x2, y1:y2] = m_pos.shape[:-diff, :]
+        try:
+            mask[x1:x2, y1:y2] = m_pos.shape[:int(-diff), :]
+        except ValueError:
+            pass
     elif y2 > mask_size[1]:
         diff = abs(mask_size[1] - y2)
-        mask[x1:x2, y1:y2] = m_pos[:, :-diff]
+        try:
+            mask[x1:x2, y1:y2] = m_pos[:, :int(-diff)]
+        except ValueError:
+            pass
     else:
-        mask[x1:x2, y1:y2] = m_pos
+        try:
+            mask[x1:x2, y1:y2] = m_pos
+        except ValueError:
+            pass
+
     return mask
 
 """

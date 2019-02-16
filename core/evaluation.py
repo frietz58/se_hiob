@@ -100,6 +100,7 @@ def do_tracking_evaluation(tracking):
             r['adjusted_overlap_score'],
             r['lost'],
             r['updated'],
+            r['gt_size_score'],
             r['size_score']
         )
         csv_lines.append(line)

@@ -276,6 +276,31 @@ class CandidateApproach:
         new_x = int(old_x - np.rint(new_w/2))
         new_y = int(old_y - np.rint(new_h/2))
 
+        # handle out of bounds
+        if new_x <= 1:
+            new_x = 1
+
+        if new_y <= 1:
+            new_y = 1
+
+        if new_x >= self.frame.size[1]:
+            new_x = self.frame.size[1]
+
+        if new_y >= self.frame.size[2]:
+            new_y = self.frame.size[2]
+
+        if new_w <= 1:
+            new_w = 1
+
+        if new_h <= 1:
+            new_h = 1
+
+        if new_w >= self.frame.size[1]:
+            new_w = self.frame.size[1]
+
+        if new_h >= self.frame.size[2]:
+            new_h = self.frame.size[2]
+
         return Rect(new_x, new_y, new_w, new_h)
 
     def rate_scaled_candidate(self, candidate, mask_scale_factor, feature_mask):
