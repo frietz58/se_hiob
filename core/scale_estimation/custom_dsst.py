@@ -205,9 +205,13 @@ class CustomDsst:
             # check for out of bounds
             xs[xs < 1] = 1
             ys[ys < 1] = 1
-            xs[xs > np.shape(im)[0]] = np.shape(im)[0]
-            ys[ys > np.shape(im)[1]] = np.shape(im)[1]
+            # xs[xs > np.shape(im)[0]] = np.shape(im)[0]
+            # ys[ys > np.shape(im)[1]] = np.shape(im)[1]
+            xs[xs > np.shape(im)[1] - 1] = np.shape(im)[1] - 1
+            ys[ys > np.shape(im)[0] - 1] = np.shape(im)[0] - 1
 
+            if frame.number == 984:
+                print("here")
             img_patch = im[ys, :]
             img_patch = img_patch[:, xs]
 
