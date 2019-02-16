@@ -10,38 +10,23 @@ parser = argparse.ArgumentParser(description="Evaluates the results of a HIOB tr
                                              "the tracker. Additionally, precision and success will be calculated for "
                                              "the groups of attributes from the tb100")
 
-parser.add_argument("-p", "--path", help="Absolute path to the folder which contains the tracking logs of the "
-                                         "experiment.")
+parser.add_argument("-ptr", "--pathresults", help="Absolute path to the folder which contains the tracking logs of "
+                                                  "the experiment.")
+
 args = parser.parse_args()
 
 # get the path from the commandline argument
-path = args.path
+results_path = args.pathresults
 
-# get all subfolders
-subfolders = [x[0] for x in os.walk(path)]
-del subfolders[0]
+# get all subfolders of tracked sequences
+sequences = [x[0] for x in os.walk(results_path)]
+del sequences[0]
+for i, folder in enumerate(sequences):
+    if 'evaluation' in folder or not 'tracking' in folder:
+        del sequences[i]
 
 
-def evaluate_single_sequence(sequence_dir):
-
-    sequence_name = sequence_dir.split('-')[-1]
-
-    # # read the gt_coords from the ground_truth file
-    # global gt_coords
-    # with open(os.path.join(sequence_dir, str(sequence_name + ".txt")), mode="r") as f:
-    #     gt_coords = f.readlines()
-    #     for i in range(0, len(gt_coords)):
-    #         gt_coords[i] = gt_coords[i].replace("\n", "")
-    #         gt_coords[i] = gt_coords[i].split(',')
-    #         gt_coords[i] = list(map(int, gt_coords[i]))
-    #
-    # # parse lists into of coords into rects.
-    # gt_rects = [None] * len(gt_coords)
-    # for i in range(0, len(gt_coords)):
-    #     gt_rects[i] = Rect(gt_coords[i][0], gt_coords[i][1], gt_coords[i][2], gt_coords[i][3])
-
-    print(sequence_name)
-
+def get_single_sequence_results(sequence_dir):
     # read the tracking evaluation from the evaluation file
     with open(os.path.join(sequence_dir, str("evaluation.txt")), mode="r") as f:
         tracking_evaluation = f.readlines()
@@ -69,6 +54,7 @@ def evaluate_single_sequence(sequence_dir):
     results = []
     for index, line in enumerate(tracking_results):
         working_line = line.replace("\n", "").split(",")
+        print(working_line)
         line_dict = {}
         for i in range(0, len(working_line)):
             try:
@@ -80,20 +66,20 @@ def evaluate_single_sequence(sequence_dir):
                 line_dict["frame_number"] = working_line[i]
             elif i == 1:
                 line_dict["predicted_position"] = Rect(working_line[i],
-                                                       working_line[i+1],
-                                                       working_line[i+2],
-                                                       working_line[i+3])
+                                                       working_line[i + 1],
+                                                       working_line[i + 2],
+                                                       working_line[i + 3])
                 i += 3
             elif i == 5:
                 line_dict["prediction_quality"] = working_line[i]
             elif i == 6:
                 line_dict["roi_position"] = Rect(working_line[i],
-                                                 working_line[i+1],
-                                                 working_line[i+2],
-                                                 working_line[i+3])
+                                                 working_line[i + 1],
+                                                 working_line[i + 2],
+                                                 working_line[i + 3])
                 i += 3
             elif i == 10:
-                line_dict["center_distamce"] = working_line[i]
+                line_dict["center_distance"] = working_line[i]
             elif i == 11:
                 line_dict["relative_center_distance"] = working_line[i]
             elif i == 12:
@@ -105,12 +91,103 @@ def evaluate_single_sequence(sequence_dir):
             elif i == 15:
                 line_dict["updated"] = working_line[i]
             elif i == 16:
+                line_dict["gt_size_score"] = working_line[i]
+            elif i == 17:
                 line_dict["size_score"] = working_line[i]
 
-        print(line_dict)
         results.append(line_dict)
 
+    return results, evaluation_dict
 
-# traverse all sub folders and do evaluation for each sequence
-for folder in subfolders:
-    evaluate_single_sequence(folder)
+
+def build_dist_fun(dists):
+    def f(thresh):
+        return (dists <= thresh).sum() / len(dists)
+
+    return f
+
+
+def build_over_fun(overs):
+    def f(thresh):
+        return (overs >= thresh).sum() / len(overs)
+
+    return f
+
+
+def create_graphs_for_sequence(single_sequence_result, sequence_folder):
+    center_distances = np.empty(len(single_sequence_result))
+    overlap_score = np.empty(len(single_sequence_result))
+
+    for n, line in enumerate(single_sequence_result):
+        center_distances[n] = line["center_distance"]
+        overlap_score[n] = line["overlap_score"]
+
+    # precision plot
+    dfun = build_dist_fun(center_distances)
+    figure_file2 = os.path.join(sequence_folder, 'evaluation/precision_plot.svg')
+    figure_file3 = os.path.join(sequence_folder, 'evaluation/precision_plot.pdf')
+    f = plt.figure()
+    x = np.arange(0., 50.1, .1)
+    y = [dfun(a) for a in x]
+    at20 = dfun(20)
+    tx = "prec(20) = %0.4f" % at20
+    plt.text(5.05, 0.05, tx)
+    plt.xlabel("center distance [pixels]")
+    plt.ylabel("occurrence")
+    plt.xlim(xmin=0, xmax=50)
+    plt.ylim(ymin=0.0, ymax=1.0)
+    plt.plot(x, y)
+    plt.savefig(figure_file2)
+    plt.savefig(figure_file3)
+    plt.close()
+
+    # success plot
+    ofun = build_over_fun(overlap_score)
+    figure_file2 = os.path.join(sequence_folder, 'evaluation/success_plot.svg')
+    figure_file3 = os.path.join(sequence_folder, 'evaluation/success_plot.pdf')
+    f = plt.figure()
+    x = np.arange(0., 1.001, 0.001)
+    y = [ofun(a) for a in x]
+    auc = np.trapz(y, x)
+    tx = "AUC = %0.4f" % auc
+    plt.text(0.05, 0.05, tx)
+    plt.xlabel("overlap score")
+    plt.ylabel("occurrence")
+    plt.xlim(xmin=0.0, xmax=1.0)
+    plt.ylim(ymin=0.0, ymax=1.0)
+    plt.plot(x, y)
+    plt.savefig(figure_file2)
+    plt.savefig(figure_file3)
+    plt.close()
+
+
+def eval_sequences_only(tracked_sequences):
+    # traverse all sub folders and do evaluation for each sequence
+    for sequence in tracked_sequences:
+        if not os.path.exists(sequence + "/evaluation"):
+            os.mkdir(os.path.join(sequence, "evaluation"))
+        sequence_result, tracking_evaluation = get_single_sequence_results(sequence)
+        create_graphs_for_sequence(sequence_result, sequence)
+
+def eval_tracking(tracking_dir):
+    # traverse all sub folder, eval each sequence and get results for each sequence
+    sequences_results = []
+    for sequence in tracking_dir:
+        if not os.path.exists(sequence + "/evaluation"):
+            os.mkdir(os.path.join(sequence, "evaluation"))
+        sequence_result, sequence_evaluation = get_single_sequence_results(sequence)
+        sequences_results.extend(sequence_result)
+        print(np.shape(sequences_results))
+        create_graphs_for_sequence(sequence_result, sequence)
+
+    if not os.path.exists(results_path + "/evaluation"):
+        os.mkdir(os.path.join(results_path, "evaluation"))
+
+    # treat collection of results for tracking like one sequence
+    create_graphs_for_sequence(sequences_results, results_path)
+
+
+if __name__ == '__main__':
+    # eval_sequences_only(sequences)
+    eval_tracking(sequences)
+
