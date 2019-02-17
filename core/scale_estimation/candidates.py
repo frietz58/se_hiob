@@ -11,12 +11,13 @@ class CandidateApproach:
         # configuration
         self.number_scales = None
         self.inner_punish_threshold = None
-        self.inner_punish_factor = None
         self.outer_punish_threshold = None
         self.scale_step = None
         self.max_scale_change = None
         self.scale_window_step_size = None
         self.change_aspect_ration = None
+        self.adjust_max_scale_diff = None
+        self.adjust_max_scale_diff_after = None
 
         # run time
         self.frame = None
@@ -42,12 +43,13 @@ class CandidateApproach:
         if np.mod(self.number_scales, 2) == 0:
             raise ValueError("Number of Scales needs to be odd!")
         self.inner_punish_threshold = configuration['inner_punish_threshold']
-        self.inner_punish_factor = configuration['inner_punish_factor']
         self.outer_punish_threshold = configuration['outer_punish_threshold']
         self.scale_step = configuration['scale_factor']
         self.max_scale_change = configuration['max_scale_difference']
         self.scale_window_step_size = configuration['scale_window_step_size']
         self.change_aspect_ration = configuration['c_change_aspect_ratio']
+        self.adjust_max_scale_diff = configuration['adjust_max_scale_diff']
+        self.adjust_max_scale_diff_after = configuration['adjust_max_scale_diff_after']
 
         self.calc_manual_scale_window(step_size=self.scale_window_step_size)
         self.hanning_scale_window = np.hanning(self.number_scales)
@@ -371,12 +373,13 @@ class CandidateApproach:
         """
 
         # see if the factor has been limited 3 times in a row, indicating a currently strong change
-        if len(self.limited_growth_times) > 2:
-            self.max_scale_change += 0.02
-            logger.info("scale_factor has been reduced too often, new limit is {0}".format(self.max_scale_change))
-        elif len(self.limited_shrink_times) > 2:
-            self.max_scale_change += 0.02
-            logger.info("scale_factor has been increased too often, new limit is {0}".format(self.max_scale_change))
+        if self.adjust_max_scale_diff:
+            if len(self.limited_growth_times) > self.adjust_max_scale_diff_after:
+                self.max_scale_change += 0.02
+                logger.info("scale_factor has been reduced too often, new limit is {0}".format(self.max_scale_change))
+            elif len(self.limited_shrink_times) > self.adjust_max_scale_diff_after:
+                self.max_scale_change += 0.02
+                logger.info("scale_factor has been increased too often, new limit is {0}".format(self.max_scale_change))
 
         # make sure area didn't change too much, correcting scale factor
         if new > old + max_change_percentage:

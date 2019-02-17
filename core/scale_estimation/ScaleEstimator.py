@@ -14,7 +14,6 @@ from .matlab_dsst import DsstEstimator
 from .custom_dsst import CustomDsst
 from ..Rect import Rect
 from .candidates import CandidateApproach
-from .eco import Eco
 
 from matplotlib import pyplot as plt
 from multiprocessing import Pool
@@ -79,7 +78,6 @@ class ScaleEstimator:
         self.use_scale_estimation = self.econf['use_scale_estimation']
         self.approach = self.econf['approach']
         self.inner_punish_threshold = self.econf['inner_punish_threshold']
-        self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
         self.scale_factor = self.econf['scale_factor']
         self.learning_rate = self.econf['learning_rate']
