@@ -440,7 +440,6 @@ class Tracking(object):
         return not self.frames_left() or self.tracker.interrupt_received
 
     async def tracking_step(self):
-        logger.info("start main loop")
         await self.tracking_next_frame()
         self.tracking_track_frame()
         self.tracking_evaluate_frame()
@@ -448,7 +447,6 @@ class Tracking(object):
         self.tracking_log_frame()
         if self.configuration['ros_mode']:
             self.tracking_publish_position()
-        logger.info("end main loop")
 
     def finish_tracking(self):
         self.initial_frame = None
