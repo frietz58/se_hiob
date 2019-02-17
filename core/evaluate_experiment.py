@@ -15,10 +15,14 @@ parser = argparse.ArgumentParser(description="Evaluates the results of a HIOB tr
 parser.add_argument("-ptr", "--pathresults", help="Absolute path to the folder which contains the tracking logs of "
                                                   "the experiment.")
 
+parser.add_argument("-pta", "--attributes", help="Absolute path to the TB100 collection file, which contains the "
+                                                 "attributes for each sequence.")
+
 args = parser.parse_args()
 
 # get the path from the commandline argument
 results_path = args.pathresults
+attributes_path = args.attributes
 
 
 # get the different folder representing different tracking executions
@@ -26,7 +30,6 @@ def get_tracking_folders(experiment_folder):
     sub_folders = [x[0] for x in os.walk(experiment_folder)]
     only_tracking_dirs = []
     for i, folder in enumerate(sub_folders):
-        print(folder)
         if 'hiob-execution' not in folder:
             continue
         elif 'tracking' in folder:
@@ -53,6 +56,7 @@ def get_tracked_sequences(tracking_dir):
     return only_sequence_folders
 
 
+# read the tracking log file for one sequence and extract the values from the file
 def get_single_sequence_results(sequence_dir):
     # read the tracking evaluation from the evaluation file
     with open(os.path.join(sequence_dir, str("evaluation.txt")), mode="r") as f:
@@ -81,7 +85,6 @@ def get_single_sequence_results(sequence_dir):
     results = []
     for index, line in enumerate(tracking_results):
         working_line = line.replace("\n", "").split(",")
-        print(working_line)
         line_dict = {}
         for i in range(0, len(working_line)):
             try:
@@ -127,6 +130,7 @@ def get_single_sequence_results(sequence_dir):
     return results, evaluation_dict
 
 
+# helper function for metric
 def build_dist_fun(dists):
     def f(thresh):
         return (dists <= thresh).sum() / len(dists)
@@ -134,6 +138,7 @@ def build_dist_fun(dists):
     return f
 
 
+# helper function for metric
 def build_over_fun(overs):
     def f(thresh):
         return (overs >= thresh).sum() / len(overs)
@@ -141,6 +146,7 @@ def build_over_fun(overs):
     return f
 
 
+# calculates the ares between two curves
 def area_between_curves(curve1, curve2):
     assert len(curve1) == len(curve2), "Not the same amount of data points in the two curves"
     abc = 0
@@ -150,6 +156,7 @@ def area_between_curves(curve1, curve2):
     return abc
 
 
+# creates the graphs for a single sequence
 def create_graphs_for_sequence(single_sequence_result, sequence_folder):
     center_distances = np.empty(len(single_sequence_result))
     overlap_score = np.empty(len(single_sequence_result))
@@ -161,8 +168,6 @@ def create_graphs_for_sequence(single_sequence_result, sequence_folder):
         overlap_score[n] = line["overlap_score"]
         gt_ss[n] = line['gt_size_score']
         ss[n] = line['size_score']
-
-    score_dict = {}
 
     # precision plot
     dfun = build_dist_fun(center_distances)
@@ -182,7 +187,6 @@ def create_graphs_for_sequence(single_sequence_result, sequence_folder):
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
-    score_dict["prec(20)"] = tx
 
     # success plot
     ofun = build_over_fun(overlap_score)
@@ -202,7 +206,6 @@ def create_graphs_for_sequence(single_sequence_result, sequence_folder):
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
-    score_dict["success"] = tx
 
     # Size Plot:
     abc = area_between_curves(ss, gt_ss)
@@ -223,10 +226,8 @@ def create_graphs_for_sequence(single_sequence_result, sequence_folder):
     plt.savefig(figure_file3)
     plt.close()
 
-    return score_dict
 
-
-# read the informations from the tracker.yaml file to reconstruct which tracking algorithm has been used
+# read the information from the tracker.yaml file to reconstruct which tracking algorithm has been used
 def get_approach_from_yaml(tracking_dir):
     with open(tracking_dir + "/tracker.yaml", "r") as stream:
         try:
@@ -251,25 +252,126 @@ def get_approach_from_yaml(tracking_dir):
         return algorithm
 
 
-def eval_sequences(tracked_sequences):
-    # traverse all sub folders and do evaluation for each sequence
-    for sequence in tracked_sequences:
-        if not os.path.exists(sequence + "/evaluation"):
-            os.mkdir(os.path.join(sequence, "evaluation"))
-        sequence_result, tracking_evaluation = get_single_sequence_results(sequence)
-        create_graphs_for_sequence(sequence_result, sequence)
+# calculates the metrics for a given collection of sequences
+def get_metrics_for_collections(sequences):
+
+    center_distances = []
+    overlap_scores = []
+    ground_truth_size = []
+    predicted_size = []
+    frames = 0
+
+    # for every sequence in the collection get the results on each frame
+    for sequence in sequences:
+        sequence_result, sequence_evaluation = get_single_sequence_results(sequence)
+
+        for line in sequence_result:
+            center_distances.append(line["center_distance"])
+            overlap_scores.append(line["overlap_score"])
+            ground_truth_size.append(line["gt_size_score"])
+            predicted_size.append(line["size_score"])
+        frames += len(sequence_result)
+
+    # values need to be array for calculations to work, not lists
+    center_distances = np.asarray(center_distances)
+    overlap_scores = np.asarray(overlap_scores)
+    ground_truth_size = np.asarray(ground_truth_size)
+    predicted_size = np.asarray(predicted_size)
+
+    # calculate the metrics based on the results for each frame of the sequences in the collection
+    scores_for_collection = {}
+
+    scores_for_collection["Samples"] = len(sequences)
+    scores_for_collection["Frames"] = frames
+
+    dfun = build_dist_fun(center_distances)
+    at20 = dfun(20)
+    scores_for_collection["Precision"] = at20
+
+    ofun = build_over_fun(overlap_scores)
+    x = np.arange(0., 1.001, 0.001)
+    y = [ofun(a) for a in x]
+    auc = np.trapz(y, x)
+    scores_for_collection["Success"] = auc
+
+    return scores_for_collection
 
 
-def create_tracking_results_csv(tracking_dir):
-
+# build a collection of sequences for each attribute, based on the sequences in tracking dir
+def get_attribute_collections(tracking_dir):
     sequnce_dirs = get_tracked_sequences(tracking_dir)
 
+    with open(attributes_path, "r") as stream:
+        try:
+            tb100 = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    attribute_collection = {"IV": [],
+                            "SV": [],
+                            "OCC": [],
+                            "DEF": [],
+                            "MB": [],
+                            "FM": [],
+                            "IPR": [],
+                            "OPR": [],
+                            "OV": [],
+                            "BC": [],
+                            "LR": []}
+
+    # find the attributes of each sequence and extend the collection for that attribute by the name of the sequence
+    for sequnce in sequnce_dirs:
+        sequence_name = sequnce.split("/")[-1].split("-")[-1]
+        for sample in tb100["samples"]:
+            if sample["name"] == sequence_name:
+                for attribute in sample["attributes"]:
+                    attribute_collection[attribute].append(sequnce)
+
+    return attribute_collection
+
+
+# creates a csv file with the scores for each attribute of the tb100
+def create_attribute_results_csv(tracking_dir):
+
+    attribute_collection = get_attribute_collections(tracking_dir)
+    attribute_scores = {}
+
+    # get the metric scores for each collection
+    for attribute in attribute_collection:
+        metrics = get_metrics_for_collections(sequences=attribute_collection[attribute])
+        attribute_scores[attribute] = metrics
+
+    approach = get_approach_from_yaml(tracking_dir)
+
+    # get the results for every sequence into on csv
+    csv_name = tracking_dir + '/evaluation/' + approach + '_attribute_results.csv'
+    with open(csv_name, 'w', newline='') as outcsv:
+        writer = csv.DictWriter(outcsv, fieldnames=["Attribute", "Samples", "Frames", "Precision", "Success"])
+        writer.writeheader()
+
+        for attribute in attribute_scores:
+            sample_name = attribute
+            samples = attribute_scores[attribute]["Samples"]
+            frames = attribute_scores[attribute]["Frames"]
+            precision = attribute_scores[attribute]["Precision"]
+            success = attribute_scores[attribute]["Success"]
+
+            writer.writerow({"Attribute": sample_name,
+                             "Samples": samples,
+                             "Frames": frames,
+                             "Precision": precision,
+                             "Success": success})
+
+
+# creates a csv file with every score for every sequence within one tracking folder
+def create_tracking_results_csv(tracking_dir):
+    sequnce_dirs = get_tracked_sequences(tracking_dir)
     approach = get_approach_from_yaml(tracking_dir)
 
     # get the results for every sequence into on csv
     csv_name = tracking_dir + '/evaluation/' + approach + '_sequence_results.csv'
     with open(csv_name, 'w', newline='') as outcsv:
-        writer = csv.DictWriter(outcsv, fieldnames=["Sample", "Total Frames", "Framerate", "Precision", "Success"])
+        writer = csv.DictWriter(outcsv, fieldnames=["Sample", "Frames", "Framerate", "Precision", "Success"])
         writer.writeheader()
 
         for sequence in sequnce_dirs:
@@ -281,12 +383,23 @@ def create_tracking_results_csv(tracking_dir):
                 precision = lines[26].replace("\n", "").split("=")[1]
                 success = lines[28].replace("\n", "").split("=")[1]
                 writer.writerow({'Sample': sample_name,
-                                 'Total Frames': number_frames,
+                                 'Frames': number_frames,
                                  'Framerate': frame_rate,
                                  'Precision': precision,
                                  'Success': success})
 
 
+# only creates graphs for the sequences in one tracking folder
+def eval_sequences(tracked_sequences):
+    # traverse all sub folders and do evaluation for each sequence
+    for sequence in tracked_sequences:
+        if not os.path.exists(sequence + "/evaluation"):
+            os.mkdir(os.path.join(sequence, "evaluation"))
+        sequence_result, tracking_evaluation = get_single_sequence_results(sequence)
+        create_graphs_for_sequence(sequence_result, sequence)
+
+
+# first evaluate each sequence, based on that calc metrics for tracking approach
 def eval_tracking(tracking_dir):
     # traverse all sub folder, eval each sequence and get results for each sequence
     sequences_results = []
@@ -306,21 +419,21 @@ def eval_tracking(tracking_dir):
 
     # treat collection of results for tracking like one sequence
     scores = create_graphs_for_sequence(sequences_results, tracking_dir)
-    approach = get_approach_from_yaml(tracking_dir)
 
-    # get the results for every sequence into on csv
+    # get the results for every sequence into one csv
     create_tracking_results_csv(tracking_dir)
 
+    # get the results for each attribute into one csv
+    # get_attribute_collections(tracking_dir)
+    create_attribute_results_csv(tracking_dir)
 
 
+# evaluates every tracking approach in the experiments folder
 def eval_all_trackings():
     tracking_folders = get_tracking_folders(results_path)
     for tracking_folder in tracking_folders:
         eval_tracking(tracking_folder)
 
 
-
 if __name__ == '__main__':
     eval_all_trackings()
-
-
