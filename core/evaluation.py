@@ -34,6 +34,11 @@ def build_over_fun(overs):
     return f
 
 
+def area_between_curves(graph1, graph2):
+    print(graph1, graph2)
+    return "200"
+
+
 def do_tracking_evaluation(tracking):
     tracker = tracking.tracker
 
@@ -89,7 +94,7 @@ def do_tracking_evaluation(tracking):
                 pos.left, pos.top, pos.right, pos.bottom)
         princeton_lines.append(line)
         # my own log line:
-        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
+        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
             n + 1,
             pos.left, pos.top, pos.width, pos.height,
             r['prediction_quality'],
@@ -168,14 +173,15 @@ def do_tracking_evaluation(tracking):
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
 
-    #Size Plot:
+    # Size Plot:
     figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
     figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
     f = plt.figure()
     plt.xlabel("frame")
     plt.ylabel("size")
     plt.plot(dim, ss, 'r-', label='predicted size')
-    plt.plot(dim, gt_ss, 'g--', label='groundtruth size', alpha=0.7)
+    plt.plot(dim, gt_ss, 'g-', label='groundtruth size', alpha=0.7)
+    plt.fill_between(dim, ss, gt_ss, color="y")
     plt.axhline(y=ss[0], color='c', linestyle=':', label='initial size')
     plt.legend(loc='best')
     plt.xlim(1, len(ss))

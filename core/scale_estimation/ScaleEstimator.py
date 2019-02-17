@@ -14,7 +14,6 @@ from .matlab_dsst import DsstEstimator
 from .custom_dsst import CustomDsst
 from ..Rect import Rect
 from .candidates import CandidateApproach
-from .eco import Eco
 
 from matplotlib import pyplot as plt
 from multiprocessing import Pool
