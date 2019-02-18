@@ -294,6 +294,9 @@ def get_metrics_for_collections(sequences):
     auc = np.trapz(y, x)
     scores_for_collection["Success"] = auc
 
+    abc = area_between_curves(ground_truth_size, predicted_size)
+    scores_for_collection["Size Diff"] = abc
+
     return scores_for_collection
 
 
@@ -346,7 +349,12 @@ def create_attribute_results_csv(tracking_dir):
     # get the results for every sequence into on csv
     csv_name = tracking_dir + '/evaluation/' + approach + '_attribute_results.csv'
     with open(csv_name, 'w', newline='') as outcsv:
-        writer = csv.DictWriter(outcsv, fieldnames=["Attribute", "Samples", "Frames", "Precision", "Success"])
+        writer = csv.DictWriter(outcsv, fieldnames=["Attribute",
+                                                    "Samples",
+                                                    "Frames",
+                                                    "Precision",
+                                                    "Success",
+                                                    "Size Difference"])
         writer.writeheader()
 
         for attribute in attribute_scores:
@@ -355,12 +363,14 @@ def create_attribute_results_csv(tracking_dir):
             frames = attribute_scores[attribute]["Frames"]
             precision = attribute_scores[attribute]["Precision"]
             success = attribute_scores[attribute]["Success"]
+            abc = attribute_scores[attribute]["Size Diff"]
 
             writer.writerow({"Attribute": sample_name,
                              "Samples": samples,
                              "Frames": frames,
                              "Precision": precision,
-                             "Success": success})
+                             "Success": success,
+                             "Size Difference": abc})
 
 
 # creates a csv file with every score for every sequence within one tracking folder

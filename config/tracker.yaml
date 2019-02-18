@@ -96,12 +96,12 @@ tracking_conf:
   shuffle: false
 
 scale_estimator:
-  use_scale_estimation: True  # Enable or disable scale estimation
+  use_scale_estimation: False  # Enable or disable scale estimation
   scale_estimation_threshold: 0.1
 
   # Determines which approach to use for scale estimation.
-  #approach: 'candidates'
-  approach: 'custom_dsst'
+  approach: 'candidates'
+  #approach: 'custom_dsst'
 
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls
@@ -114,7 +114,7 @@ scale_estimator:
   dsst_number_scales: 33 # number of scaled candidates to generate
 
   # candidate params:
-  c_change_aspect_ratio: False # change aspect ratio of bouding box
+  c_change_aspect_ratio: True # change aspect ratio of bouding box
   inner_punish_threshold: 0.3 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   outer_punish_threshold: 0.3 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
   c_number_scales: 33 # number of scaled candidates to generate
