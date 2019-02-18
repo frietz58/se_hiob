@@ -272,6 +272,18 @@ def get_metrics_for_collections(sequences):
             predicted_size.append(line["size_score"])
         frames += len(sequence_result)
 
+    # if the current collection is empty (probably only in test cases)
+    if frames == 0:
+        scores_for_collection = {}
+
+        scores_for_collection["Samples"] = 0
+        scores_for_collection["Frames"] = 0
+        scores_for_collection["Precision"] = 'None'
+        scores_for_collection["Success"] = 'None'
+        scores_for_collection["Size Diff"] = 'None'
+
+        return scores_for_collection
+
     # values need to be array for calculations to work, not lists
     center_distances = np.asarray(center_distances)
     overlap_scores = np.asarray(overlap_scores)
@@ -381,7 +393,7 @@ def create_tracking_results_csv(tracking_dir):
     # get the results for every sequence into on csv
     csv_name = tracking_dir + '/evaluation/' + approach + '_sequence_results.csv'
     with open(csv_name, 'w', newline='') as outcsv:
-        writer = csv.DictWriter(outcsv, fieldnames=["Sample", "Frames", "Framerate", "Precision", "Success"])
+        writer = csv.DictWriter(outcsv, fieldnames=["Sample", "Frames", "Framerate", "Precision", "Success", "Size Diff"])
         writer.writeheader()
 
         for sequence in sequnce_dirs:
@@ -390,13 +402,15 @@ def create_tracking_results_csv(tracking_dir):
                 sample_name = lines[1].replace("\n", "").split("=")[1]
                 number_frames = lines[9].replace("\n", "").split("=")[1]
                 frame_rate = lines[10].replace("\n", "").split("=")[1]
-                precision = lines[26].replace("\n", "").split("=")[1]
-                success = lines[28].replace("\n", "").split("=")[1]
+                abc = lines[26].replace("\n", "").split("=")[1]
+                precision = lines[27].replace("\n", "").split("=")[1]
+                success = lines[29].replace("\n", "").split("=")[1]
                 writer.writerow({'Sample': sample_name,
                                  'Frames': number_frames,
                                  'Framerate': frame_rate,
                                  'Precision': precision,
-                                 'Success': success})
+                                 'Success': success,
+                                 'Size Diff': abc})
 
 
 # only creates graphs for the sequences in one tracking folder
@@ -434,7 +448,6 @@ def eval_tracking(tracking_dir):
     create_tracking_results_csv(tracking_dir)
 
     # get the results for each attribute into one csv
-    # get_attribute_collections(tracking_dir)
     create_attribute_results_csv(tracking_dir)
 
 
