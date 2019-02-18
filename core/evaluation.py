@@ -34,9 +34,35 @@ def build_over_fun(overs):
     return f
 
 
-def area_between_curves(graph1, graph2):
-    print(graph1, graph2)
-    return "200"
+# calculates the ares between two curves
+def area_between_curves(curve1, curve2):
+    assert len(curve1) == len(curve2), "Not the same amount of data points in the two curves"
+    abc = 0
+    for i in range(0, len(curve1)):
+        abc += abs(curve1[i] - curve2[i])
+
+    return round(abc, 2)
+
+
+def normalize_size_datapoints(log):
+
+    size_scores = []
+    gt_size_scores = []
+
+    # get all size scores
+    for line in log:
+        size_scores.append(line['result']['size_score'])
+        gt_size_scores.append(line['result']['gt_size_score'])
+
+    # normalize each size score
+    max_val = max((max(size_scores), max(gt_size_scores)))
+    min_val = min((min(size_scores),  min(gt_size_scores)))
+
+    for line in log:
+        line['result']['size_score'] = (line['result']['size_score'] - min_val) / (max_val - min_val + 0.0025) * 100
+        line['result']['gt_size_score'] = (line['result']['gt_size_score'] - min_val) / (max_val - min_val + 0.0025) * 100
+
+    return log
 
 
 def do_tracking_evaluation(tracking):
@@ -80,6 +106,9 @@ def do_tracking_evaluation(tracking):
     lost2 = 0
     lost3 = 0
     failures = 0
+
+    log = normalize_size_datapoints(log)
+
     for n, l in enumerate(log):
         r = l['result']
         pos = r['predicted_position']
@@ -93,6 +122,8 @@ def do_tracking_evaluation(tracking):
             line = "{},{},{},{}".format(
                 pos.left, pos.top, pos.right, pos.bottom)
         princeton_lines.append(line)
+        # normalize size data to so that the area between the size curves is consisted
+
         # my own log line:
         line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
             n + 1,
@@ -174,11 +205,14 @@ def do_tracking_evaluation(tracking):
     plt.savefig(figure_file3)
 
     # Size Plot:
+    abc = area_between_curves(ss, gt_ss)
     figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
     figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
     f = plt.figure()
     plt.xlabel("frame")
     plt.ylabel("size")
+    tx = "abc = {0}".format(abc)
+    plt.text(5.05, 0.05, tx)
     plt.plot(dim, ss, 'r-', label='predicted size')
     plt.plot(dim, gt_ss, 'g-', label='groundtruth size', alpha=0.7)
     plt.fill_between(dim, ss, gt_ss, color="y")
@@ -187,6 +221,7 @@ def do_tracking_evaluation(tracking):
     plt.xlim(1, len(ss))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    evaluation['area_between_size_curves'] = abc
 
     # distances:
     figure_file2 = os.path.join(tracking_dir, 'relative_center_distance.svg')
