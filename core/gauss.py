@@ -76,6 +76,7 @@ def gen_gauss_mask(mask_size, gauss_pos, sigf=0.5):
 
     #  if the prediction grows almost as big or bigger than entire frame, the generated gaus mask
     #  also grows bigger than the mask size, which causes tracking to fail. this prevents that from happening
+
     # if prediction only too wide
     if gauss_pos[2] > mask_size[0] and gauss_pos[3] <= mask_size[1]:
         m_pos = gauss_dist(*(mask_size[0], gauss_pos[3]), sigf=sigf)
@@ -98,7 +99,7 @@ def gen_gauss_mask(mask_size, gauss_pos, sigf=0.5):
     if x2 > mask_size[0]:
         diff = abs(mask_size[0] - x2)
         try:
-            mask[x1:x2, y1:y2] = m_pos.shape[:int(-diff), :]
+            mask[x1:x2, y1:y2] = m_pos[:int(-diff), :]
         except ValueError:
             pass
     elif y2 > mask_size[1]:
