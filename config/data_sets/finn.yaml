@@ -9,3 +9,6 @@ samples:
     - name: dog1
       attributes: [OCC, OPR, OV, SV]
       actual_frames: 855
+    - name: Biker3f
+      attributes: [FM, LR, MB, OCC, OPR, OV, SV]
+      actual_frames: 3
