@@ -64,7 +64,9 @@ class ScaleEstimator:
         self.approach = None
         self.scale_model_size = None
         self.padding = None
-        self.scale_estimation_threshold = None
+        self.min_se_treshold = None
+        self.max_se_treshold = None
+        self.use_update_strategies = None
 
     def setup(self, tracker=None, sample=None):
         self.tracker = tracker
@@ -86,7 +88,9 @@ class ScaleEstimator:
         self.scale_model_max = self.econf['scale_model_max']
         self.scale_model_size = self.econf['scale_model_size']
         self.padding = self.econf['padding']
-        self.scale_estimation_threshold = self.econf['scale_estimation_threshold']
+        self.min_se_treshold = self.econf['min_se_treshold']
+        self.max_se_treshold = self.econf['max_se_treshold']
+        self.use_update_strategies = self.econf['use_update_strategies']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -124,10 +128,16 @@ class ScaleEstimator:
             return frame.predicted_position
 
         # if the quality of the prediction is too low. return unscaled bounding box
-        if prediction_quality < self.scale_estimation_threshold:
+        if prediction_quality < self.min_se_treshold and self.use_update_strategies:
             logger.info("frame prediction quality is smaller than scale estimation threshold {0}, not changing"
-                        " the size".format(self.scale_estimation_threshold))
+                        " the size".format(self.min_se_treshold))
             return frame.predicted_position
+
+        # if quality of prediction is too high no SE needed
+        #if prediction_quality > self.max_se_treshold and self.use_update_strategies:
+        #    logger.info("frame prediction quality bigger than scale estimation threshold {0}, not changing"
+        #                " the size".format(self.max_se_treshold))
+        #    return frame.predicted_position
 
         if self.approach == 'candidates':
             logger.info("starting scale estimation. Approach: Candidate Generation")
