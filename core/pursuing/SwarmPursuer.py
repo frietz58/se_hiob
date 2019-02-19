@@ -79,9 +79,6 @@ class SwarmPursuer(Pursuer):
         else:
             raise ValueError("Invalid value for lost: {}".format(lost))
 
-        # FINN: Die Anzahl wird in der Configurationsdatei unter Tracker gesetzt
-        # print("num_particles: {}".format(num_particles))
-
         # geo = loc2affgeo(loc)
         geos = np.tile(geo, (num_particles, 1)).T
 #        r = self.np_random.randn(4, num_particles)
@@ -187,9 +184,6 @@ class SwarmPursuer(Pursuer):
         #
         mask = frame.prediction_mask.copy()
 
-        #Finn okay, mask enthält keine Coordinaten, eher die visuellen Features
-        #logger.info("mask: %s", mask)
-
         #ps.append(time.time())  # 1
 
         mask[mask < self.target_lower_limit] = self.target_punish_low
@@ -215,9 +209,6 @@ class SwarmPursuer(Pursuer):
 
 
         logger.info("previous position: %s", frame.previous_position)
-
-        # Finn: in locs sind alle bounding boxen als <rect(1,1,1,1)>
-        # print("locs: {}".format(locs))
 
         #total = np.sum(img_mask)
         #total_max = np.sum(img_mask[img_mask > 0])
