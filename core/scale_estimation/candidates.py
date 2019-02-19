@@ -55,12 +55,30 @@ class CandidateApproach:
         self.hanning_scale_window = np.hanning(self.number_scales)
 
     def handle_initial_frame(self, frame):
+
+        # reset values from previous sequence
+        self.frame = None
+        self.scale_factors = None
+        self.manual_scale_window = ()
+        self.hanning_scale_window = None
+        self.base_target_size = None
+        self.current_scale_factor = 1
+        self.current_width_factor = 1
+        self.current_height_factor = 1
+        self.width_scale_factors = []
+        self.height_scale_factors = []
+        self.limited_growth_times = []
+        self.limited_shrink_times = []
+
         self.frame = frame
         self.base_target_size = [self.frame.ground_truth.w, self.frame.ground_truth.h]
         self.current_scale_factor = 1
 
         ss = np.arange(1, self.number_scales + 1)
         self.scale_factors = np.power(self.scale_step, (np.ceil(self.number_scales / 2) - ss))
+
+        self.calc_manual_scale_window(step_size=self.scale_window_step_size)
+        self.hanning_scale_window = np.hanning(self.number_scales)
 
     def generate_scaled_candidates(self, frame):
         """

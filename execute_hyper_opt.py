@@ -63,7 +63,14 @@ candidates_hyper_opt = [
 
 ]
 
-for change in candidates_hyper_opt:
+candidates_hyper_opt_test = [
+
+    [["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.2]],
+    [["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.3]]
+
+]
+
+for change in candidates_hyper_opt_test:
     set_keyval(change)
     print(change)
     subprocess.run(['./execute_experiments.sh', 'config', 'config/environment_experiments.yaml'])
