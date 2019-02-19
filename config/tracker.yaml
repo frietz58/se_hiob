@@ -132,10 +132,10 @@ tracking:
 # = Training Set = #
 - tb100/Basketball
 - tb100/Biker
-- tb100/Bird2
-- tb100/Box
 - tb100/Freeman3
 - tb100/Panda
+- tb100/Bird2
+- tb100/Box
 - tb100/ClifBar
 - tb100/Crowds
 - tb100/RedTeam
