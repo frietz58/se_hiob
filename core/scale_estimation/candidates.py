@@ -372,12 +372,12 @@ class CandidateApproach:
         :return: if factors out of threshold, threshold factor, otherwise normal factor
         """
 
-        # see if the factor has been limited 3 times in a row, indicating a currently strong change
+        # see if the factor has been limited x times in a row, indicating a currently strong change
         if self.adjust_max_scale_diff:
-            if len(self.limited_growth_times) > self.adjust_max_scale_diff_after:
+            if len(self.limited_growth_times) >= self.adjust_max_scale_diff_after:
                 self.max_scale_change += 0.02
                 logger.info("scale_factor has been reduced too often, new limit is {0}".format(self.max_scale_change))
-            elif len(self.limited_shrink_times) > self.adjust_max_scale_diff_after:
+            elif len(self.limited_shrink_times) >= self.adjust_max_scale_diff_after:
                 self.max_scale_change += 0.02
                 logger.info("scale_factor has been increased too often, new limit is {0}".format(self.max_scale_change))
 

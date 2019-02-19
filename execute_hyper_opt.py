@@ -1,5 +1,7 @@
 import subprocess
 import ruamel.yaml
+import numpy as np
+import gc
 
 
 def set_keyval(key_val_list):
@@ -11,7 +13,6 @@ def set_keyval(key_val_list):
         tb100 = yaml.load(f)
 
         for key_val in key_val_list:
-
             key = key_val[0]
             val = key_val[1]
 
@@ -28,13 +29,42 @@ tracker_changes = [[["use_scale_estimation", False]],
                    [["use_scale_estimation", True], ["approach", "candidates"]],
                    [["use_scale_estimation", True], ["approach", 'custom_dsst']]]
 
-# subprocess.call(['./execute_experiments.sh', 'config', 'config/environment_experiments.yaml'])
+candidates_hyper_opt = [
 
-for change in tracker_changes:
+    [["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.2]],
+    [["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.3]],
+    [["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.4]],
+    [["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.5]],
+    [["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.6]],
 
+    [["inner_punish_threshold", 0.3], ["outer_punish_threshold", 0.2]],
+    [["inner_punish_threshold", 0.3], ["outer_punish_threshold", 0.3]],
+    [["inner_punish_threshold", 0.3], ["outer_punish_threshold", 0.4]],
+    [["inner_punish_threshold", 0.3], ["outer_punish_threshold", 0.5]],
+    [["inner_punish_threshold", 0.3], ["outer_punish_threshold", 0.6]],
+
+    [["inner_punish_threshold", 0.4], ["outer_punish_threshold", 0.2]],
+    [["inner_punish_threshold", 0.4], ["outer_punish_threshold", 0.3]],
+    [["inner_punish_threshold", 0.4], ["outer_punish_threshold", 0.4]],
+    [["inner_punish_threshold", 0.4], ["outer_punish_threshold", 0.5]],
+    [["inner_punish_threshold", 0.4], ["outer_punish_threshold", 0.6]],
+
+    [["inner_punish_threshold", 0.5], ["outer_punish_threshold", 0.2]],
+    [["inner_punish_threshold", 0.5], ["outer_punish_threshold", 0.3]],
+    [["inner_punish_threshold", 0.5], ["outer_punish_threshold", 0.4]],
+    [["inner_punish_threshold", 0.5], ["outer_punish_threshold", 0.5]],
+    [["inner_punish_threshold", 0.5], ["outer_punish_threshold", 0.6]],
+
+    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.2]],
+    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.3]],
+    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.4]],
+    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.5]],
+    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.6]]
+
+]
+
+for change in candidates_hyper_opt:
     set_keyval(change)
     print(change)
-
     subprocess.run(['./execute_experiments.sh', 'config', 'config/environment_experiments.yaml'])
-
-
+    gc.collect()
