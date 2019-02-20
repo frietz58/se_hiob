@@ -70,63 +70,7 @@ tracker_changes = [
     [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.3]],
     [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.4]],
     [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.5]],
-    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.6]],
-
-    [["c_number_scales", 11], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 11], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 11], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 11], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 11], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 21], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 27], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 33], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 37], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 41], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.05]],
-
-    [["scale_window_step_size", 0.005]],
-    [["scale_window_step_size", 0.0005]],
-    [["scale_window_step_size", 0.001]],
-    [["scale_window_step_size", 0.0015]],
-    [["scale_window_step_size", 0.002]],
-    [["scale_window_step_size", 0.0025]],
-    [["scale_window_step_size", 0.003]],
-    [["scale_window_step_size", 0.0035]],
-    [["scale_window_step_size", 0.004]],
-    [["scale_window_step_size", 0.0045]],
-    [["scale_window_step_size", 0.005]],
-    [["scale_window_step_size", 0.0055]],
-    [["scale_window_step_size", 0.006]],
-    [["scale_window_step_size", 0.0065]],
-    [["scale_window_step_size", 0.007]],
-    [["scale_window_step_size", 0.0075]],
-    [["scale_window_step_size", 0.008]],
-    [["scale_window_step_size", 0.0085]],
-    [["scale_window_step_size", 0.009]]
+    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.6]]
 
 ]
 
