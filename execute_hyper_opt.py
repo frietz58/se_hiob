@@ -1,7 +1,15 @@
 import subprocess
 import ruamel.yaml
-import numpy as np
 import gc
+import argparse
+
+
+parser = argparse.ArgumentParser(description='Execute Parameter Optimization')
+parser.add_argument('-g', '--gpu')
+parser.add_argument('-e', '--environment')
+parser.add_argument('-t', '--tracker')
+
+args = parser.parse_args()
 
 def set_keyval(key_val_list):
     load_from = "config/backup.yaml"
@@ -125,5 +133,8 @@ tracker_changes = [
 for change in tracker_changes:
     set_keyval(change)
     print(change)
-    subprocess.run(['./execute_experiments.sh', 'config', 'config/environment_experiments.yaml'])
+    #subprocess.run(['./execute_experiments.sh', 'config', 'config/environment_experiments.yaml'])
+    if args.gpu is None:
+        args.gpu = 0
+    subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker,  '-g', str(args.gpu)])
     gc.collect()
