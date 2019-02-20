@@ -32,12 +32,13 @@ def set_keyval(key_val_list):
 
 tracker_changes = [
 
-    [["adjust_max_scale_diff", False]],
-    [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 1]],
-    [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 2]],
-    [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 3]],
-    [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 4]],
-    [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 5]],
+    #[["adjust_max_scale_diff", False]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 1]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 2]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 3]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 4]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 5]],
+
     [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 6]],
     [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 7]],
     [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 8]],
