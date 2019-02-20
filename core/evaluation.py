@@ -34,6 +34,37 @@ def build_over_fun(overs):
     return f
 
 
+# calculates the ares between two curves
+def area_between_curves(curve1, curve2):
+    assert len(curve1) == len(curve2), "Not the same amount of data points in the two curves"
+    abc = 0
+    for i in range(0, len(curve1)):
+        abc += abs(curve1[i] - curve2[i])
+
+    return round(abc, 2)
+
+
+def normalize_size_datapoints(log):
+
+    size_scores = []
+    gt_size_scores = []
+
+    # get all size scores
+    for line in log:
+        size_scores.append(line['result']['size_score'])
+        gt_size_scores.append(line['result']['gt_size_score'])
+
+    # normalize each size score
+    max_val = max((max(size_scores), max(gt_size_scores)))
+    min_val = min((min(size_scores),  min(gt_size_scores)))
+
+    for line in log:
+        line['result']['size_score'] = (line['result']['size_score'] - min_val) / (max_val - min_val + 0.0025) * 100
+        line['result']['gt_size_score'] = (line['result']['gt_size_score'] - min_val) / (max_val - min_val + 0.0025) * 100
+
+    return log
+
+
 def do_tracking_evaluation(tracking):
     tracker = tracking.tracker
 
@@ -75,6 +106,9 @@ def do_tracking_evaluation(tracking):
     lost2 = 0
     lost3 = 0
     failures = 0
+
+    log = normalize_size_datapoints(log)
+
     for n, l in enumerate(log):
         r = l['result']
         pos = r['predicted_position']
@@ -88,8 +122,10 @@ def do_tracking_evaluation(tracking):
             line = "{},{},{},{}".format(
                 pos.left, pos.top, pos.right, pos.bottom)
         princeton_lines.append(line)
+        # normalize size data to so that the area between the size curves is consisted
+
         # my own log line:
-        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
+        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
             n + 1,
             pos.left, pos.top, pos.width, pos.height,
             r['prediction_quality'],
@@ -100,6 +136,7 @@ def do_tracking_evaluation(tracking):
             r['adjusted_overlap_score'],
             r['lost'],
             r['updated'],
+            r['gt_size_score'],
             r['size_score']
         )
         csv_lines.append(line)
@@ -138,6 +175,7 @@ def do_tracking_evaluation(tracking):
     ov = np.empty(len(log))
     aov = np.empty(len(log))
     cf = np.empty(len(log))
+    gt_ss = np.empty(len(log))
     ss = np.empty(len(log))
     in20 = 0
     for n, l in enumerate(log):
@@ -149,6 +187,7 @@ def do_tracking_evaluation(tracking):
         ov[n] = r['overlap_score']
         aov[n] = r['adjusted_overlap_score']
         cf[n] = r['prediction_quality']
+        gt_ss[n] = r['gt_size_score']
         ss[n] = r['size_score']
 
     dim = np.arange(1, len(cd) + 1)
@@ -165,17 +204,24 @@ def do_tracking_evaluation(tracking):
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
 
-    #Size Plot:
+    # Size Plot:
+    abc = area_between_curves(ss, gt_ss)
     figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
     figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
     f = plt.figure()
     plt.xlabel("frame")
     plt.ylabel("size")
-    plt.axhline(y=ss[0], color='r', linestyle='--')
-    plt.plot(dim, ss, 'k', dim, ss, 'bo')
+    tx = "abc = {0}".format(abc)
+    plt.text(5.05, 0.05, tx)
+    plt.plot(dim, ss, 'r-', label='predicted size')
+    plt.plot(dim, gt_ss, 'g-', label='groundtruth size', alpha=0.7)
+    plt.fill_between(dim, ss, gt_ss, color="y")
+    plt.axhline(y=ss[0], color='c', linestyle=':', label='initial size')
+    plt.legend(loc='best')
     plt.xlim(1, len(ss))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    evaluation['area_between_size_curves'] = abc
 
     # distances:
     figure_file2 = os.path.join(tracking_dir, 'relative_center_distance.svg')

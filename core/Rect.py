@@ -1,7 +1,7 @@
 """
 Created on 2016-10-06
 
-@author: Peer Springstübe
+@author: Peer Springstuebe
 """
 
 import numpy as np

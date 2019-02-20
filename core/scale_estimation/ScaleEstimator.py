@@ -6,17 +6,23 @@ Created on 2018-11-17
 
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 import logging
+import scipy.stats as st
 import cv2
-import transitions
-
+from .matlab_dsst import DsstEstimator
+from .custom_dsst import CustomDsst
 from ..Rect import Rect
+from .candidates import CandidateApproach
+
+from matplotlib import pyplot as plt
+from multiprocessing import Pool
+import concurrent
 
 logger = logging.getLogger(__name__)
 
 
-class ScaleEstimator():
+class ScaleEstimator:
 
     #TODO make it a state machine
 
@@ -24,219 +30,159 @@ class ScaleEstimator():
 
         self.configuration = None
         self.econf = None
+        self.dsst = DsstEstimator()
+        self.custom_dsst = CustomDsst()
+        self.candidate_approach = CandidateApproach()
 
         self.frame = None
         self.tracker = None
+        self.initial_size = None
+        self.sample = None
+        self.conj_G = None
+        self.executor = None
+        self.worker_count = None
+        self.sample = None
+        self.filter_history = []
+        self.scaled_filters = []
         self.box_history = []
+        self.dsst_numerator_a = []
+        self.dsst_denominator_b = []
 
+        #configuration
         self.use_scale_estimation = None
         self.number_scales = None
         self.inner_punish_threshold = None
         self.inner_punish_factor = None
         self.outer_punish_threshold = None
+        self.scale_factor_range = None
+        self.scale_factor = None
+        self.learning_rate = None
+        self.regularization = None
+        self.scale_sigma_factor = None
+        self.lam = None
+        self.scale_model_max = None
+        self.approach = None
+        self.scale_model_size = None
+        self.padding = None
+        self.min_se_treshold = None
+        self.max_se_treshold = None
+        self.use_update_strategies = None
 
-    def setup(self, tracker=None):
+    def setup(self, tracker=None, sample=None):
         self.tracker = tracker
         self.configuration = tracker.configuration
+        self.sample = sample
+
+        self.set_up_modules()
 
     def configure(self, configuration):
         self.econf = configuration['scale_estimator']
         self.use_scale_estimation = self.econf['use_scale_estimation']
         self.approach = self.econf['approach']
         self.inner_punish_threshold = self.econf['inner_punish_threshold']
-        self.inner_punish_factor = self.econf['inner_punish_factor']
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
+        self.scale_factor = self.econf['scale_factor']
+        self.learning_rate = self.econf['learning_rate']
+        self.regularization = self.econf['reg']
+        self.scale_sigma_factor = self.econf['scale_sigma_factor']
+        self.scale_model_max = self.econf['scale_model_max']
+        self.scale_model_size = self.econf['scale_model_size']
+        self.padding = self.econf['padding']
+        self.min_se_treshold = self.econf['min_se_treshold']
+        self.max_se_treshold = self.econf['max_se_treshold']
+        self.use_update_strategies = self.econf['use_update_strategies']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
             print("Scale Estimator has been configured")
 
-    def estimate_scale(self, frame, feature_mask, mask_scale_factor, roi):
+    def set_up_modules(self):
+        self.dsst.setup(n_scales=self.number_scales,
+                        scale_step=self.scale_factor,
+                        scale_sigma_factor=self.scale_sigma_factor,
+                        img_files=self.sample.cv2_img_cache,
+                        scale_model_max=self.scale_model_max,
+                        learning_rate=self.learning_rate)
+
+        self.custom_dsst.configure(self.econf, img_files=self.sample.cv2_img_cache)
+
+        self.candidate_approach.configure(self.econf)
+
+    def estimate_scale(self, frame, feature_mask, mask_scale_factor, prediction_quality):
         """
         :param frame: the current frame in which the best position has already been calculated
         :param feature_mask: he consolidated feature mask containing pixel values for how likely they belong to the
         object
         :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
         size, the cnn output is 48x48
-        :param roi: the region of interest
+        :param prediction_quality: the quality of the prediction for the current frame.
         :return: the best rated candidate
         """
 
         self.frame = frame
+        final_candidate = None
 
         # If scale estimation has been disabled in configuration, return unscaled bounding box
         if not self.use_scale_estimation:
-            logger.critical("Scale Estimation is disabled, returning unchanged prediction")
+            logger.info("Scale Estimation is disabled, returning unchanged prediction")
             return frame.predicted_position
 
-        if self.approach == 'candidates':
+        # if the quality of the prediction is too low. return unscaled bounding box
+        if prediction_quality < self.min_se_treshold and self.use_update_strategies:
+            logger.info("frame prediction quality is smaller than scale estimation threshold {0}, not changing"
+                        " the size".format(self.min_se_treshold))
+            return frame.predicted_position
 
+        # if quality of prediction is too high no SE needed
+        #if prediction_quality > self.max_se_treshold and self.use_update_strategies:
+        #    logger.info("frame prediction quality bigger than scale estimation threshold {0}, not changing"
+        #                " the size".format(self.max_se_treshold))
+        #    return frame.predicted_position
+
+        if self.approach == 'candidates':
             logger.info("starting scale estimation. Approach: Candidate Generation")
 
-            scaled_candidates = self.generate_scaled_candidates(frame)
-            final_candidate = self.evaluate_scaled_candidates(scaled_candidates, feature_mask, mask_scale_factor, roi)
+            scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame)
+            final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
+                                                                                 feature_mask,
+                                                                                 mask_scale_factor)
 
             logger.info("finished scale estimation")
 
-        elif self.approach == 'correlation':
+        elif self.approach == "custom_dsst":
+            logger.info("starting scale estimation. Approach: DSST")
 
-            logger.info("starting scale estimation. Approach: Correlation Filter")
-
-            self.create_fourier_rep(self.tracker)
+            size = self.custom_dsst.dsst(frame)
+            frame.predicted_position = Rect(frame.predicted_position.x,
+                                            frame.predicted_position.y,
+                                            size[0],
+                                            size[1])
             final_candidate = frame.predicted_position
+
             logger.info("finished scale estimation")
+
         else:
             logger.critical("No implementation for approach in configuration")
 
         return final_candidate
 
-    def generate_scaled_candidates(self, frame):
+    def handle_initial_frame(self, frame, sample):
         """
-        :param frame: the current frame in which the best position has already been calculated
-        :return: a list of scaled variations of the best predicted position
+        :param sample: the current tracking sequence
+        :param frame: the 0th frame
+        :return:
         """
+        if not self.use_scale_estimation:
+            return None
 
         self.frame = frame
+        self.sample = sample
 
-        current_prediction = frame.predicted_position
-        scaled_predictions = []
+        if self.approach == "custom_dsst":
+            self.custom_dsst.handle_initial_frame(frame=frame)
 
-        # Generate n scaled candidates
-        for i in range(self.number_scales):
-            scaled_width = np.random.normal(loc=current_prediction.width, scale=1.0)
-            scaled_height = np.random.normal(loc=current_prediction.height, scale=1.0)
-
-            scaled_box = Rect(frame.predicted_position.x, frame.predicted_position.y, scaled_width, scaled_height)
-            scaled_predictions.append(scaled_box)
-
-        logger.info("created %s scaled candidates", len(scaled_predictions))
-
-        # append current prediction aswell, so that the array can be evaluated and that its possible,
-        # that no changes in scale are necessary.
-        scaled_predictions.append(current_prediction)
-
-        return scaled_predictions
-
-    def evaluate_scaled_candidates(self, scaled_candidates, feature_mask, mask_scale_factor, roi):
-        """
-        :param scaled_candidates: the candidates based on the best position but scaled in widht and height
-        :param feature_mask: the consolidated feature mask containing pixel values for how likely they belong to the
-        object
-        :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI 
-        size, the cnn output is 48x48
-        :param roi: the region of interest
-        :return: the best scaled candidate, can also be the original, not scaled candidate
-        """
-
-        logger.info("evaluating scaled candidates")
-
-        # Apply the scaled candidates to the feature mask like mask[top:bottom,width:height]
-        pixel_values = [feature_mask[
-                        round(pos.top / mask_scale_factor[1]):
-                        round((pos.bottom - 1) / mask_scale_factor[1]),
-                        round(pos.left / mask_scale_factor[0]):
-                        round((pos.right - 1) / mask_scale_factor[0])] for pos in scaled_candidates]
-
-        # Sum up the values from the candidates
-        candidate_sums = list(map(np.sum, pixel_values))
-
-        # Evaluate each candidate based on its size
-        evaluated_candidates = []
-
-        for single_sum, candidate in zip(candidate_sums, scaled_candidates):
-            evaluated_candidates.append(self.rate_scaled_candidate(single_sum,
-                                                                   candidate,
-                                                                   mask_scale_factor,
-                                                                   feature_mask))
-
-        best_candidate = np.argmax(evaluated_candidates)
-
-        return Rect(scaled_candidates[best_candidate])
-
-    def rate_scaled_candidate(self, candidate_sum, candidate, mask_scale_factor, feature_mask):
-        """
-        :param candidate_sum: the summed up pixel values of the candidate
-        :param candidate: the current candidate
-        :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
-        size, the cnn output is 48x48
-        :param feature_mask: the consolidated feature mask containing pixel values for how likely they belong to the
-        object
-        :param roi: the region of interest
-        :return: the quality of the candidate based on its size
-        """
-
-        # Calculate a score that punishes the candidate for containing pixel values < x
-        inner_punish = np.where(feature_mask[
-                        round(candidate.top / mask_scale_factor[1]):
-                        round((candidate.bottom - 1) / mask_scale_factor[1]),
-                        round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] < self.inner_punish_threshold)
-
-        inner_punish_sum = np.sum(inner_punish) * self.inner_punish_factor
-
-        # Calculate a score that punishes the candidate for not containing pixel values > x
-        outer_punish = np.sum([np.where(feature_mask > self.outer_punish_threshold)])
-        inner_helper = np.where(feature_mask[
-                        round(candidate.top / mask_scale_factor[1]):
-                        round((candidate.bottom - 1) / mask_scale_factor[1]),
-                        round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])] > self.outer_punish_threshold)
-
-        inner_helper_sum = np.sum(inner_helper)
-        outer_punish_sum = outer_punish - inner_helper_sum
-        # TODO make this without the helper (only take the values that are bigger and not in the candidate...)
-
-
-        # Evaluate the candidate
-        quality_of_candidate = candidate_sum - (inner_punish_sum + outer_punish_sum)
-
-
-        # logger.info("inner_punish_sum: {0}, outer_punish_sum: {1}, quality: {2} ".format(
-        # inner_punish_sum,
-        # outer_punish_sum,
-        # quality_of_candidate))
-
-        return quality_of_candidate
-
-    def create_fourier_rep(self, tracker):
-
-        # arr = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)
-        # im = Image.fromarray(arr[0])
-
-        self.tracker = tracker
-
-        # im ist ndarray. dim 200 200 3 also 200x200 mit rgb data
-        im = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0]
-
-        #cv2_image = cv2.imread(im)
-
-        f = np.fft.fft2(im)
-        # f = abs(np.fft.fft2(im))
-
-        fshift = np.fft.fftshift(f)
-        magnitude_spectrum = 20 * np.log(np.abs(fshift))
-
-        pil_image = Image.fromarray(magnitude_spectrum, mode='RGB')
-
-        return pil_image
-
-    def append_to_history(self, frame):
-        """
-        Writes the final (scaled or unscaled) box from the current frame to the execution log
-        :param frame: the current frame
-        """
-        self.box_history.append([frame.number, frame.predicted_position.x, frame.predicted_position.y, frame.predicted_position.width, frame.predicted_position.height])
-
-        logger.info("Box at frame{0}: size: {5}x: {1}, y: {2}, width: {3}, height: {4}".format(
-            frame.number,
-            frame.predicted_position.x,
-            frame.predicted_position.y,
-            frame.predicted_position.width,
-            frame.predicted_position.height, (
-                    frame.predicted_position.width *
-                    frame.predicted_position.height)
-        ))
-
-
+        elif self.approach == 'candidates':
+            # nothing needs to be done
+            self.candidate_approach.handle_initial_frame(frame)
 
 

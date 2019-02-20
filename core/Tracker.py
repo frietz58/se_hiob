@@ -223,9 +223,6 @@ class Tracker:
                 and (self.current_sample is None or sample.capture_size != self.current_sample.capture_size):
             return self.context
 
-        #if self.current_sample is not None:
-        #self.current_sample = sample
-
         # setup modules
         self.roi_calculator.setup(self)
         size = sample.capture_size
@@ -242,7 +239,7 @@ class Tracker:
         self.consolidator.setup(self)
         self.pursuer.setup(self)
 
-        self.estimator.setup(self)
+        self.estimator.setup(self, sample=self.current_sample)
 
         self.is_setup = True
         logger.info("Setup done")

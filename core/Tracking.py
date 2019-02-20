@@ -67,7 +67,6 @@ class Tracking(object):
         'tracking_evaluated',
     ]
 
-    #Finn Transitions werden wie methoden aufgerugen und gehen von der ersten in die letzte
     transitions = [
         ['commence_load_sample', 'created', 'loading_sample'],
         ['complete_load_sample', 'loading_sample', 'sample_loaded'],
@@ -196,10 +195,9 @@ class Tracking(object):
         # for now, the initial frame is the current frame:
         self.current_frame = self.initial_frame
 
-        #FINN erstes Frame wird verarbeitet
-
         self.tracker.pursuer.set_initial_position(self.initial_frame.previous_position)
         self.tracker.roi_calculator.set_initial_position(self.initial_frame.previous_position)
+        self.tracker.estimator.handle_initial_frame(self.current_frame, self.sample)
 
     async def _get_next_sample_frame(self):
         frame = Frame(tracking=self, number=self.sample.current_frame_id + 1, size=None)
@@ -442,7 +440,6 @@ class Tracking(object):
         return not self.frames_left() or self.tracker.interrupt_received
 
     async def tracking_step(self):
-        logger.info("start main loop")
         await self.tracking_next_frame()
         self.tracking_track_frame()
         self.tracking_evaluate_frame()
@@ -450,7 +447,6 @@ class Tracking(object):
         self.tracking_log_frame()
         if self.configuration['ros_mode']:
             self.tracking_publish_position()
-        logger.info("end main loop")
 
     def finish_tracking(self):
         self.initial_frame = None
@@ -624,12 +620,14 @@ class Tracking(object):
             result['center_distance'] = gt.center_distance(p)
             result['relative_center_distance'] = gt.relative_center_distance(p)
             result['adjusted_overlap_score'] = gt.adjusted_overlap_score(p)
-            result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
+            result['gt_size_score'] = gt.width * gt.height * 0.1
+            result['size_score'] = frame.predicted_position.width * frame.predicted_position.height * 0.1
         else:
             result['overlap_score'] = None
             result['center_distance'] = None
             result['relative_center_distance'] = None
             result['adjusted_overlap_score'] = None
+            result['gt_size_score'] = None
             result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
         frame.result = result
         frame.complete_evaluation()
@@ -766,10 +764,6 @@ class Tracking(object):
                 pos = self.capture_to_sroi(
                     frame.predicted_position, frame.roi).inner
                 draw.rectangle(pos, None, self.colours['prediction'])
-        return im
-
-    def get_frame_fourier_image(self):
-        im = self.tracker.estimator.create_fourier_rep(self.tracker)
         return im
 
     def get_frame_consolidation_images(self, frame=None, decorations=True):

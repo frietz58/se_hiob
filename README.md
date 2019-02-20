@@ -48,6 +48,33 @@ a bit tricky though, especially if you want to install the custom graphics drive
 cudnn installation. Therefor go to your virtualenv python installation and add the following line to your activate file in /path_to_venv/bin/activate, right under the export PATH statement
 
 ```
+export PYTHONPATH="/usr/local/cuda-9.0/lib64"
+export PYTHONPATH="/usr/local/cuda/lib64"
+```
+
+
+# for using your GPU and CUDA
+    (hiob_env) $ cd HIOB
+    (hiob_env) $ pip install -r requirements.txt 
+
+    
+#### Installing CUDA
+In order to run the gpu version, cuda needs to be installed on the machine. In order to install cuda and cudnn, perform the following actions:
+1. <b>Install cuda</b> with your method of choice from <a href="https://developer.nvidia.com/cuda-downloads">here</a> 
+(or <a href="https://developer.nvidia.com/cuda-toolkit-archive">older versions</a>) <br>
+Theoretically, Tensorflow >= 1.11 should recogniue CUDA 10.0, but in my case it didn't hence I installed cuda 9.0 which, even though not officially suported,
+runs on Ubuntu 18.04.<br>
+I had the best experience installing cuda via the deb file, but every method should work. Make sure to apt-get --purge remove any previous installations, as this can be
+a bit tricky though, especially if you want to install the custom graphics driver, i highly encourage anyone to read the <a href="http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/CUDA_Installation_Guide_Linux.pdf">official liunx installation guide</a>.
+
+2. <b>Install cudnn</b> from <a href="https://developer.nvidia.com/cudnn">here</a>, you have to register a nvidia developer account in the process.
+ Follow the installation instructions from <a href="https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html">here</a> for a smooth installation, for me 
+ the installation via tar file worked great.
+ 
+3. <b>Add cudnn to the virtualenv path.</b> Maybe this was just buggy for me, but after successful installation of cuda 9.0 and cudnn, tensorflow would not find my
+cudnn installation. Therefor go to your virtualenv python installation and add the following line to your activate file in /path_to_venv/bin/activate, right under the export PATH statement
+
+```
     export PYTHONPATH="/usr/local/cuda-9.0/lib64"
     export PYTHONPATH="/usr/local/cuda/lib64"
 ```
@@ -68,7 +95,7 @@ Install required packages:
 
     # for using your GPU and CUDA
     (hiob_env) $ cd HIOB
-    (hiob_env) $ pip install -r requirements.txt 
+    (hiob_env) $ pip install -r requirements.txt
 
 This installs a tensorflow build that requires a NVIDIA GPU and the CUDA machine learning library. You can alternatively use a tensorflow build that only uses the CPU. It should work, but it will not be fast. We supply a diffenrent requirements.txt for that:
 

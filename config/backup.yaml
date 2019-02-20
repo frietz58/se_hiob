@@ -130,8 +130,8 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 # = Training Set = #
-- tb100/Basketball
-- tb100/Biker
+  - tb100/Basketball
+  - tb100/Biker
 #  - tb100/Bird2
 #  - tb100/Box
 #  - tb100/Freeman3

@@ -45,7 +45,6 @@ class SwarmPursuer(Pursuer):
         self.thread_executor = None
         self.np_random = None
         self.initial_location = None
-        #self.estimator = ScaleEstimator() # Aha, das darf kein eigener sein, sondern der aus dem Tracker
 
     def configure(self, configuration):
         self.configuration = configuration
@@ -79,9 +78,6 @@ class SwarmPursuer(Pursuer):
             spread = 5.0
         else:
             raise ValueError("Invalid value for lost: {}".format(lost))
-
-        # FINN: Die Anzahl wird in der Configurationsdatei unter Tracker gesetzt
-        # print("num_particles: {}".format(num_particles))
 
         # geo = loc2affgeo(loc)
         geos = np.tile(geo, (num_particles, 1)).T
@@ -188,16 +184,17 @@ class SwarmPursuer(Pursuer):
         #
         mask = frame.prediction_mask.copy()
 
-        #Finn okay, mask enthält keine Coordinaten, eher die visuellen Features
-        #logger.info("mask: %s", mask)
-
         #ps.append(time.time())  # 1
 
         mask[mask < self.target_lower_limit] = self.target_punish_low
         mask[mask < 0.0] = 0.0
 
         #print("a", mask.max(), mask.min(), np.average(mask))
-        img_size = [frame.size[1], frame.size[0]]
+        # check rgb vs gray format
+        if len(frame.size) == 3:
+            img_size = [frame.size[2], frame.size[1]]
+        elif len(frame.size) == 2:
+            img_size = [frame.size[1], frame.size[2]]
 
         #ps.append(time.time())  # 2
 
@@ -212,9 +209,6 @@ class SwarmPursuer(Pursuer):
 
 
         logger.info("previous position: %s", frame.previous_position)
-
-        # Finn: in locs sind alle bounding boxen als <rect(1,1,1,1)>
-        # print("locs: {}".format(locs))
 
         #total = np.sum(img_mask)
         #total_max = np.sum(img_mask[img_mask > 0])
@@ -265,7 +259,7 @@ class SwarmPursuer(Pursuer):
         # if scaling is enabled, punish pixels with low feature rating
         punish_low = self.particle_scale_factor != 1.0
 
-        # This is just a mapping: [img_mask[x:y,a:b]]
+        # This is just a mapping: [img_mask[top:bot,left:right]]
         slices = [img_mask[round(pos.top / scale_factor[1]):round((pos.bottom - 1) / scale_factor[1]),
                   round(pos.left / scale_factor[0]):round((pos.right - 1) / scale_factor[0])] for pos in locs]
 
@@ -284,43 +278,19 @@ class SwarmPursuer(Pursuer):
         best_arg = np.argmax(quals)
         frame.predicted_position = Rect(locs[best_arg])
 
-        frame.predicted_position = self.tracker.estimator.estimate_scale(
-            frame=frame,
-            feature_mask=img_mask,
-            mask_scale_factor=scale_factor,
-            roi=frame.roi)
-
-        '''
-        pos: initial position
-        frame.roi: roi
-        img_mask_sum: okay wtf macht das
-        inner_sum: iterationsvariable der for schleife -.-
-        sums: für das threading
-        total_max: 1?
-        
-        
-        scaled_predictions = self.estimator.estimate_scale(frame)
-
-        scaled_quals = [self.position_quality(pos, frame.roi, img_mask_sum, inner_sum, scale_factor) / total_max
-            for pos, inner_sum in zip(scaled_predictions, sums)]
-
-        #best_scaled = np.argmax(scaled_quals)
-        #logger.info("Best location {0}, best location scaled {1}".format(frame.predicted_position, Rect(scaled_predictions[best_scaled])))
-        #self.estimator.evaluate_scaled_candidates(scaled_predictions, frame)
-        #frame.predicted_position = Rect(scaled_predictions[best_scaled])
-        '''
-
-        self.tracker.estimator.append_to_history(frame)
-
-
         # quality of prediction needs to be absolute, so we normalise it with
         # the "perfect" value this prediction would have:
         perfect_quality = 1
-        #print(quals[best_arg], perfect_quality)
         frame.prediction_quality = max(
             0.0, min(1.0, quals[best_arg] / perfect_quality))
         logger.info("Prediction: %s, quality: %f",
                     frame.predicted_position, frame.prediction_quality)
+
+        frame.predicted_position = self.tracker.estimator.estimate_scale(
+            frame=frame,
+            feature_mask=img_mask,
+            mask_scale_factor=scale_factor,
+            prediction_quality=frame.prediction_quality)
 
         #ps.append(time.time())  # 9
 
@@ -335,8 +305,6 @@ class SwarmPursuer(Pursuer):
         #print(log[2:])
 
         return frame.predicted_position
-
-
 
     @staticmethod
     def calculate_sum(mat, punish_low=False):

@@ -176,7 +176,7 @@ samples:
     - name: Human3
       attributes: [BC, DEF, OCC, OPR, SV]
       actual_frames: 1698
-    - name: Human4.2
+    - name: Human4
       attributes: [DEF, IV, OCC, SV]
       actual_frames: 667
     - name: Human5
@@ -197,10 +197,10 @@ samples:
     - name: Ironman
       attributes: [BC, FM, IPR, IV, MB, OCC, OPR, OV, SV]
       actual_frames: 166
-    - name: Jogging.1
+    - name: Jogging1
       attributes: [DEF, OCC, OPR]
       actual_frames: 307
-    - name: Jogging.2
+    - name: Jogging2
       attributes: [DEF, OCC, OPR]
       actual_frames: 307
     - name: Jump
@@ -260,10 +260,10 @@ samples:
     - name: Skating1
       attributes: [BC, DEF, IV, OCC, OPR, SV]
       actual_frames: 400
-    - name: Skating2.1
+    - name: Skating2
       attributes: [DEF, FM, OCC, OPR, SV]
       actual_frames: 473
-    - name: Skating2.2
+    - name: Skating3
       attributes: [DEF, FM, OCC, OPR, SV]
       actual_frames: 473
     - name: Skiing
