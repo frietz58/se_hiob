@@ -25,7 +25,7 @@ def set_keyval(key_val_list):
 
             tb100["scale_estimator"][key] = val
 
-    save_to = "config/tracker.yaml"
+    save_to = "config/tracker_2.yaml"
     with open(save_to, 'w') as f:
         yaml.dump(tb100, f)
 
