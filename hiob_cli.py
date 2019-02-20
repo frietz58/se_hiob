@@ -59,10 +59,14 @@ def main():
     # parse arguments:
     logger.info("Parsing command line arguments")
     parser.prog = "hiob_cli"
+
+    parser.add_argument('-g', '--gpu')
+
     args = parser.parse_args()
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-    print(os.environ)
+    if args.gpu is not None:
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
+        logger.info("GPU specified, setting cuda_visivle_devices = {0}".format(args.gpu))
 
     ev = track(environment_path=args.environment, tracker_path=args.tracker,
                ros_config=None if args.ros_subscribe is None and args.ros_publish is None
