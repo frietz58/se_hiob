@@ -25,7 +25,7 @@ def set_keyval(key_val_list):
 
             tb100["scale_estimator"][key] = val
 
-    save_to = "config/tracker_2.yaml"
+    save_to = "config/tracker_3.yaml"
     with open(save_to, 'w') as f:
         yaml.dump(tb100, f)
 
@@ -98,44 +98,44 @@ tracker_changes = [
     #[["c_number_scales", 33], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.006]],
     #[["c_number_scales", 33], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.007]],
 
-    [["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.003]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.004]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.005]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.006]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.007]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.003]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.004]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.005]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.006]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.007]],
 
-    [["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.003]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.004]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.005]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.006]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.007]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.003]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.004]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.005]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.006]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.007]],
 
-    [["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.003]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.004]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.005]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.006]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.007]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.003]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.004]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.005]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.006]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.007]],
 
-    [["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.003]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.004]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.005]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.006]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.007]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.003]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.004]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.005]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.006]],
+    #[["c_number_scales", 33], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.007]],
 
-    [["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.003]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.004]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.005]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.006]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.007]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.003]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.004]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.005]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.006]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.007]],
 
-    [["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.003]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.004]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.005]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.006]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.007]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.003]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.004]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.005]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.006]],
+    #[["c_number_scales", 37], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.007]],
 
-    #[["c_number_scales", 37], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.003]],
-    #[["c_number_scales", 37], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.004]],
+   ##### [["c_number_scales", 37], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.003]],
+   # [["c_number_scales", 37], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.004]],
     #[["c_number_scales", 37], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.005]],
     #[["c_number_scales", 37], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.006]],
     #[["c_number_scales", 37], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.007]],
@@ -153,76 +153,37 @@ tracker_changes = [
     #[["c_number_scales", 37], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.007]],
 
     #[["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.003]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.004]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.005]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.006]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.007]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.004]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.005]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.006]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.01], ["scale_window_step_size", 0.007]],
 
-    #[["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.003]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.004]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.005]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.006]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.007]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.003]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.004]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.005]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.006]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.02], ["scale_window_step_size", 0.007]],
 
-    #[["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.003]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.004]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.005]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.006]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.007]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.003]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.004]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.005]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.006]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.03], ["scale_window_step_size", 0.007]],
 
-    #[["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.003]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.004]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.005]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.006]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.007]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.003]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.004]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.005]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.006]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.04], ["scale_window_step_size", 0.007]],
 
-    #[["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.003]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.004]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.005]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.006]],
-    #[["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.007]],
-
-]
-
-tracker_changes_subset = [
-
-    [["c_number_scales", 21], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 21], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 27], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 27], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 33], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 33], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 37], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 37], ["max_scale_difference", 0.05]],
-
-    [["c_number_scales", 41], ["max_scale_difference", 0.01]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.02]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.03]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.04]],
-    [["c_number_scales", 41], ["max_scale_difference", 0.05]],
-
-    [["scale_window_step_size", 0.003]],
-    [["scale_window_step_size", 0.004]],
-    [["scale_window_step_size", 0.005]],
-    [["scale_window_step_size", 0.006]],
-    [["scale_window_step_size", 0.007]]
+    [["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.003]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.004]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.005]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.006]],
+    [["c_number_scales", 41], ["max_scale_difference", 0.05], ["scale_window_step_size", 0.007]],
 
 ]
+
 
 for change in tracker_changes:
     set_keyval(change)
