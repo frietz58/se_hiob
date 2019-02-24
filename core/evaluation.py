@@ -205,7 +205,7 @@ def do_tracking_evaluation(tracking):
     plt.savefig(figure_file3)
 
     # Size Plot:
-    abc = area_between_curves(ss, gt_ss)
+    abc = area_between_curves(ss, gt_ss) / len(log)
     figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
     figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
     f = plt.figure()

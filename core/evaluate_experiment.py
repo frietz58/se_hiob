@@ -254,7 +254,6 @@ def get_approach_from_yaml(tracking_dir):
 
 # calculates the metrics for a given collection of sequences
 def get_metrics_for_collections(sequences):
-
     center_distances = []
     overlap_scores = []
     ground_truth_size = []
@@ -347,7 +346,6 @@ def get_attribute_collections(tracking_dir):
 
 # creates a csv file with the scores for each attribute of the tb100
 def create_attribute_results_csv(tracking_dir):
-
     attribute_collection = get_attribute_collections(tracking_dir)
     attribute_scores = {}
 
@@ -393,7 +391,8 @@ def create_tracking_results_csv(tracking_dir):
     # get the results for every sequence into on csv
     csv_name = tracking_dir + '/evaluation/' + approach + '_sequence_results.csv'
     with open(csv_name, 'w', newline='') as outcsv:
-        writer = csv.DictWriter(outcsv, fieldnames=["Sample", "Frames", "Framerate", "Precision", "Success", "Size Diff"])
+        writer = csv.DictWriter(outcsv,
+                                fieldnames=["Sample", "Frames", "Framerate", "Precision", "Success", "Size Diff"])
         writer.writeheader()
 
         for sequence in sequnce_dirs:
@@ -500,21 +499,6 @@ def create_opt_csv(experiment_folder):
                     except yaml.YAMLError as exc:
                         print(exc)
 
-            elif "tracker_2.yaml" in os.listdir(tracking_dir):
-                with open(tracking_dir + "/tracker_2.yaml", "r") as stream:
-                    try:
-                        configuration = yaml.safe_load(stream)
-                        scale_estimator_conf = configuration["scale_estimator"]
-                        adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
-                        adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
-                        inner_thresh = scale_estimator_conf["inner_punish_threshold"]
-                        outer_thresh = scale_estimator_conf["outer_punish_threshold"]
-                        number_c = scale_estimator_conf["c_number_scales"]
-                        max_diff = scale_estimator_conf["max_scale_difference"]
-                        window_step_size = scale_estimator_conf["scale_window_step_size"]
-
-                    except yaml.YAMLError as exc:
-                        print(exc)
             else:
                 print("no tracker.yaml configuration found")
 
@@ -530,6 +514,69 @@ def create_opt_csv(experiment_folder):
                              'scale_window_step_size': window_step_size})
 
 
+# get params for tracking run
+def get_params_of_tracking(experiment_folder):
+    # get all the tracking runs
+    trackings = get_tracking_folders(experiment_folder)
+
+    # sort trackings by datetime
+    trackings.sort(key=lambda x: x.split('/')[-1])
+
+    unique_settings = []
+
+    # get one tracking
+    for tracking_dir in trackings:
+
+
+
+        if "tracker.yaml" in os.listdir(tracking_dir):
+            with open(tracking_dir + "/tracker.yaml", "r") as stream:
+                try:
+                    configuration = yaml.safe_load(stream)
+                    scale_estimator_conf = configuration["scale_estimator"]
+                    adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
+                    adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
+                    inner_thresh = scale_estimator_conf["inner_punish_threshold"]
+                    outer_thresh = scale_estimator_conf["outer_punish_threshold"]
+                    number_c = scale_estimator_conf["c_number_scales"]
+                    max_diff = scale_estimator_conf["max_scale_difference"]
+                    window_step_size = scale_estimator_conf["scale_window_step_size"]
+
+                except yaml.YAMLError as exc:
+                    print(exc)
+
+        line = str(tracking_dir.split('/')[-1]) + ': ' + \
+               str(adj_max_dif) + ', ' + \
+               str(adj_max_dif_after) + ', ' + \
+               str(inner_thresh) + ', ' + \
+               str(outer_thresh) + ', ' + \
+               str(number_c) + ', ' + \
+               str(max_diff) + ', ' + \
+               str(window_step_size)
+
+        print(line.split()[0])
+
+        if is_valid_tracking(tracking_dir):
+            print("valid")
+        else:
+            print("invalid")
+
+        if line.split()[1:] not in unique_settings:
+            unique_settings.append(line.split()[1:])
+            print(line.split()[1:])
+        else:
+            print("dublicate")
+
+
+# check whether tracking run completed
+def is_valid_tracking(tracking_dir):
+
+    return "evaluation.txt" in os.listdir(tracking_dir)
+
+
+
+
 if __name__ == '__main__':
     # eval_all_trackings()
     create_opt_csv(results_path)
+    # get_params_of_tracking(results_path)
