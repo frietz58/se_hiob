@@ -44,7 +44,7 @@ class CandidateApproach:
             raise ValueError("Number of Scales needs to be odd!")
         self.inner_punish_threshold = configuration['inner_punish_threshold']
         self.outer_punish_threshold = configuration['outer_punish_threshold']
-        self.scale_step = configuration['scale_factor']
+        self.scale_step = configuration['c_scale_factor']
         self.max_scale_change = configuration['max_scale_difference']
         self.scale_window_step_size = configuration['scale_window_step_size']
         self.change_aspect_ration = configuration['c_change_aspect_ratio']
@@ -366,7 +366,7 @@ class CandidateApproach:
         # get the values of the filter
         outer_values = feature_mask[outer_mask_filter]
 
-        # find the values that are bigger but within the candidate (we dont want to punish those)
+        # find the values that are bigger but within the candidate (we don't want to punish those)
         on_candidate_filter = candidate_on_mask > self.outer_punish_threshold
 
         # get the values

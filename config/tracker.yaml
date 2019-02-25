@@ -115,6 +115,7 @@ scale_estimator:
   dsst_number_scales: 33 # number of scaled candidates to generate
 
   # candidate params:
+  c_scale_factor: 1.02 # scale factor between candidates
   c_change_aspect_ratio: true # change aspect ratio of bouding box
   inner_punish_threshold: 0.6 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   outer_punish_threshold: 0.6 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
