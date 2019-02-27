@@ -415,6 +415,7 @@ def do_tracker_evaluation(tracker):
             updates_max_frames += e['updates_max_frames']
             updates_confidence += e['updates_confidence']
             updates_total += e['updates_total']
+            se_time_total = e['test']
         roi_calculation_frame_rate = roi_calculation_sum / len(tracker.tracking_evaluations)
         sroi_generation_frame_rate = sroi_generation_sum / len(tracker.tracking_evaluations)
         feature_extraction_frame_rate = feature_extraction_sum / len(tracker.tracking_evaluations)
