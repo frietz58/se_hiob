@@ -102,19 +102,21 @@ scale_estimator:
   use_update_strategies: true
 
   # Determines which approach to use for scale estimation. candidates or custom_dsst
-  approach: candidates
+  approach: custom_dsst
 
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls
   scale_sigma_factor: 0.25
   learning_rate: 0.025
   reg: 0.01
-  scale_model_max: 512 #max area of the scale model on the image
+  scale_model_max: 512 # max area of the scale model on the image
   scale_model_size: 16
   padding: 1.0
   dsst_number_scales: 33 # number of scaled candidates to generate
+  d_change_aspect_ratio: true
 
   # candidate params:
+  c_scale_factor: 1.02 # scale factor between candidates
   c_change_aspect_ratio: true # change aspect ratio of bouding box
   inner_punish_threshold: 0.3 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   outer_punish_threshold: 0.3 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
@@ -130,127 +132,127 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 # = Training Set = #
-  - tb100/Basketball
-  - tb100/Biker
-  - tb100/Bird2
-  - tb100/Box
-  - tb100/Freeman3
-  - tb100/Panda
-  - tb100/ClifBar
-  - tb100/Crowds
-  - tb100/RedTeam
-  - tb100/BlurFace
-  - tb100/Singer2
-  - tb100/Soccer
-  - tb100/Car1
-  - tb100/Liquor
-  - tb100/Bird1
-  - tb100/DragonBaby
-  - tb100/Deer
-  - tb100/Diving
-  - tb100/Dudek
-  - tb100/David
+- tb100/Basketball
+- tb100/Biker
+- tb100/Bird2
+- tb100/Box
+- tb100/Freeman3
+- tb100/Panda
+- tb100/ClifBar
+- tb100/Crowds
+- tb100/RedTeam
+- tb100/BlurFace
+- tb100/Singer2
+- tb100/Soccer
+- tb100/Car1
+- tb100/Liquor
+- tb100/Bird1
+- tb100/DragonBaby
+- tb100/Deer
+- tb100/Diving
+- tb100/Dudek
+- tb100/David
 # = TB100 = #
-#  - tb100/Basketball
-#  - tb100/Biker
-#  - tb100/Bird1
-#  - tb100/Bird2
-#  - tb100/BlurBody
-#  - tb100/BlurCar1
-#  - tb100/BlurCar2
-#  - tb100/BlurCar3
-#  - tb100/BlurCar4
-#  - tb100/BlurFace
-#  - tb100/BlurOwl
-#  - tb100/Board
-#  - tb100/Bolt
-#  - tb100/Bolt2
-#  - tb100/Box
-#  - tb100/Boy
-#  - tb100/Car1
-#  - tb100/Car2
-#  - tb100/Car24
-#  - tb100/Car4
-#  - tb100/CarDark
-#  - tb100/CarScale
-#  - tb100/ClifBar
-#  - tb100/Coke
-#  - tb100/Couple
-#  - tb100/Coupon
-#  - tb100/Crossing
-#  - tb100/Crowds
-#  - tb100/Dancer
-#  - tb100/Dancer2
-#  - tb100/David
-#  - tb100/David2
-#  - tb100/David3
-#  - tb100/Deer
-#  - tb100/Diving
-#  - tb100/Dog
-#  - tb100/Dog1
-#  - tb100/Doll
-#  - tb100/DragonBaby
-#  - tb100/Dudek
-#  - tb100/FaceOcc1
-#  - tb100/FaceOcc2
-#  - tb100/Fish
-#  - tb100/FleetFace
-#  - tb100/Football
-#  - tb100/Football1
-#  - tb100/Freeman1
-#  - tb100/Freeman3
-#  - tb100/Freeman4
-#  - tb100/Girl
-#  - tb100/Girl2
-#  - tb100/Gym
-#  - tb100/Human2
-#  - tb100/Human3
-#  - tb100/Human4
-#  - tb100/Human5
-#  - tb100/Human6
-#  - tb100/Human7
-#  - tb100/Human8
-#  - tb100/Human9
-#  - tb100/Ironman
-#  - tb100/Jogging1
-#  - tb100/Jogging2
-#  - tb100/Jump
-#  - tb100/Jumping
-#  - tb100/KiteSurf
-#  - tb100/Lemming
-#  - tb100/Liquor
-#  - tb100/Man
-#  - tb100/Matrix
-#  - tb100/Mhyang
-#  - tb100/MotorRolling
-#  - tb100/MountainBike
-#  - tb100/Panda
-#  - tb100/RedTeam
-#  - tb100/Rubik
-#  - tb100/Shaking
-#  - tb100/Singer1
-#  - tb100/Singer2
-#  - tb100/Skater
-#  - tb100/Skater2
-#  - tb100/Skating1
-#  - tb100/Skating2
-#  - tb100/Skating3
-#  - tb100/Skiing
-#  - tb100/Soccer
-#  - tb100/Subway
-#  - tb100/Surfer
-#  - tb100/Suv
-#  - tb100/Sylvester
-#  - tb100/Tiger1
-#  - tb100/Tiger2
-#  - tb100/Toy
-#  - tb100/Trans
-#  - tb100/Trellis
-#  - tb100/Twinnings
-#  - tb100/Vase
-#  - tb100/Walking
-#  - tb100/Walking2
-#  - tb100/Woman
+#- tb100/Basketball
+#- tb100/Biker
+#- tb100/Bird1
+#- tb100/Bird2
+#- tb100/BlurBody
+#- tb100/BlurCar1
+#- tb100/BlurCar2
+#- tb100/BlurCar3
+#- tb100/BlurCar4
+#- tb100/BlurFace
+#- tb100/BlurOwl
+#- tb100/Board
+#- tb100/Bolt
+#- tb100/Bolt2
+#- tb100/Box
+#- tb100/Boy
+#- tb100/Car1
+#- tb100/Car2
+#- tb100/Car24
+#- tb100/Car4
+#- tb100/CarDark
+#- tb100/CarScale
+#- tb100/ClifBar
+#- tb100/Coke
+#- tb100/Couple
+#- tb100/Coupon
+#- tb100/Crossing
+#- tb100/Crowds
+#- tb100/Dancer
+#- tb100/Dancer2
+#- tb100/David
+#- tb100/David2
+#- tb100/David3
+#- tb100/Deer
+#- tb100/Diving
+#- tb100/Dog
+#- tb100/Dog1
+#- tb100/Doll
+#- tb100/DragonBaby
+#- tb100/Dudek
+#- tb100/FaceOcc1
+#- tb100/FaceOcc2
+#- tb100/Fish
+#- tb100/FleetFace
+#- tb100/Football
+#- tb100/Football1
+#- tb100/Freeman1
+#- tb100/Freeman3
+#- tb100/Freeman4
+#- tb100/Girl
+#- tb100/Girl2
+#- tb100/Gym
+#- tb100/Human2
+#- tb100/Human3
+#- tb100/Human4
+#- tb100/Human5
+#- tb100/Human6
+#- tb100/Human7
+#- tb100/Human8
+#- tb100/Human9
+#- tb100/Ironman
+#- tb100/Jogging1
+#- tb100/Jogging2
+#- tb100/Jump
+#- tb100/Jumping
+#- tb100/KiteSurf
+#- tb100/Lemming
+#- tb100/Liquor
+#- tb100/Man
+#- tb100/Matrix
+#- tb100/Mhyang
+#- tb100/MotorRolling
+#- tb100/MountainBike
+#- tb100/Panda
+#- tb100/RedTeam
+#- tb100/Rubik
+#- tb100/Shaking
+#- tb100/Singer1
+#- tb100/Singer2
+#- tb100/Skater
+#- tb100/Skater2
+#- tb100/Skating1
+#- tb100/Skating2
+#- tb100/Skating3
+#- tb100/Skiing
+#- tb100/Soccer
+#- tb100/Subway
+#- tb100/Surfer
+#- tb100/Suv
+#- tb100/Sylvester
+#- tb100/Tiger1
+#- tb100/Tiger2
+#- tb100/Toy
+#- tb100/Trans
+#- tb100/Trellis
+#- tb100/Twinnings
+#- tb100/Vase
+#- tb100/Walking
+#- tb100/Walking2
+#- tb100/Woman
 
 #  - ros/nico/vision/videoStream
 #  - nico_recordings/banana

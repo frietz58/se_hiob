@@ -47,6 +47,7 @@ class ScaleEstimator:
         self.box_history = []
         self.dsst_numerator_a = []
         self.dsst_denominator_b = []
+        self.se_time = 0.0
 
         #configuration
         self.use_scale_estimation = None

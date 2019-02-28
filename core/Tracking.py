@@ -147,6 +147,7 @@ class Tracking(object):
         self.feature_extraction_total_seconds = 0.0
         self.feature_reduction_total_seconds = 0.0
         self.feature_consolidation_total_seconds = 0.0
+        self.se_total_seconds = 0.0
 
 
         # updates
@@ -388,6 +389,8 @@ class Tracking(object):
         self.pursue_frame(frame)
         self.pursuing_total_seconds += (datetime.now() - ts_start).total_seconds()
 
+        # scale estimator time is appended in swarm pursuer where the main call is...
+        self.se_total_seconds += self.tracker.estimator.se_time
 
         # ps.append(time.time())  # 6
 
@@ -406,7 +409,6 @@ class Tracking(object):
         # for n, t in enumerate(ts):
         #     log += "; part{}: {:.2} ({:.2})".format(n, t, t / total)
         # print(log)
-
 
     def tracking_evaluate_frame(self):
         self.commence_evaluating_frame()

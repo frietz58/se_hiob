@@ -11,6 +11,7 @@ parser.add_argument('-t', '--tracker')
 
 args = parser.parse_args()
 
+
 def set_keyval(key_val_list):
     load_from = "config/backup.yaml"
 
@@ -39,9 +40,9 @@ tracker_changes = [
     #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 4]],
     #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 5]],
 
-   # [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 6]],
-   # [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 7]],
-   # [["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 8]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 6]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 7]],
+    #[["adjust_max_scale_diff", True], ["adjust_max_scale_diff_after", 8]],
 
     #[["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.2]],
     #[["inner_punish_threshold", 0.2], ["outer_punish_threshold", 0.3]],
@@ -70,15 +71,15 @@ tracker_changes = [
     #[["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.2]],
     #[["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.3]],
     #[["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.4]],
-    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.5]],
-    [["inner_punish_threshold", 0.6], ["outer_punish_threshold", 0.6]]
+
+    [["d_change_aspect_ratio", False]],
+    [["d_change_aspect_ratio", True]]
 
 ]
 
 for change in tracker_changes:
     set_keyval(change)
     print(change)
-    #subprocess.run(['./execute_experiments.sh', 'config', 'config/environment_experiments.yaml'])
     if args.gpu is None:
         args.gpu = 0
     subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker,  '-g', str(args.gpu)])

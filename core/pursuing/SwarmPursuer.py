@@ -18,7 +18,6 @@ import time
 import multiprocessing
 
 #from ..subpackage2.moduleZ import eggs
-from ..scale_estimation import ScaleEstimator
 
 avgs = []
 
@@ -148,8 +147,6 @@ class SwarmPursuer(Pursuer):
                 int(pos.top):int(pos.bottom - 1),
                 int(pos.left):int(pos.right - 1)].sum()"""
         inner = inner_sum
-        #inner is a scalar, but where does it come from?
-        #logger.info("inner_sum: {0}, pos: {1}".format(inner, pos))
 
         # p3 = time.time()
         inner_fill = inner / (pos.pixel_count() / scale_factor_squared)
@@ -286,11 +283,15 @@ class SwarmPursuer(Pursuer):
         logger.info("Prediction: %s, quality: %f",
                     frame.predicted_position, frame.prediction_quality)
 
+        se_start_time = time.time()
         frame.predicted_position = self.tracker.estimator.estimate_scale(
             frame=frame,
             feature_mask=img_mask,
             mask_scale_factor=scale_factor,
             prediction_quality=frame.prediction_quality)
+        self.tracker.estimator.se_time = time.time() - se_start_time
+
+
 
         #ps.append(time.time())  # 9
 

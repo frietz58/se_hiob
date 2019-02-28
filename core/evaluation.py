@@ -91,6 +91,8 @@ def do_tracking_evaluation(tracking):
     evaluation['feature_extraction_frame_rate'] = tracking.total_frames / tracking.feature_extraction_total_seconds
     evaluation['feature_reduction_frame_rate'] = tracking.total_frames / tracking.feature_reduction_total_seconds
     evaluation['feature_consolidation_frame_rate'] = tracking.total_frames / tracking.feature_consolidation_total_seconds
+    evaluation['se_total_seconds'] = tracking.se_total_seconds
+    evaluation['se_frame_rate'] = tracking.total_frames / tracking.se_total_seconds
 
     tracking_dir = os.path.join(tracker.execution_dir, tracking.name)
     try:
@@ -377,6 +379,7 @@ def do_tracker_evaluation(tracker):
     relative_precision_sum = 0.0
     success_sum = 0.0
     adjusted_success_sum = 0.0
+    se_time_total = 0.0
     lost1 = 0
     lost2 = 0
     lost3 = 0
@@ -389,10 +392,10 @@ def do_tracker_evaluation(tracker):
         return {}
     with open(trackings_file, 'w') as f:
 
-        line = "#n,set_name,sample_name,sample_frames,precision_rating,relative_precision_rating,success_rating,adjusted_success_rating,loaded,features_selected,consolidator_trained,tracking_completed,total_seconds,preparing_seconds,tracking_seconds,frame_rate,roi_calculation_sum,sroi_generation_sum,feature_extraction_frame_rate,feature_reduction_sum,feature_consolidation_sum,pursuing_frame_rate,lost1,lost2,lost3,updates_max_frames,updates_confidence,update_total\n"
+        line = "#n,set_name,sample_name,sample_frames,precision_rating,relative_precision_rating,success_rating,adjusted_success_rating,loaded,features_selected,consolidator_trained,tracking_completed,total_seconds,preparing_seconds,tracking_seconds,frame_rate,roi_calculation_sum,sroi_generation_sum,feature_extraction_frame_rate,feature_reduction_sum,feature_consolidation_sum,pursuing_frame_rate,lost1,lost2,lost3,updates_max_frames,updates_confidence,update_total,se_total_seconds,se_frame_rate\n"
         f.write(line)
         for n, e in enumerate(tracker.tracking_evaluations):
-            line = "{n},{set_name},{sample_name},{sample_frames},{precision_rating},{relative_precision_rating},{success_rating},{adjusted_success_rating},{loaded},{features_selected},{consolidator_trained},{tracking_completed},{total_seconds},{preparing_seconds},{tracking_seconds},{frame_rate},{pursuing_frame_rate},{feature_extraction_frame_rate},{lost1},{lost2},{lost3},{updates_max_frames},{updates_confidence},{updates_total}\n".format(
+            line = "{n},{set_name},{sample_name},{sample_frames},{precision_rating},{relative_precision_rating},{success_rating},{adjusted_success_rating},{loaded},{features_selected},{consolidator_trained},{tracking_completed},{total_seconds},{preparing_seconds},{tracking_seconds},{frame_rate},{pursuing_frame_rate},{feature_extraction_frame_rate},{lost1},{lost2},{lost3},{updates_max_frames},{updates_confidence},{updates_total},{se_total_seconds},{se_frame_rate}\n".format(
                 n=n + 1,
                 **e)
             f.write(line)
@@ -403,7 +406,7 @@ def do_tracker_evaluation(tracker):
             sroi_generation_sum += e['sroi_generation_frame_rate']
             feature_extraction_sum += e['feature_extraction_frame_rate']
             feature_reduction_sum += e['feature_reduction_frame_rate']
-            feature_consolidation_sum +=e['feature_consolidation_frame_rate']
+            feature_consolidation_sum += e['feature_consolidation_frame_rate']
             precision_sum += e['precision_rating']
             relative_precision_sum += e['relative_precision_rating']
             success_sum += e['success_rating']
@@ -415,13 +418,14 @@ def do_tracker_evaluation(tracker):
             updates_max_frames += e['updates_max_frames']
             updates_confidence += e['updates_confidence']
             updates_total += e['updates_total']
-            se_time_total = e['test']
+            se_total_seconds = e['se_total_seconds']
         roi_calculation_frame_rate = roi_calculation_sum / len(tracker.tracking_evaluations)
         sroi_generation_frame_rate = sroi_generation_sum / len(tracker.tracking_evaluations)
         feature_extraction_frame_rate = feature_extraction_sum / len(tracker.tracking_evaluations)
         feature_reduction_frame_rate = feature_reduction_sum / len(tracker.tracking_evaluations)
         feature_consolidation_frame_rate = feature_consolidation_sum / len(tracker.tracking_evaluations)
         pursuing__frame_rate = pursuing_sum / len(tracker.tracking_evaluations)
+        se_frame_rate = se_total_seconds / len(tracker.tracking_evaluations)
 
     # eval from paper:
     dfun = build_dist_fun(tracker.total_center_distances)
@@ -523,6 +527,7 @@ def do_tracker_evaluation(tracker):
     ev['feature_reduction_frame_rate'] = feature_reduction_frame_rate
     ev['feature_consolidation_frame_rate'] = feature_consolidation_frame_rate
     ev['pursuing_frame_rate'] = pursuing__frame_rate
+    ev['se_frame_rate'] = se_frame_rate
     ev['preparing_seconds'] = preparing_sum
     apr = precision_sum / ev['total_samples']
     ev['average_precision_rating'] = apr
