@@ -96,13 +96,13 @@ tracking_conf:
   shuffle: false
 
 scale_estimator:
-  use_scale_estimation: true   # Enable or disable scale estimation
+  use_scale_estimation: false   # Enable or disable scale estimation
   min_se_treshold: 0.2
   max_se_treshold: 0.4
-  use_update_strategies: true
+  use_update_strategies: false
 
   # Determines which approach to use for scale estimation. candidates or custom_dsst
-  approach: custom_dsst
+  approach: candidates
 
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls

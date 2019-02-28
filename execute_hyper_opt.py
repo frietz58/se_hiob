@@ -13,7 +13,7 @@ args = parser.parse_args()
 
 
 def set_keyval(key_val_list):
-    load_from = "config/backup.yaml"
+    load_from = "config/backup_tracker.yaml"
 
     yaml = ruamel.yaml.YAML()
 

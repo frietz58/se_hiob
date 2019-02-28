@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 
 def set_keyval(key_val_list):
-    load_from = "config/backup.yaml"
+    load_from = "config/backup_tracker.yaml"
 
     yaml = ruamel.yaml.YAML()
 
@@ -25,7 +25,7 @@ def set_keyval(key_val_list):
 
             tb100["scale_estimator"][key] = val
 
-    save_to = "config/tracker_3.yaml"
+    save_to = "config/tracker_dsst.yaml"
     with open(save_to, 'w') as f:
         yaml.dump(tb100, f)
 
