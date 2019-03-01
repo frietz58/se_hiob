@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import logging
+from ..Rect import Rect
 import os
 import scipy.io
 from math import gcd
@@ -254,7 +255,14 @@ class CustomDsst:
                 np.floor(np.multiply(self.base_target_size[0], self.current_x_scale_factor)),
                 np.floor(np.multiply(self.base_target_size[1], self.current_y_scale_factor))]
 
-        return new_target_size
+        # adjust x and y pos so that the box remains centered when height/width change
+        old_x = self.frame.predicted_position.center[0]
+        old_y = self.frame.predicted_position.center[1]
+
+        new_x = int(old_x - np.rint(new_target_size[0] / 2))
+        new_y = int(old_y - np.rint(new_target_size[1] / 2))
+
+        return Rect(new_x, new_y, new_target_size[0], new_target_size[1])
 
     def extract_scale_sample(self, frame):
         global out

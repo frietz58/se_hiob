@@ -135,7 +135,7 @@ class ScaleEstimator:
             return frame.predicted_position
 
         # if quality of prediction is too high no SE needed
-        #if prediction_quality > self.max_se_treshold and self.use_update_strategies:
+        # if prediction_quality > self.max_se_treshold and self.use_update_strategies:
         #    logger.info("frame prediction quality bigger than scale estimation threshold {0}, not changing"
         #                " the size".format(self.max_se_treshold))
         #    return frame.predicted_position
@@ -153,12 +153,7 @@ class ScaleEstimator:
         elif self.approach == "custom_dsst":
             logger.info("starting scale estimation. Approach: DSST")
 
-            size = self.custom_dsst.dsst(frame)
-            frame.predicted_position = Rect(frame.predicted_position.x,
-                                            frame.predicted_position.y,
-                                            size[0],
-                                            size[1])
-            final_candidate = frame.predicted_position
+            final_candidate = self.custom_dsst.dsst(frame)
 
             logger.info("finished scale estimation")
 
