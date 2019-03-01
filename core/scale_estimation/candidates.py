@@ -97,15 +97,25 @@ class CandidateApproach:
             # calculate the current scale factors
             scale_factors = np.multiply(self.scale_factors, self.current_scale_factor)
 
-            # init scaled predictions 2d array. 0 for scaled width, 1 for scaled height
             scaled_predictions = []
 
             # Generate n scaled candidates
             for i in range(self.number_scales):
                 scale_factor = scale_factors[i]
+
+                # calc new width and height
+                new_w = round(self.base_target_size[0] * self.current_scale_factor)
+                new_h = round(self.base_target_size[1] * self.current_scale_factor)
+
+                # adjust x and y pos so that the box remains centered when height/width change
+                old_x = self.frame.predicted_position.center[0]
+                old_y = self.frame.predicted_position.center[1]
+                new_x = int(old_x - np.rint(new_w / 2))
+                new_y = int(old_y - np.rint(new_h / 2))
+
                 scaled_box = Rect(
-                    frame.predicted_position.x,
-                    frame.predicted_position.y,
+                    new_x,
+                    new_y,
                     np.floor(self.base_target_size[0] * scale_factor),
                     np.floor(self.base_target_size[1] * scale_factor))
 
@@ -134,9 +144,11 @@ class CandidateApproach:
                 old_x = self.frame.predicted_position.center[0]
                 old_y = self.frame.predicted_position.center[1]
 
-                # TODO check oob
                 new_x = int(old_x - np.rint(new_w / 2))
                 new_y = int(old_y - np.rint(new_h / 2))
+
+                # handle out of bounds
+                new_x, new_y, new_w, new_h = self.check_oob(new_x, new_y, new_w, new_h)
 
                 scaled_width_box = Rect(
                     new_x,
@@ -296,31 +308,6 @@ class CandidateApproach:
         new_x = int(old_x - np.rint(new_w/2))
         new_y = int(old_y - np.rint(new_h/2))
 
-        # handle out of bounds
-        if new_x <= 1:
-            new_x = 1
-
-        if new_y <= 1:
-            new_y = 1
-
-        if new_x >= self.frame.size[1]:
-            new_x = self.frame.size[1]
-
-        if new_y >= self.frame.size[2]:
-            new_y = self.frame.size[2]
-
-        if new_w <= 1:
-            new_w = 1
-
-        if new_h <= 1:
-            new_h = 1
-
-        if new_w >= self.frame.size[1]:
-            new_w = self.frame.size[1]
-
-        if new_h >= self.frame.size[2]:
-            new_h = self.frame.size[2]
-
         return Rect(new_x, new_y, new_w, new_h)
 
     def rate_scaled_candidate(self, candidate, mask_scale_factor, feature_mask):
@@ -473,3 +460,31 @@ class CandidateApproach:
             curve[neg_loc] = val
 
         self.manual_scale_window = curve
+
+    def check_oob(self, new_x, new_y, new_w, new_h):
+        # handle out of bounds
+        if new_x <= 1:
+            new_x = 1
+
+        if new_y <= 1:
+            new_y = 1
+
+        if new_x >= self.frame.size[1]:
+            new_x = self.frame.size[1]
+
+        if new_y >= self.frame.size[2]:
+            new_y = self.frame.size[2]
+
+        if new_w <= 1:
+            new_w = 1
+
+        if new_h <= 1:
+            new_h = 1
+
+        if new_w >= self.frame.size[1]:
+            new_w = self.frame.size[1]
+
+        if new_h >= self.frame.size[2]:
+            new_h = self.frame.size[2]
+
+        return new_x, new_y, new_w, new_h

@@ -610,7 +610,6 @@ class Tracking(object):
     def estimate_scale(self, frame=None):
         if frame is None:
             frame = self.current_frame
-        # frame.commence_scale_estimation()
 
         frame.predicted_position = self.tracker.estimator.estimate_scale(
             frame=frame,
