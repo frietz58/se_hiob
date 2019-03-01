@@ -571,6 +571,7 @@ def print_tracking_evaluation(evaluation, log_context):
                     "feature_extraction_frame_rate",
                     "feature_reduction_frame_rate",
                     "feature_consolidation_frame_rate",
+                    "se_frame_rate",
                     "lost1",
                     "lost2",
                     "lost3",

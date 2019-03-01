@@ -389,9 +389,9 @@ class Tracking(object):
         self.pursue_frame(frame)
         self.pursuing_total_seconds += (datetime.now() - ts_start).total_seconds()
 
-        # scale estimator time is appended in swarm pursuer where the main call is...
-        self.se_total_seconds += self.tracker.estimator.se_time
-        print(self.se_total_seconds)
+        se_start_time = datetime.now()
+        self.estimate_scale(frame)
+        self.se_total_seconds += (datetime.now() - se_start_time).total_seconds()
 
         # ps.append(time.time())  # 6
 
@@ -606,6 +606,17 @@ class Tracking(object):
                 frame.predicted_position = frame.previous_position
 
         frame.complete_pursuing()
+
+    def estimate_scale(self, frame=None):
+        if frame is None:
+            frame = self.current_frame
+        # frame.commence_scale_estimation()
+
+        frame.predicted_position = self.tracker.estimator.estimate_scale(
+            frame=frame,
+            feature_mask=frame.image_mask,
+            mask_scale_factor=frame.mask_scale_factor,
+            prediction_quality=frame.prediction_quality)
 
     def evaluate_frame(self, frame=None):
         if frame is None:

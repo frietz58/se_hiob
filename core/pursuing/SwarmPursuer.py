@@ -186,18 +186,20 @@ class SwarmPursuer(Pursuer):
         mask[mask < self.target_lower_limit] = self.target_punish_low
         mask[mask < 0.0] = 0.0
 
-        #print("a", mask.max(), mask.min(), np.average(mask))
         # check rgb vs gray format
-        if len(frame.size) == 3:
-            img_size = [frame.size[2], frame.size[1]]
-        elif len(frame.size) == 2:
-            img_size = [frame.size[1], frame.size[2]]
+        # if len(frame.size) == 3:
+        #     img_size = [frame.size[2], frame.size[1]]
+        # elif len(frame.size) == 2:
+        #     img_size = [frame.size[1], frame.size[2]]
+
+        img_size = [frame.size[2], frame.size[1]]
 
         #ps.append(time.time())  # 2
 
         img_mask, scale_factor = self.upscale_mask(mask, frame.roi, img_size)
         #print("a", img_mask.max(), img_mask.min(), np.average(img_mask))
         frame.image_mask = img_mask
+        frame.mask_scale_factor = scale_factor
 
         #ps.append(time.time())  # 3
 
@@ -256,7 +258,6 @@ class SwarmPursuer(Pursuer):
         # if scaling is enabled, punish pixels with low feature rating
         punish_low = self.particle_scale_factor != 1.0
 
-        # This is just a mapping: [img_mask[top:bot,left:right]]
         slices = [img_mask[round(pos.top / scale_factor[1]):round((pos.bottom - 1) / scale_factor[1]),
                   round(pos.left / scale_factor[0]):round((pos.right - 1) / scale_factor[0])] for pos in locs]
 
@@ -282,16 +283,6 @@ class SwarmPursuer(Pursuer):
             0.0, min(1.0, quals[best_arg] / perfect_quality))
         logger.info("Prediction: %s, quality: %f",
                     frame.predicted_position, frame.prediction_quality)
-
-        se_start_time = time.time()
-        frame.predicted_position = self.tracker.estimator.estimate_scale(
-            frame=frame,
-            feature_mask=img_mask,
-            mask_scale_factor=scale_factor,
-            prediction_quality=frame.prediction_quality)
-        self.tracker.estimator.se_time = time.time() - se_start_time
-        print(self.tracker.estimator.se_time)
-
 
         #ps.append(time.time())  # 9
 
