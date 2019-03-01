@@ -54,7 +54,7 @@ def change_c_number_scales_old():
             ["use_update_strategies", False],
             ["approach", "custom_dsst"],
             ["c_change_aspect_ratio", False]
-            ]
+        ]
 
         set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml", save_to=args.tracker)
 
@@ -71,15 +71,15 @@ def change_c_number_scales_old():
     # original val
     print(c_number_scales_start)
     c_number_scales_change = [
-            ["c_number_scales", c_number_scales_start],
-            ["use_scale_estimation", True],
-            ["use_update_strategies", False],
-            ["approach", "custom_dsst"],
-            ["c_change_aspect_ratio", False]
-            ]
+        ["c_number_scales", c_number_scales_start],
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "custom_dsst"],
+        ["c_change_aspect_ratio", False]
+    ]
     print()
 
-    set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml",  save_to=args.tracker)
+    set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml", save_to=args.tracker)
 
     if args.gpu is None:
         args.gpu = 0
@@ -98,9 +98,9 @@ def change_c_number_scales_old():
             ["use_update_strategies", False],
             ["approach", "custom_dsst"],
             ["c_change_aspect_ratio", False]
-            ]
+        ]
 
-        set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml",  save_to=args.tracker)
+        set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml", save_to=args.tracker)
 
         if args.gpu is None:
             args.gpu = 0
@@ -110,13 +110,14 @@ def change_c_number_scales_old():
         print()
 
 
-def change_parameter(parameter_name, additional_parameters, start, step, times, change_function, test, only_one_dir):
+def change_parameter(parameter_name, additional_parameters, start, step, times_per_dir, change_function, test,
+                     only_one_dir):
     parameter_name = str(parameter_name)
     print("Parameter: " + parameter_name)
 
     # make val bigger
     print("Increasing Parameter Value: ")
-    for i in range(1, times + 1):
+    for i in range(1, times_per_dir + 1):
 
         # val_change = start + (step ** i) - 1
         val_change = change_function(start, step, i, "bigger")
@@ -157,14 +158,20 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
     gc.collect()
 
     # make val smaller
+
     print("Decreasing Parameter Value: ")
-    for i in range(1, times + 1):
+    for i in range(1, times_per_dir + 1):
 
         if only_one_dir:
             break
 
         # val_change = start  (step ** i) - 1
-        val_change = change_function(start, step, i, "smaller")
+        try:
+            val_change = change_function(start, step, i, "smaller")
+        except ValueTooSmallError:
+            print("Value resulting from decrease function is smaller than threshold, stopping decrease for the "
+                  "current parameter")
+            break
 
         print(val_change)
 
@@ -198,11 +205,6 @@ def change_inner_punish_threshold(start, step, i, direction):
         return float(np.around(start - (step ** i) + 1, decimals=2))
 
 
-def change_c_scale_factor(start, step, i, direction):
-    # special case, we want it to only grow, smaller case is never used
-    return float(np.around(start + (step ** i) - (1 ** i), decimals=2))
-
-
 def change_max_scale_difference(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
     return float(np.around(start + (step ** i) - (1 ** i), decimals=2))
@@ -218,6 +220,64 @@ def change_adjust_max_scale_diff_after(start, step, i, direction):
     return float(np.around(start + (step * i), decimals=0))
 
 
+#####################################################################################
+
+
+class ValueTooSmallError(Exception):
+    """Raised when the input value is too small"""
+    pass
+
+
+def change_scale_factor(start, step, i, direction):
+    # special case, we want it to only grow, smaller case is never used
+    return float(np.around(start + (step ** i) - (1 ** i), decimals=2))
+
+
+def change_scale_sigma_factor(start, step, i, direction):
+    if direction == "bigger":
+        return float(np.around(start + (step * i * i) - (1 * i * i), decimals=2))
+    elif direction == "smaller":
+        if float(np.around(start - (step * i * i) + (1 * i * i), decimals=2)) < 0.01:
+            raise ValueTooSmallError
+        else:
+            return float(np.around(start - (step * i * i) + (1 * i * i), decimals=2))
+
+
+def change_learning_rate(start, step, i, direction):
+    if direction == "bigger":
+        return float(np.around(start + (step ** i) - (1 ** i), decimals=3))
+    elif direction == "smaller":
+        if float(np.around(start - (step ** i) + (1 ** i), decimals=3)) < 0.01:
+            raise ValueTooSmallError
+        else:
+            return float(np.around(start - (step ** i) + (1 ** i), decimals=3))
+
+
+def change_scale_model_max(start, step, i, direction):
+    if direction == "bigger":
+        return float(np.around(start * step ** i, decimals=2))
+    elif direction == "smaller":
+        return float(np.around(start * (2 - step) ** i, decimals=2))
+
+
+def change_scale_model_size(start, step, i, direction):
+    if direction == "bigger":
+        return float(np.around(start + step ** i, decimals=2))
+    elif direction == "smaller":
+        if float(np.around(start - step ** i, decimals=2)) < 1:
+            raise ValueTooSmallError
+        return float(np.around(start - step ** i, decimals=2))
+
+
+def change_dsst_number_scales(start, step, i, direction):
+    if direction == "bigger":
+        return float(np.around(start + step ** i, decimals=2))
+    elif direction == "smaller":
+        if float(np.around(start - step ** i, decimals=2)) < 10:
+            raise ValueTooSmallError
+        return float(np.around(start - step ** i, decimals=2))
+
+
 if __name__ == '__main__':
 
     if args.gpu is None:
@@ -225,65 +285,50 @@ if __name__ == '__main__':
 
     test = True
 
-    change_parameter(parameter_name='c_number_scales', additional_parameters=[
+    change_parameter(parameter_name='scale_factor', additional_parameters=[
         ["use_scale_estimation", True],
         ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", False]
-    ], start=33, step=2, times=5, change_function=change_c_number_scales, test=test, only_one_dir=False)
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=1.01, step=1.01, times_per_dir=10, change_function=change_scale_factor, test=test, only_one_dir=True)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='inner_punish_threshold', additional_parameters=[
+    change_parameter(parameter_name='scale_sigma_factor', additional_parameters=[
         ["use_scale_estimation", True],
         ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", False]
-    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=0.25, step=1.02, times_per_dir=5, change_function=change_scale_sigma_factor, test=test, only_one_dir=False)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='outer_punish_threshold', additional_parameters=[
+    change_parameter(parameter_name='learning_rate', additional_parameters=[
         ["use_scale_estimation", True],
         ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", False]
-    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=0.05, step=1.02, times_per_dir=5, change_function=change_learning_rate, test=test, only_one_dir=False)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='c_scale_factor', additional_parameters=[
+    change_parameter(parameter_name='scale_model_max', additional_parameters=[
         ["use_scale_estimation", True],
         ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", False]
-    ], start=1.01, step=1.01, times=10, change_function=change_c_scale_factor, test=test, only_one_dir=True)
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=512, step=1.1, times_per_dir=5, change_function=change_scale_model_max, test=test, only_one_dir=False)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='max_scale_difference', additional_parameters=[
+    change_parameter(parameter_name='scale_model_size', additional_parameters=[
         ["use_scale_estimation", True],
         ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", False]
-    ], start=0.01, step=1.02, times=10, change_function=change_max_scale_difference, test=test, only_one_dir=True)
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=16, step=2, times_per_dir=5, change_function=change_scale_model_size, test=test, only_one_dir=False)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='scale_window_step_size', additional_parameters=[
+    change_parameter(parameter_name='dsst_number_scales', additional_parameters=[
         ["use_scale_estimation", True],
         ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", False]
-    ], start=0.005, step=1.02, times=10, change_function=change_scale_window_step_size, test=test, only_one_dir=True)
-
-    print("==== new parameter ==== \n")
-    change_parameter(parameter_name='adjust_max_scale_diff_after', additional_parameters=[
-        ["use_scale_estimation", True],
-        ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", True]
-    ], start=1, step=1, times=10, change_function=change_adjust_max_scale_diff_after, test=test, only_one_dir=True)
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=33, step=2, times_per_dir=5, change_function=change_dsst_number_scales, test=test, only_one_dir=False)
 

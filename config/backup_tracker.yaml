@@ -113,7 +113,7 @@ scale_estimator:
   scale_model_size: 16
   padding: 1.0
   dsst_number_scales: 33 # number of scaled candidates to generate
-  d_change_aspect_ratio: true
+  d_change_aspect_ratio: false
 
   # candidate params:
   c_scale_factor: 1.02 # scale factor between candidates
