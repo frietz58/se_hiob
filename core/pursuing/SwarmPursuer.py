@@ -290,7 +290,7 @@ class SwarmPursuer(Pursuer):
             mask_scale_factor=scale_factor,
             prediction_quality=frame.prediction_quality)
         self.tracker.estimator.se_time = time.time() - se_start_time
-
+        print(self.tracker.estimator.se_time)
 
 
         #ps.append(time.time())  # 9

@@ -407,6 +407,7 @@ def do_tracker_evaluation(tracker):
             feature_extraction_sum += e['feature_extraction_frame_rate']
             feature_reduction_sum += e['feature_reduction_frame_rate']
             feature_consolidation_sum += e['feature_consolidation_frame_rate']
+            se_sum = e['se_frame_rate']
             precision_sum += e['precision_rating']
             relative_precision_sum += e['relative_precision_rating']
             success_sum += e['success_rating']
@@ -418,14 +419,13 @@ def do_tracker_evaluation(tracker):
             updates_max_frames += e['updates_max_frames']
             updates_confidence += e['updates_confidence']
             updates_total += e['updates_total']
-            se_total_seconds = e['se_total_seconds']
         roi_calculation_frame_rate = roi_calculation_sum / len(tracker.tracking_evaluations)
         sroi_generation_frame_rate = sroi_generation_sum / len(tracker.tracking_evaluations)
         feature_extraction_frame_rate = feature_extraction_sum / len(tracker.tracking_evaluations)
         feature_reduction_frame_rate = feature_reduction_sum / len(tracker.tracking_evaluations)
         feature_consolidation_frame_rate = feature_consolidation_sum / len(tracker.tracking_evaluations)
         pursuing__frame_rate = pursuing_sum / len(tracker.tracking_evaluations)
-        se_frame_rate = se_total_seconds / len(tracker.tracking_evaluations)
+        se_frame_rate = se_sum / len(tracker.tracking_evaluations)
 
     # eval from paper:
     dfun = build_dist_fun(tracker.total_center_distances)

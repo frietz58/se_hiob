@@ -391,6 +391,7 @@ class Tracking(object):
 
         # scale estimator time is appended in swarm pursuer where the main call is...
         self.se_total_seconds += self.tracker.estimator.se_time
+        print(self.se_total_seconds)
 
         # ps.append(time.time())  # 6
 
