@@ -110,7 +110,7 @@ def change_c_number_scales_old():
         print()
 
 
-def change_parameter(parameter_name, start, step, times, change_function, test):
+def change_parameter(parameter_name, additional_parameters, start, step, times, change_function, test, only_one_dir):
     parameter_name = str(parameter_name)
     print("Parameter: " + parameter_name)
 
@@ -121,13 +121,9 @@ def change_parameter(parameter_name, start, step, times, change_function, test):
         # val_change = start + (step ** i) - 1
         val_change = change_function(start, step, i, "bigger")
         print(val_change)
-        val_changes_bigger = [
-            [str(parameter_name), val_change],
-            ["use_scale_estimation", True],
-            ["use_update_strategies", False],
-            ["approach", "candidates"],
-            ["c_change_aspect_ratio", False]
-        ]
+
+        val_changes_bigger = additional_parameters
+        val_changes_bigger.append([str(parameter_name), val_change])
 
         set_keyval(key_val_list=val_changes_bigger, load_from="config/backup_tracker.yaml",
                    save_to=args.tracker)
@@ -144,13 +140,10 @@ def change_parameter(parameter_name, start, step, times, change_function, test):
     # original val
     print("Base Value")
     print(start)
-    start_val = [
-        [str(parameter_name), start],
-        ["use_scale_estimation", True],
-        ["use_update_strategies", False],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-    ]
+
+    start_val = additional_parameters
+    start_val.append([str(parameter_name), start])
+
     print()
 
     set_keyval(key_val_list=start_val, load_from="config/backup_tracker.yaml", save_to=args.tracker)
@@ -164,19 +157,20 @@ def change_parameter(parameter_name, start, step, times, change_function, test):
     gc.collect()
 
     # make val smaller
+
     print("Decreasing Parameter Value: ")
     for i in range(1, times + 1):
 
+        if only_one_dir:
+            break
+
         # val_change = start  (step ** i) - 1
         val_change = change_function(start, step, i, "smaller")
+
         print(val_change)
-        val_changes_smaller = [
-            [str(parameter_name), val_change],
-            ["use_scale_estimation", True],
-            ["use_update_strategies", False],
-            ["approach", "candidates"],
-            ["c_change_aspect_ratio", False]
-        ]
+
+        val_changes_smaller = additional_parameters
+        val_changes_smaller.append([str(parameter_name), val_change])
 
         set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
                    save_to=args.tracker)
@@ -206,19 +200,23 @@ def change_inner_punish_threshold(start, step, i, direction):
 
 
 def change_c_scale_factor(start, step, i, direction):
-    # special case, we want it to only grow, so split growth over both direction cases...
-    if direction == "bigger":
-        return float(np.around(start + (step * i) - (1 * i), decimals=2))
-    elif direction == "smaller":
-        return float(np.around(start + 0.05 + (step * i) - (1 * i), decimals=2))
+    # special case, we want it to only grow, smaller case is never used
+    return float(np.around(start + (step ** i) - (1 ** i), decimals=2))
 
 
 def change_max_scale_difference(start, step, i, direction):
-    # special case, we want it to only grow, so split growth over both direction cases...
-    if direction == "bigger":
-        return float(np.around(start + (step * i) - (1 * i), decimals=2))
-    elif direction == "smaller":
-        return float(np.around(start + 0.05 + (step * i) - (1 * i), decimals=2))
+    # special case, we want it to only grow, smaller case is never used
+    return float(np.around(start + (step ** i) - (1 ** i), decimals=2))
+
+
+def change_scale_window_step_size(start, step, i, direction):
+    # special case, we want it to only grow, smaller case is never used
+    return float(np.around(start + (step ** i) - (1 ** i), decimals=3))
+
+
+def change_adjust_max_scale_diff_after(start, step, i, direction):
+    # special case, we want it to only grow, smaller case is never used
+    return float(np.around(start + (step * i), decimals=0))
 
 
 if __name__ == '__main__':
@@ -228,21 +226,65 @@ if __name__ == '__main__':
 
     test = True
 
-    change_parameter(parameter_name='c_number_scales', start=33, step=2, times=5,
-                     change_function=change_c_number_scales, test=test)
-    print("==== new parameter ==== \n")
-    change_parameter(parameter_name='inner_punish_threshold', start=0.5, step=1.05, times=5,
-                     change_function=change_inner_punish_threshold, test=test)
+    change_parameter(parameter_name='c_number_scales', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=33, step=2, times=5, change_function=change_c_number_scales, test=test, only_one_dir=False)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='outer_punish_threshold', start=0.5, step=1.05, times=5,
-                     change_function=change_inner_punish_threshold, test=test)
+    change_parameter(parameter_name='inner_punish_threshold', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='c_scale_factor', start=1.01, step=1.01, times=5,
-                     change_function=change_c_scale_factor, test=test)
+    change_parameter(parameter_name='outer_punish_threshold', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='max_scale_difference', start=0.01, step=1.01, times=5,
-                     change_function=change_max_scale_difference, test=test)
+    change_parameter(parameter_name='c_scale_factor', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=1.01, step=1.01, times=10, change_function=change_c_scale_factor, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='max_scale_difference', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.01, step=1.02, times=10, change_function=change_max_scale_difference, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='scale_window_step_size', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.005, step=1.02, times=10, change_function=change_scale_window_step_size, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='adjust_max_scale_diff_after', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", True]
+    ], start=1, step=1, times=10, change_function=change_adjust_max_scale_diff_after, test=test, only_one_dir=True)
 
