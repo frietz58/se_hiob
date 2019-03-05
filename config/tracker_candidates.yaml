@@ -102,7 +102,7 @@ scale_estimator:
   use_update_strategies: false
 
   # Determines which approach to use for scale estimation. candidates or custom_dsst
-  approach: candidates
+  approach: custom_dsst
 
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls
@@ -112,19 +112,19 @@ scale_estimator:
   scale_model_max: 512 # max area of the scale model on the image
   scale_model_size: 16
   padding: 1.0
-  dsst_number_scales: 33 # number of scaled candidates to generate
-  d_change_aspect_ratio: true
+  dsst_number_scales: 17.0 # number of scaled candidates to generate
+  d_change_aspect_ratio: false
 
   # candidate params:
   c_scale_factor: 1.02 # scale factor between candidates
-  c_change_aspect_ratio: false # change aspect ratio of bouding box
+  c_change_aspect_ratio: true # change aspect ratio of bouding box
   inner_punish_threshold: 0.3 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
   outer_punish_threshold: 0.3 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
   c_number_scales: 33 # number of scaled candidates to generate
   max_scale_difference: 0.02 # max value the scale may change between two frames
   scale_window_step_size: 0.005 # the deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
-  adjust_max_scale_diff: true  # adjust the max_scale_difference value if the factor has been limited n time sin a row, necessary for extreme scale changes that exceed the max_scale_difference between frames
-  adjust_max_scale_diff_after: 1 # the number after how many times of the scale factor being limited the max scale_difference gets adjusted
+  adjust_max_scale_diff: false # adjust the max_scale_difference value if the factor has been limited n time sin a row, necessary for extreme scale changes that exceed the max_scale_difference between frames
+  adjust_max_scale_diff_after: 3 # the number after how many times of the scale factor being limited the max scale_difference gets adjusted
 
 
 # = tracking =

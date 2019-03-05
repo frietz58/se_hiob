@@ -37,79 +37,6 @@ def set_keyval(key_val_list, load_from, save_to):
         yaml.dump(yaml_file, f)
 
 
-def change_c_number_scales_old():
-    print("Parameter: c_number_scales")
-    c_number_scales_start = 33
-    c_number_scales_step = 2
-    c_number_scales_times = 5
-
-    # make val bigger,
-    for i in range(1, c_number_scales_times + 1):
-
-        c_number_scales_val = c_number_scales_start + c_number_scales_step ** i
-        print(c_number_scales_val)
-        c_number_scales_change = [
-            ["c_number_scales", c_number_scales_val],
-            ["use_scale_estimation", True],
-            ["use_update_strategies", False],
-            ["approach", "custom_dsst"],
-            ["c_change_aspect_ratio", False]
-        ]
-
-        set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml", save_to=args.tracker)
-
-        environment_change = [["environment_name", "candidates"], ["log_dir", "../candidates_opt/c_number_scales"]]
-        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
-
-        if args.gpu is None:
-            args.gpu = 0
-
-        subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
-        gc.collect()
-        print()
-
-    # original val
-    print(c_number_scales_start)
-    c_number_scales_change = [
-        ["c_number_scales", c_number_scales_start],
-        ["use_scale_estimation", True],
-        ["use_update_strategies", False],
-        ["approach", "custom_dsst"],
-        ["c_change_aspect_ratio", False]
-    ]
-    print()
-
-    set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml", save_to=args.tracker)
-
-    if args.gpu is None:
-        args.gpu = 0
-
-    subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
-    gc.collect()
-
-    # make val smaller,
-    for i in range(1, c_number_scales_times + 1):
-
-        c_number_scales_val = c_number_scales_start - c_number_scales_step ** i
-        print(c_number_scales_val)
-        c_number_scales_change = [
-            ["c_number_scales", c_number_scales_val],
-            ["use_scale_estimation", True],
-            ["use_update_strategies", False],
-            ["approach", "custom_dsst"],
-            ["c_change_aspect_ratio", False]
-        ]
-
-        set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml", save_to=args.tracker)
-
-        if args.gpu is None:
-            args.gpu = 0
-
-        subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
-        gc.collect()
-        print()
-
-
 def change_parameter(parameter_name, additional_parameters, start, step, times_per_dir, change_function, test,
                      only_one_dir):
     parameter_name = str(parameter_name)
@@ -129,8 +56,8 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
         set_keyval(key_val_list=val_changes_bigger, load_from="config/backup_tracker.yaml",
                    save_to=args.tracker)
 
-        environment_change = [["environment_name", "candidates"],
-                              ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+        environment_change = [["environment_name", "dsst"],
+                              ["log_dir", "../dsst_opt/" + str(parameter_name)]]
         set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
         if not test:
@@ -149,8 +76,8 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
 
     set_keyval(key_val_list=start_val, load_from="config/backup_tracker.yaml", save_to=args.tracker)
 
-    environment_change = [["environment_name", "candidates"],
-                          ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+    environment_change = [["environment_name", "dsst"],
+                          ["log_dir", "../dsst_opt/" + str(parameter_name)]]
     set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
     if not test:
@@ -181,8 +108,8 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
         set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
                    save_to=args.tracker)
 
-        environment_change = [["environment_name", "candidates"],
-                              ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+        environment_change = [["environment_name", "dsst"],
+                              ["log_dir", "../dsst_opt/" + str(parameter_name)]]
         set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
         if not test:
@@ -287,7 +214,7 @@ if __name__ == '__main__':
 
     change_parameter(parameter_name='scale_factor', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "custom_dsst"],
         ["d_change_aspect_ratio", False]
     ], start=1.01, step=1.01, times_per_dir=10, change_function=change_scale_factor, test=test, only_one_dir=True)
@@ -295,7 +222,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='scale_sigma_factor', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "custom_dsst"],
         ["d_change_aspect_ratio", False]
     ], start=0.25, step=1.02, times_per_dir=5, change_function=change_scale_sigma_factor, test=test, only_one_dir=False)
@@ -303,7 +230,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='learning_rate', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "custom_dsst"],
         ["d_change_aspect_ratio", False]
     ], start=0.05, step=1.02, times_per_dir=5, change_function=change_learning_rate, test=test, only_one_dir=False)
@@ -311,7 +238,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='scale_model_max', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "custom_dsst"],
         ["d_change_aspect_ratio", False]
     ], start=512, step=1.1, times_per_dir=5, change_function=change_scale_model_max, test=test, only_one_dir=False)
@@ -327,7 +254,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='dsst_number_scales', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "custom_dsst"],
         ["d_change_aspect_ratio", False]
     ], start=33, step=2, times_per_dir=5, change_function=change_dsst_number_scales, test=test, only_one_dir=False)

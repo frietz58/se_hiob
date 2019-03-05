@@ -227,7 +227,7 @@ if __name__ == '__main__':
 
     change_parameter(parameter_name='c_number_scales', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='inner_punish_threshold', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='outer_punish_threshold', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
@@ -254,7 +254,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='c_scale_factor', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
@@ -263,7 +263,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='max_scale_difference', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
@@ -272,7 +272,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='scale_window_step_size', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
@@ -281,7 +281,7 @@ if __name__ == '__main__':
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='adjust_max_scale_diff_after', additional_parameters=[
         ["use_scale_estimation", True],
-        ["use_update_strategies", False],
+        ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", True]
