@@ -114,6 +114,7 @@ class Tracking(object):
             'roi': 'cyan',
             'ground_truth': 'green',
             'prediction': 'yellow',
+            'candidate': 'magenta'
         }
 
         # size of capture image (determined on sample loading)
@@ -615,7 +616,8 @@ class Tracking(object):
             frame=frame,
             feature_mask=frame.image_mask,
             mask_scale_factor=frame.mask_scale_factor,
-            prediction_quality=frame.prediction_quality)
+            prediction_quality=frame.prediction_quality,
+            tracking=self)
 
     def evaluate_frame(self, frame=None):
         if frame is None:

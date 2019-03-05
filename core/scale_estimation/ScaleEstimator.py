@@ -48,6 +48,7 @@ class ScaleEstimator:
         self.dsst_numerator_a = []
         self.dsst_denominator_b = []
         self.se_time = 0.0
+        self.passed_since_last_se = 0
 
         #configuration
         self.use_scale_estimation = None
@@ -65,9 +66,10 @@ class ScaleEstimator:
         self.approach = None
         self.scale_model_size = None
         self.padding = None
-        self.min_se_treshold = None
-        self.max_se_treshold = None
-        self.use_update_strategies = None
+        self.dyn_min_se_treshold = None
+        self.dyn_max_se_treshold = None
+        self.update_strategy = None
+        self.static_update_val = None
 
     def setup(self, tracker=None, sample=None):
         self.tracker = tracker
@@ -89,9 +91,11 @@ class ScaleEstimator:
         self.scale_model_max = self.econf['scale_model_max']
         self.scale_model_size = self.econf['scale_model_size']
         self.padding = self.econf['padding']
-        self.min_se_treshold = self.econf['min_se_treshold']
-        self.max_se_treshold = self.econf['max_se_treshold']
-        self.use_update_strategies = self.econf['use_update_strategies']
+        self.dyn_min_se_treshold = self.econf['dyn_min_se_treshold']
+        self.dyn_max_se_treshold = self.econf['dyn_max_se_treshold']
+        self.update_strategy = self.econf['update_strategy']
+        self.static_update_val = self.econf['static_update_val']
+        self.passed_since_last_se = self.econf['static_update_val']
 
         # logger is not initialized at this point, hence print statement...
         if self.use_scale_estimation:
@@ -109,7 +113,7 @@ class ScaleEstimator:
 
         self.candidate_approach.configure(self.econf)
 
-    def estimate_scale(self, frame, feature_mask, mask_scale_factor, prediction_quality):
+    def estimate_scale(self, frame, feature_mask, mask_scale_factor, prediction_quality, tracking):
         """
         :param frame: the current frame in which the best position has already been calculated
         :param feature_mask: he consolidated feature mask containing pixel values for how likely they belong to the
@@ -128,11 +132,40 @@ class ScaleEstimator:
             logger.info("Scale Estimation is disabled, returning unchanged prediction")
             return frame.predicted_position
 
+        # update strategies:
+        # continuous, update on every frame
+        if self.update_strategy == "cont":
+            final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
+
+        # static, update every x frames
+        elif self.update_strategy == "static":
+            if self.passed_since_last_se == self.static_update_val:
+                final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
+                self.passed_since_last_se = 0
+            else:
+                self.passed_since_last_se += 1
+                final_candidate = frame.predicted_position
+
+        # dynamic, update every time the quality gets smaller than threshold, indicating change in appearance
+        elif self.update_strategy == "dynamic":
+            if prediction_quality <= self.dyn_max_se_treshold:
+                final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
+            else:
+                final_candidate = frame.predicted_position
+
+        # limited, dynamic but only if quality still good enough
+        elif self.update_strategy == "limited":
+            if self.dyn_max_se_treshold >= prediction_quality >= self.dyn_min_se_treshold:
+                final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
+            else:
+
+                final_candidate = frame.predicted_position
+
         # if the quality of the prediction is too low. return unscaled bounding box
-        if prediction_quality < self.min_se_treshold and self.use_update_strategies:
-            logger.info("frame prediction quality is smaller than scale estimation threshold {0}, not changing"
-                        " the size".format(self.min_se_treshold))
-            return frame.predicted_position
+        # if prediction_quality < self.min_se_treshold and self.use_update_strategies:
+        #     logger.info("frame prediction quality is smaller than scale estimation threshold {0}, not changing"
+        #                 " the size".format(self.min_se_treshold))
+        #     return frame.predicted_position
 
         # if quality of prediction is too high no SE needed
         # if prediction_quality > self.max_se_treshold and self.use_update_strategies:
@@ -140,25 +173,27 @@ class ScaleEstimator:
         #                " the size".format(self.max_se_treshold))
         #    return frame.predicted_position
 
-        if self.approach == 'candidates':
-            logger.info("starting scale estimation. Approach: Candidate Generation")
+        # final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor)
 
-            scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame)
-            final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
-                                                                                 feature_mask,
-                                                                                 mask_scale_factor)
-
-            logger.info("finished scale estimation")
-
-        elif self.approach == "custom_dsst":
-            logger.info("starting scale estimation. Approach: DSST")
-
-            final_candidate = self.custom_dsst.dsst(frame)
-
-            logger.info("finished scale estimation")
-
-        else:
-            logger.critical("No implementation for approach in configuration")
+        # if self.approach == 'candidates':
+        #     logger.info("starting scale estimation. Approach: Candidate Generation")
+        #
+        #     scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame)
+        #     final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
+        #                                                                          feature_mask,
+        #                                                                          mask_scale_factor)
+        #
+        #     logger.info("finished scale estimation")
+        #
+        # elif self.approach == "custom_dsst":
+        #     logger.info("starting scale estimation. Approach: DSST")
+        #
+        #     final_candidate = self.custom_dsst.dsst(frame)
+        #
+        #     logger.info("finished scale estimation")
+        #
+        # else:
+        #     logger.critical("No implementation for approach in configuration")
 
         return final_candidate
 
@@ -181,4 +216,27 @@ class ScaleEstimator:
             # nothing needs to be done
             self.candidate_approach.handle_initial_frame(frame)
 
+    def execute_se_algorithm(self, frame, feature_mask, mask_scale_factor, tracking):
+        if self.approach == 'candidates':
+            logger.info("starting scale estimation. Approach: Candidate Generation")
 
+            scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame, tracking)
+            final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
+                                                                                 feature_mask,
+                                                                                 mask_scale_factor,
+                                                                                 )
+
+            logger.info("finished scale estimation")
+
+        elif self.approach == "custom_dsst":
+            logger.info("starting scale estimation. Approach: DSST")
+
+            final_candidate = self.custom_dsst.dsst(frame, tracking)
+
+            logger.info("finished scale estimation")
+
+        else:
+            logger.critical("No implementation for approach in configuration")
+            final_candidate = None
+
+        return final_candidate

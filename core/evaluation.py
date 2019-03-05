@@ -41,6 +41,7 @@ def area_between_curves(curve1, curve2):
     for i in range(0, len(curve1)):
         abc += abs(curve1[i] - curve2[i])
 
+    abc = abc / len(curve1)
     return round(abc, 2)
 
 
@@ -205,16 +206,18 @@ def do_tracking_evaluation(tracking):
     plt.xlim(1, len(cd))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
 
     # Size Plot:
-    abc = area_between_curves(ss, gt_ss) / len(log)
+    abc = area_between_curves(ss, gt_ss)
     figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
     figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
     f = plt.figure()
     plt.xlabel("frame")
     plt.ylabel("size")
     tx = "abc = {0}".format(abc)
-    plt.text(5.05, 0.05, tx)
+    bbox_props = dict(boxstyle="round", fc="w", ec="0.5", alpha=0.7)
+    plt.text(5.05, 0.05, tx, bbox=bbox_props)
     plt.plot(dim, ss, 'r-', label='predicted size')
     plt.plot(dim, gt_ss, 'g-', label='groundtruth size', alpha=0.7)
     plt.fill_between(dim, ss, gt_ss, color="y")
@@ -224,6 +227,7 @@ def do_tracking_evaluation(tracking):
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     evaluation['area_between_size_curves'] = abc
+    plt.close()
 
     # distances:
     figure_file2 = os.path.join(tracking_dir, 'relative_center_distance.svg')
@@ -238,6 +242,7 @@ def do_tracking_evaluation(tracking):
     plt.xlim(5, len(rcd))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
 
     figure_file2 = os.path.join(tracking_dir, 'overlap_score.svg')
     figure_file3 = os.path.join(tracking_dir, 'overlap_score.pdf')
@@ -249,6 +254,7 @@ def do_tracking_evaluation(tracking):
     plt.ylim(ymin=0.0, ymax=1.0)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
 
     figure_file2 = os.path.join(tracking_dir, 'adjusted_overlap_score.svg')
     figure_file3 = os.path.join(tracking_dir, 'adjusted_overlap_score.pdf')
@@ -260,6 +266,7 @@ def do_tracking_evaluation(tracking):
     plt.ylim(ymin=0.0, ymax=1.0)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
 
     # eval from paper:
     dfun = build_dist_fun(cd)
@@ -277,8 +284,10 @@ def do_tracking_evaluation(tracking):
     plt.text(5.05, 0.05, tx)
     plt.xlabel("center distance [pixels]")
     plt.ylabel("occurrence")
-    plt.xlim(xmin=0, xmax=400)
+    plt.xlim(xmin=0, xmax=50)
     plt.ylim(ymin=0.0, ymax=1.0)
+    ind = np.where(x == 20.0)[0][0]
+    plt.axvline(x=x[ind], color='c', linestyle=':', label='precision at 20px')
     plt.plot(x, y)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)

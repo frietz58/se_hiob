@@ -153,7 +153,8 @@ def area_between_curves(curve1, curve2):
     for i in range(0, len(curve1)):
         abc += abs(curve1[i] - curve2[i])
 
-    return abc
+    abc = abc / len(curve1)
+    round(abc, 2)
 
 
 # creates the graphs for a single sequence

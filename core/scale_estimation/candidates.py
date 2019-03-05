@@ -1,6 +1,8 @@
 import logging
 import numpy as np
 from ..Rect import Rect
+import os
+from PIL import Image, ImageDraw
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +82,7 @@ class CandidateApproach:
         self.calc_manual_scale_window(step_size=self.scale_window_step_size)
         self.hanning_scale_window = np.hanning(self.number_scales)
 
-    def generate_scaled_candidates(self, frame):
+    def generate_scaled_candidates(self, frame, tracking):
         """
         generates the candidates based on the predicted position but at different scale levels. Depending on the
         settings in the configuration, either candidates will only be scaled, or will be scaled along x or y axis
@@ -104,8 +106,8 @@ class CandidateApproach:
                 scale_factor = scale_factors[i]
 
                 # calc new width and height
-                new_w = round(self.base_target_size[0] * self.current_scale_factor)
-                new_h = round(self.base_target_size[1] * self.current_scale_factor)
+                new_w = round(self.base_target_size[0] * scale_factor)
+                new_h = round(self.base_target_size[1] * scale_factor)
 
                 # adjust x and y pos so that the box remains centered when height/width change
                 old_x = self.frame.predicted_position.center[0]
@@ -152,17 +154,21 @@ class CandidateApproach:
 
                 scaled_width_box = Rect(
                     new_x,
-                    old_y,
+                    self.frame.predicted_position.y,
                     new_w,
                     self.frame.predicted_position.h)
                 scaled_predictions[0].append(scaled_width_box)
 
                 scaled_height_box = Rect(
-                    old_x,
+                    self.frame.predicted_position.x,
                     new_y,
                     self.frame.predicted_position.w,
                     new_h)
                 scaled_predictions[1].append(scaled_height_box)
+
+        # for creating images...
+        if False:
+            self.create_image_with_generated_candidates(scaled_predictions, tracking, frame)
 
         return scaled_predictions
 
@@ -488,3 +494,77 @@ class CandidateApproach:
             new_h = self.frame.size[2]
 
         return new_x, new_y, new_w, new_h
+
+    def create_image_with_generated_candidates(self, scaled_predictions, tracking, frame):
+        image_dir = os.path.join("images", tracking.sample.name)
+        if not os.path.exists(image_dir):
+            os.makedirs(image_dir)
+
+        conolidator_img1 = tracking.get_frame_consolidation_images(decorations=False)['single']
+        conolidator_img2 = tracking.get_frame_consolidation_images(decorations=False)['single']
+
+        sroi_img1 = tracking.get_frame_sroi_image(decorations=False)
+        sroi_img2 = tracking.get_frame_sroi_image(decorations=False)
+
+        capture_img1 = tracking.get_frame_capture_image(decorations=False)
+        capture_img2 = tracking.get_frame_capture_image(decorations=False)
+
+
+        consolidator_draw1 = ImageDraw.Draw(conolidator_img1)
+        consolidator_draw2 = ImageDraw.Draw(conolidator_img2)
+
+        sroi_draw1 = ImageDraw.Draw(sroi_img1)
+        sroi_draw2 = ImageDraw.Draw(sroi_img2)
+
+        capture_draw1 = ImageDraw.Draw(capture_img1)
+        capture_draw2 = ImageDraw.Draw(capture_img2)
+
+        if not self.change_aspect_ration:
+            for i, rect in enumerate(scaled_predictions):
+                if i % 5 == 0 or i == 0 or i == 32:
+                    sroi_pos = tracking.capture_to_sroi(rect, frame.roi).inner
+                    sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
+
+                    cap_pos = rect.inner
+                    capture_draw1.rectangle(cap_pos, None, tracking.colours['candidate'])
+
+                if i == 0:
+                    cons_pos = tracking.capture_to_mask(
+                        rect, frame.roi).inner
+                    consolidator_draw1.rectangle(cons_pos, None, tracking.colours['roi'])
+
+                if i == 32:
+                    cons_pos = tracking.capture_to_mask(
+                        rect, frame.roi).inner
+                    consolidator_draw2.rectangle(cons_pos, None, tracking.colours['roi'])
+
+            conolidator_img1.save(os.path.join(image_dir, "{}-consolidator_0th_cand.png".format(tracking.get_current_frame_number())))
+            conolidator_img2.save(os.path.join(image_dir, "{}-consolidator_32th_cand.png".format(tracking.get_current_frame_number())))
+
+            sroi_img1.save(os.path.join(image_dir, "{}-sroi_candidates.png".format(tracking.get_current_frame_number())))
+            capture_img1.save(os.path.join(image_dir, "{}-capture_candidates.png".format(tracking.get_current_frame_number())))
+
+        elif self.change_aspect_ration:
+            for i in range(0, np.shape(scaled_predictions)[1]):
+                if i % 5 == 0 or i == 0 or i == 32:
+                    cap_pos_width = scaled_predictions[0][i].inner
+                    capture_draw1.rectangle(cap_pos_width, None, tracking.colours['candidate'])
+
+                    cap_pos_height = scaled_predictions[1][i].inner
+                    capture_draw2.rectangle(cap_pos_height, None, tracking.colours['candidate'])
+
+                    sroi_pos_width = tracking.capture_to_sroi(scaled_predictions[0][i], frame.roi).inner
+                    sroi_draw1.rectangle(sroi_pos_width, None, tracking.colours['candidate'])
+
+                    sroi_pos_width = tracking.capture_to_sroi(scaled_predictions[1][i], frame.roi).inner
+                    sroi_draw2.rectangle(sroi_pos_width, None, tracking.colours['candidate'])
+
+
+            capture_img1.save(os.path.join(image_dir, "{}-capture_width_candidates.png".format(tracking.get_current_frame_number())))
+            capture_img2.save(os.path.join(image_dir, "{}-capture_height_candidates.png".format(tracking.get_current_frame_number())))
+
+            sroi_img1.save(os.path.join(image_dir, "{}-sroi_width_candidates.png".format(tracking.get_current_frame_number())))
+            sroi_img2.save(os.path.join(image_dir, "{}-sroi_height_candidates.png".format(tracking.get_current_frame_number())))
+
+
+

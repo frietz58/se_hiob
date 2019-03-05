@@ -194,7 +194,6 @@ class App:
              'sample_text': "Sample %s/%s, Attributes: %s" % (
                 sample.set_name, sample.name, ', '.join(sample.attributes)),
              'video_text': "Frame #%04d/%04d" % (sample.current_frame_id, sample.get_actual_frames())
-             #'fourier_image': tracking.get_frame_fourier_image()
              })
         while not tracking.feature_selection_done() and not threading.current_thread().terminating:
             self.verify_running()
@@ -264,9 +263,9 @@ class App:
         return tracking
 
     def save_images(self, tracking):
-        heatmap = tracking.get_frame_consolidation_images(decorations=False)['single']
-        sroi = tracking.get_frame_sroi_image(decorations=False)
-        capture_image = tracking.get_frame_capture_image(decorations=False)
+        heatmap = tracking.get_frame_consolidation_images(decorations=True)['single']
+        sroi = tracking.get_frame_sroi_image(decorations=True)
+        capture_image = tracking.get_frame_capture_image(decorations=True)
         result = tracking.get_frame_sroi_image()
 
         image_dir = os.path.join("images", tracking.sample.name)

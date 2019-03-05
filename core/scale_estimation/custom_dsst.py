@@ -53,8 +53,39 @@ class CustomDsst:
         self.sz = None
         self.scale_model_factor = None
         self.scale_model_max_area = None
+        self.initialized_model = False
 
     def configure(self, conf, img_files):
+
+        # reset values form previous session
+        self.img_frames = None
+        self.scale_factors = None
+        self.x_scale_factors = None
+        self.y_scale_factors = None
+        self.current_scale_factor = None
+        self.current_x_scale_factor = None
+        self.current_y_scale_factor = None
+        self.min_scale_factor = None
+        self.max_scale_factor = None
+        self.frame = None
+        self.scale_samples = []
+        self.scale_window = None
+        self.ysf = None
+        self.num = None
+        self.den = None
+        self.x_num = None
+        self.y_num = None
+        self.x_den = None
+        self.y_den = None
+        self.frame_history = []
+        self.response_history = []
+        self.init_target_size = None
+        self.base_target_size = None
+        self.sz = None
+        self.scale_model_factor = None
+        self.scale_model_max_area = None
+        self.initialized_model = False
+
         self.number_scales = conf['dsst_number_scales']
         self.scale_step = conf['scale_factor']
         self.scale_sigma_factor = conf['scale_sigma_factor']
@@ -117,15 +148,15 @@ class CustomDsst:
         self.min_scale_factor = 0.15
         self.max_scale_factor = 13.6528
 
-    def dsst(self, frame):
+    def dsst(self, frame, tracking):
 
         self.frame = frame
 
         # all frames except initial
-        if self.frame.number > 1:
+        if self.initialized_model:
 
             # extract the test sample for the feature map for the scale filter
-            sample = self.extract_scale_sample(self.frame)
+            sample = self.extract_scale_sample(self.frame, tracking)
 
             # calculate the correlation response
             if not self.d_change_aspect_ratio:
@@ -176,7 +207,7 @@ class CustomDsst:
                     self.y_scale_factors[y_recovered_scale]
 
         # extract training sample for current frame, with updated scale
-        sample = self.extract_scale_sample(self.frame)
+        sample = self.extract_scale_sample(self.frame, tracking)
 
         # calculate scale filter update
         # for static aspect ratio
@@ -198,19 +229,21 @@ class CustomDsst:
             new_y_den = np.sum(np.real(np.multiply(y_f_sample, np.conj(y_f_sample))), axis=0)
 
         # if initial frame, train on image
-        if frame.number == 1 and not self.d_change_aspect_ratio:
+        if not self.initialized_model and not self.d_change_aspect_ratio:
             self.num = new_num
             self.den = new_den
+            self.initialized_model = True
 
-        elif frame.number == 1 and self.d_change_aspect_ratio:
+        elif not self.initialized_model and self.d_change_aspect_ratio:
             self.x_num = new_x_num
             self.y_num = new_y_num
 
             self.x_den = new_x_den
             self.y_den = new_y_den
+            self.initialized_model = True
 
         # update the model
-        elif frame.number > 1 and not self.d_change_aspect_ratio:
+        elif self.initialized_model and not self.d_change_aspect_ratio:
             new_num = np.add(
                 np.multiply((1 - self.learning_rate), self.num),
                 np.multiply(self.learning_rate, new_num))
@@ -222,7 +255,7 @@ class CustomDsst:
             self.num = new_num
             self.den = new_den
 
-        elif frame.number > 1 and self.d_change_aspect_ratio:
+        elif self.initialized_model and self.d_change_aspect_ratio:
             new_x_num = np.add(
                 np.multiply((1 - self.learning_rate), self.x_num),
                 np.multiply(self.learning_rate, new_x_num))
@@ -264,7 +297,7 @@ class CustomDsst:
 
         return Rect(new_x, new_y, new_target_size[0], new_target_size[1])
 
-    def extract_scale_sample(self, frame):
+    def extract_scale_sample(self, frame, tracking):
         global out
         self.frame = frame
         im = self.img_files[frame.number]
@@ -375,6 +408,9 @@ class CustomDsst:
                 img_patch_resized = cv2.resize(img_patch,
                                                (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
 
+                if i == 0 or i == 16 or i == 32:
+                    self.save_image_patch(tracking, img_patch_resized, i)
+
                 # extract the hog features
                 temp_hog = self.hog_vector(img_patch_resized)
 
@@ -415,10 +451,11 @@ class CustomDsst:
         return out
 
     def hog_vector(self, img_patch_resized):
+        # TODO use original model size
         winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
         blockSize = (4, 4)  # for illumination: large block = local changes less significant
         blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
-        cellSize = (4, 4)  # defines how big the features are that get extracted
+        cellSize = (1, 1)  # defines how big the features are that get extracted
         nbins = 9  # number of bins in histogram
         derivAperture = 1  # shouldn't be relevant
         winSigma = -1.  # shouldn't be relevant
@@ -443,3 +480,12 @@ class CustomDsst:
             multiples.append(base * i)
 
         return min(multiples, key=lambda x: abs(x - val))
+
+    def save_image_patch(self, tracking, img_patch_resized, i):
+
+        image_dir = os.path.join("images", tracking.sample.name)
+        if not os.path.exists(image_dir):
+            os.makedirs(image_dir)
+
+        cv2.imwrite(os.path.join(image_dir, "{0}_resized_patch_{1}.png".format(tracking.get_current_frame_number(), i)), img_patch_resized)
+
