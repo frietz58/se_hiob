@@ -135,31 +135,23 @@ class ScaleEstimator:
         # update strategies:
         # continuous, update on every frame
         if self.update_strategy == "cont":
+            logger.info("cont execution SE")
             final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
 
         # static, update every x frames
-        elif self.update_strategy == "static":
-            if self.passed_since_last_se == self.static_update_val:
+        elif self.update_strategy == "high_gain":
+            if self.passed_since_last_se == 20:
+                logger.info("20 frames passed without updating the scale, enforcing execution of SE")
+                final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
+                self.passed_since_last_se = 0
+            elif frame.prediction_quality >= 0.2 and frame.prediction_quality <= 0.4:
+                logger.info("frame.prediciotn_quality = {0}, lies within window, executing SE".format(frame.prediction_quality))
                 final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
                 self.passed_since_last_se = 0
             else:
+                logger.info("not executing SE")
+                final_candidate = frame.predicted_position
                 self.passed_since_last_se += 1
-                final_candidate = frame.predicted_position
-
-        # dynamic, update every time the quality gets smaller than threshold, indicating change in appearance
-        elif self.update_strategy == "dynamic":
-            if prediction_quality <= self.dyn_max_se_treshold:
-                final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
-            else:
-                final_candidate = frame.predicted_position
-
-        # limited, dynamic but only if quality still good enough
-        elif self.update_strategy == "limited":
-            if self.dyn_max_se_treshold >= prediction_quality >= self.dyn_min_se_treshold:
-                final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
-            else:
-
-                final_candidate = frame.predicted_position
 
         # if the quality of the prediction is too low. return unscaled bounding box
         # if prediction_quality < self.min_se_treshold and self.use_update_strategies:
