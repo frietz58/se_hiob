@@ -445,7 +445,7 @@ class CandidateApproach:
         """
 
         # initialize with zeros
-        curve = [0] * self.number_scales
+        curve = [0] * int(self.number_scales)
 
         if np.mod(len(curve), 2) == 0:
             raise ValueError('Number of Candidate (from configuration) needs to be odd!')

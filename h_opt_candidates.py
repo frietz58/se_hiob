@@ -186,9 +186,9 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
 
 def change_c_number_scales(start, step, i, direction):
     if direction == "bigger":
-        return float(np.around(start + step ** i, decimals=2))
+        return int(np.around(start + step ** i, decimals=2))
     elif direction == "smaller":
-        return float(np.around(start - step ** i, decimals=2))
+        return int(np.around(start - step ** i, decimals=2))
 
 
 def change_inner_punish_threshold(start, step, i, direction):
@@ -215,7 +215,7 @@ def change_scale_window_step_size(start, step, i, direction):
 
 def change_adjust_max_scale_diff_after(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
-    return float(np.around(start + (step * i), decimals=0))
+    return int(np.around(start + (step * i), decimals=0))
 
 
 if __name__ == '__main__':

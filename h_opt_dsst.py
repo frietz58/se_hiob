@@ -182,9 +182,9 @@ def change_learning_rate(start, step, i, direction):
 
 def change_scale_model_max(start, step, i, direction):
     if direction == "bigger":
-        return float(np.around(start * step ** i, decimals=2))
+        return int(np.around(start * step ** i, decimals=2))
     elif direction == "smaller":
-        return float(np.around(start * (2 - step) ** i, decimals=2))
+        return int(np.around(start * (2 - step) ** i, decimals=2))
 
 
 def change_scale_model_size(start, step, i, direction):
@@ -198,11 +198,11 @@ def change_scale_model_size(start, step, i, direction):
 
 def change_dsst_number_scales(start, step, i, direction):
     if direction == "bigger":
-        return float(np.around(start + step ** i, decimals=2))
+        return int(np.around(start + step ** i, decimals=2))
     elif direction == "smaller":
-        if float(np.around(start - step ** i, decimals=2)) < 10:
+        if int(np.around(start - step ** i, decimals=2)) < 10:
             raise ValueTooSmallError
-        return float(np.around(start - step ** i, decimals=2))
+        return int(np.around(start - step ** i, decimals=2))
 
 
 if __name__ == '__main__':

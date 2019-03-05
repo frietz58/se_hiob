@@ -5,10 +5,10 @@
 # Can be fed to program via command line argument --environment [path]
 
 # name describing this environment (for log purposes):
-environment_name: candidates
+environment_name: dsst
 
 # directory to which execution logs are written:
-log_dir: ../candidates_opt/dsst_number_scales
+log_dir: ../dsst_opt/scale_factor
 
 # directory in which data samples are kept:
 data_dir: ./data
