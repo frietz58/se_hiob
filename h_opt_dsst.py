@@ -210,7 +210,7 @@ if __name__ == '__main__':
     if args.gpu is None:
         args.gpu = 0
 
-    test = True
+    test = False
 
     change_parameter(parameter_name='scale_factor', additional_parameters=[
         ["use_scale_estimation", True],
