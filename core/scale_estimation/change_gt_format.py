@@ -56,7 +56,7 @@ def change_single_sequence(sequence_dir):
                 if ".jpg" in img and img[0] == "0":
                     number_of_imgs += 1
                     full_img_path = os.path.join(sequence_dir, 'imgs/' + img)
-                    target = sequence_dir + "/img0" + img
+                    target = sequence_dir + "/imgs/img0" + img
                     os.rename(full_img_path, target)
 
             # make new frames file
