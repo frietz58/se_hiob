@@ -1,17 +1,15 @@
 import argparse
 import os
+import errno
 
 parser = argparse.ArgumentParser(description="Changes the Structure of a TB100 sequence so that is can be run with the "
                                              "old matlab dsst implementation. The imgs will be renamed, the frames.txt "
                                              "file generated and the gt.txt file will be formatted.")
 
-parser.add_argument("-pts", "--path", help="Absolute path to sequence folder in which the img folder and gt.txt file "
+parser.add_argument("-pts", "--path", help="Absolute path to sequences folder in a folder exists for each sequence."
                                            "is located.")
 args = parser.parse_args()
-
-# get the path from the commandline argument
 path = args.path
-print("Sequence folder path: " + path)
 
 # change working dir into sequence folder
 os.chdir(path)
@@ -21,46 +19,65 @@ print("changed working dir to : " + os.getcwd())
 root_content = os.listdir(os.getcwd())
 print("content of the sequence dir: " + str(root_content))
 
-# get sample name for name of new file
-split_path = path.split("/")
-sample_name = split_path[-1]
-number_of_imgs = 0
 
-for item in root_content:
-    if item == "groundtruth_rect.txt":
-        with open(item, "r") as file_object:
-            # read the data
-            text = file_object.read()
-            formatted_text = text.replace("\t", ",")
+def change_single_sequence(sequence_dir):
+    print("")
+    # get sample name for name of new file
+    sample_name = sequence_dir.split("/")[-1]
+    number_of_imgs = 0
 
-            # write formatted data into new file
-            new_gt = open(sample_name + "_gt.txt", "w")
-            new_gt.write(formatted_text)
-            new_gt.close()
+    # if structure has a second folder (inconsistent in tb100 in dataset...)
+    if sample_name in os.listdir(sequence_dir):
+        sequence_dir = os.path.join(sequence_dir, sample_name)
 
-        print("made a new file " + sample_name + "_gt.txt file in " + path)
+    for item in os.listdir(sequence_dir):
 
-    elif item == "img":
-        # rename the folder
-        os.rename("img", "imgs")
-        print("changed foldername 'img' to 'imgs'")
+        if item == "groundtruth_rect.txt":
+            with open(os.path.join(sequence_dir, 'groundtruth_rect.txt'), "r") as file_object:
+                # read the data
+                text = file_object.read()
+                formatted_text = text.replace("\t", ",")
 
-        # go into imgs folder and rename all the jpg files accordingly
-        os.chdir("./imgs")
+                # write formatted data into new file
+                new_gt = open(os.path.join(sequence_dir, sample_name + "_gt.txt"), "w")
+                new_gt.write(formatted_text)
+                new_gt.close()
 
-        # get a list of everything in the folder and rename all jpg's where the first char is a zero
-        imgs_content = os.listdir(os.getcwd())
-        for img in imgs_content:
-            if ".jpg" in img and img[0] == "0":
-                number_of_imgs += 1
-                os.rename(img, "img0" + img)
-        print("renamed the img files from 0001.jpg to img00001.jpg")
+            print("made a new file " + sample_name + "_gt.txt file in " + path)
 
-        # go back into the main root dir and crate the frames.txt file
-        os.chdir("../")
-        frames_txt = open(sample_name + "_frames.txt", "w")
-        frames_txt.write("1," + str(number_of_imgs))
-        frames_txt.close()
-        print("created " + sample_name + "_frames.txt in " + path)
+        elif item == "img":
+            # rename the folder
+            os.rename(os.path.join(sequence_dir, "img"), os.path.join(sequence_dir, "imgs"))
+            print("changed foldername 'img' to 'imgs'")
 
-print("done")
+            # get a list of everything in the folder and rename all jpg's where the first char is a zero
+            imgs_content = os.listdir(sequence_dir + '/imgs')
+            for img in imgs_content:
+                if ".jpg" in img and img[0] == "0":
+                    number_of_imgs += 1
+                    full_img_path = os.path.join(sequence_dir, 'imgs/' + img)
+                    target = sequence_dir + "/img0" + img
+                    os.rename(full_img_path, target)
+
+            # make new frames file
+            frame_file_name = sample_name + "_frames.txt"
+            frames_txt = open(os.path.join(sequence_dir, frame_file_name), "w")
+            frames_txt.write("1," + str(number_of_imgs))
+            frames_txt.close()
+            print("created " + sample_name + "_frames.txt in " + sequence_dir)
+
+
+def change_every_sequence(sequences_dir):
+    # get all sequences
+    sequences = []
+    for item in os.listdir(sequences_dir):
+        if os.path.isdir(os.path.join(sequences_dir, item)):
+            sequences.append(os.path.join(sequences_dir, item))
+
+    for sequence_dir in sequences:
+        print(sequence_dir)
+        change_single_sequence(sequence_dir)
+
+
+if __name__ == "__main__":
+    change_every_sequence(path)

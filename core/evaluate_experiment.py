@@ -571,13 +571,13 @@ def get_params_of_tracking(experiment_folder):
 
 # check whether tracking run completed
 def is_valid_tracking(tracking_dir):
-
     return "evaluation.txt" in os.listdir(tracking_dir)
 
 
 
 
 if __name__ == '__main__':
+    # eval_tracking(results_path)
     # eval_all_trackings()
     create_opt_csv(results_path)
     # get_params_of_tracking(results_path)
