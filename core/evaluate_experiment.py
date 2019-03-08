@@ -463,7 +463,7 @@ def create_opt_csv(experiment_folder):
     trackings = get_tracking_folders(experiment_folder)
 
     csv_name = experiment_folder + "/parameter_comparision.csv"
-    with open(csv_name, 'w', newline='') as outcsv:
+    with open(csv_name, 'w', newline='1') as outcsv:
         writer = csv.DictWriter(outcsv,
                                 fieldnames=["Avg. Success",
                                             "Avg. Precision",
@@ -478,41 +478,42 @@ def create_opt_csv(experiment_folder):
         writer.writeheader()
 
         for tracking_dir in trackings:
-            with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
-                lines = evaltxt.readlines()
-                avg_succ = lines[25].replace("\n", "").split("=")[1]
-                avg_prec = lines[24].replace("\n", "").split("=")[1]
-                total_secs = lines[12].replace("\n", "").split("=")[1]
+            if is_valid_tracking(tracking_dir):
+                with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
+                    lines = evaltxt.readlines()
+                    avg_succ = lines[25].replace("\n", "").split("=")[1]
+                    avg_prec = lines[24].replace("\n", "").split("=")[1]
+                    total_secs = lines[12].replace("\n", "").split("=")[1]
 
-            if "tracker.yaml" in os.listdir(tracking_dir):
-                with open(tracking_dir + "/tracker.yaml", "r") as stream:
-                    try:
-                        configuration = yaml.safe_load(stream)
-                        scale_estimator_conf = configuration["scale_estimator"]
-                        adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
-                        adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
-                        inner_thresh = scale_estimator_conf["inner_punish_threshold"]
-                        outer_thresh = scale_estimator_conf["outer_punish_threshold"]
-                        number_c = scale_estimator_conf["c_number_scales"]
-                        max_diff = scale_estimator_conf["max_scale_difference"]
-                        window_step_size = scale_estimator_conf["scale_window_step_size"]
+                if "tracker.yaml" in os.listdir(tracking_dir):
+                    with open(tracking_dir + "/tracker.yaml", "r") as stream:
+                        try:
+                            configuration = yaml.safe_load(stream)
+                            scale_estimator_conf = configuration["scale_estimator"]
+                            adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
+                            adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
+                            inner_thresh = scale_estimator_conf["inner_punish_threshold"]
+                            outer_thresh = scale_estimator_conf["outer_punish_threshold"]
+                            number_c = scale_estimator_conf["c_number_scales"]
+                            max_diff = scale_estimator_conf["max_scale_difference"]
+                            window_step_size = scale_estimator_conf["scale_window_step_size"]
 
-                    except yaml.YAMLError as exc:
-                        print(exc)
+                        except yaml.YAMLError as exc:
+                            print(exc)
 
-            else:
-                print("no tracker.yaml configuration found")
+                else:
+                    print("no tracker.yaml configuration found")
 
-            writer.writerow({'Avg. Success': avg_succ,
-                             'Avg. Precision': avg_prec,
-                             'Total Secs': total_secs,
-                             'adjust_max_scale_diff': adj_max_dif,
-                             'adjust_max_scale_diff_after': adj_max_dif_after,
-                             'inner_punish_threshold': inner_thresh,
-                             'outer_punish_threshold': outer_thresh,
-                             'c_number_scales': number_c,
-                             'max_scale_difference': max_diff,
-                             'scale_window_step_size': window_step_size})
+                writer.writerow({'Avg. Success': avg_succ,
+                                 'Avg. Precision': avg_prec,
+                                 'Total Secs': total_secs,
+                                 'adjust_max_scale_diff': adj_max_dif,
+                                 'adjust_max_scale_diff_after': adj_max_dif_after,
+                                 'inner_punish_threshold': inner_thresh,
+                                 'outer_punish_threshold': outer_thresh,
+                                 'c_number_scales': number_c,
+                                 'max_scale_difference': max_diff,
+                                 'scale_window_step_size': window_step_size})
 
 
 # get params for tracking run
@@ -527,9 +528,6 @@ def get_params_of_tracking(experiment_folder):
 
     # get one tracking
     for tracking_dir in trackings:
-
-
-
         if "tracker.yaml" in os.listdir(tracking_dir):
             with open(tracking_dir + "/tracker.yaml", "r") as stream:
                 try:
