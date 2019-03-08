@@ -56,8 +56,8 @@ def normalize_size_datapoints(log):
         gt_size_scores.append(line['result']['gt_size_score'])
 
     # normalize each size score
-    max_val = max((max(size_scores), max(gt_size_scores)))
-    min_val = min((min(size_scores),  min(gt_size_scores)))
+    max_val = max(gt_size_scores)
+    min_val = min(gt_size_scores)
 
     for line in log:
         line['result']['size_score'] = (line['result']['size_score'] - min_val) / (max_val - min_val + 0.0025) * 100

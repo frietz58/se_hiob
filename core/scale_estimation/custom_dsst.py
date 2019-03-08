@@ -220,7 +220,7 @@ class CustomDsst:
         # for dynamic aspect ratio
         elif self.d_change_aspect_ratio:
             x_f_sample = np.fft.fft(sample['x'])
-            y_f_sample = np.fft.fft(sample['x'])
+            y_f_sample = np.fft.fft(sample['y'])
 
             new_x_num = np.multiply(self.ysf, np.conj(x_f_sample))
             new_y_num = np.multiply(self.ysf, np.conj(y_f_sample))

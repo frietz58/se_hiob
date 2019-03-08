@@ -114,7 +114,7 @@ scale_estimator:
   scale_model_size: 16
   padding: 1.0
   dsst_number_scales: 33 # number of scaled candidates to generate
-  d_change_aspect_ratio: false
+  d_change_aspect_ratio: true
 
   # candidate params:
   c_scale_factor: 1.02 # scale factor between candidates
@@ -135,14 +135,14 @@ tracking:
 # = Short Test Set = #
 #- tb100/Deer
 #- tb100/DragonBaby
-- tb100/CarScale
-- tb100/Walking
+#- tb100/CarScale
+#- tb100/Walking
 
 # = Training Set = #
 #- tb100/Basketball
 #- tb100/Biker
 #- tb100/Bird2
-#- tb100/Box
+- tb100/Box
 #- tb100/Freeman3
 #- tb100/Panda
 #- tb100/ClifBar
