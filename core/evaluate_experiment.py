@@ -463,7 +463,7 @@ def create_opt_csv(experiment_folder):
     trackings = get_tracking_folders(experiment_folder)
 
     csv_name = experiment_folder + "/parameter_comparision.csv"
-    with open(csv_name, 'w', newline='1') as outcsv:
+    with open(csv_name, 'w', newline='') as outcsv:
         writer = csv.DictWriter(outcsv,
                                 fieldnames=["Avg. Success",
                                             "Avg. Precision",
@@ -474,7 +474,8 @@ def create_opt_csv(experiment_folder):
                                             "outer_punish_threshold",
                                             "c_number_scales",
                                             "max_scale_difference",
-                                            "scale_window_step_size"])
+                                            "scale_window_step_size",
+                                            "c_scale_factor"])
         writer.writeheader()
 
         for tracking_dir in trackings:
@@ -497,6 +498,7 @@ def create_opt_csv(experiment_folder):
                             number_c = scale_estimator_conf["c_number_scales"]
                             max_diff = scale_estimator_conf["max_scale_difference"]
                             window_step_size = scale_estimator_conf["scale_window_step_size"]
+                            scale_factor = scale_estimator_conf["c_scale_factor"]
 
                         except yaml.YAMLError as exc:
                             print(exc)
@@ -513,7 +515,8 @@ def create_opt_csv(experiment_folder):
                                  'outer_punish_threshold': outer_thresh,
                                  'c_number_scales': number_c,
                                  'max_scale_difference': max_diff,
-                                 'scale_window_step_size': window_step_size})
+                                 'scale_window_step_size': window_step_size,
+                                 'c_scale_factor': scale_factor})
 
 
 # get params for tracking run
