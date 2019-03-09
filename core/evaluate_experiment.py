@@ -467,7 +467,7 @@ def create_opt_csv(experiment_folder):
     approach = get_approach_from_yaml(trackings[0])
 
     # create head with parameters
-    if approach == "Candidates dynamic" or "Candidates static":
+    if approach == "Candidates dynamic" or approach == "Candidates static":
         with open(csv_name, 'w', newline='') as outcsv:
             writer = csv.DictWriter(outcsv,
                                     fieldnames=["Avg. Success",
@@ -481,6 +481,7 @@ def create_opt_csv(experiment_folder):
                                                 "max_scale_difference",
                                                 "scale_window_step_size",
                                                 "c_scale_factor"])
+            writer.writeheader()
 
     elif approach == "DSST":
         with open(csv_name, 'w', newline='') as outcsv:
@@ -495,74 +496,73 @@ def create_opt_csv(experiment_folder):
                                                 "scale_model_size",
                                                 "scale_sigma_factor"])
 
-        writer.writeheader()
+            writer.writeheader()
 
-        for tracking_dir in trackings:
-            if is_valid_tracking(tracking_dir):
-                with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
-                    lines = evaltxt.readlines()
-                    avg_succ = lines[25].replace("\n", "").split("=")[1]
-                    avg_prec = lines[24].replace("\n", "").split("=")[1]
-                    total_secs = lines[12].replace("\n", "").split("=")[1]
+            for tracking_dir in trackings:
+                if is_valid_tracking(tracking_dir):
+                    with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
+                        lines = evaltxt.readlines()
+                        avg_succ = lines[25].replace("\n", "").split("=")[1]
+                        avg_prec = lines[24].replace("\n", "").split("=")[1]
+                        total_secs = lines[12].replace("\n", "").split("=")[1]
 
-                if "tracker.yaml" in os.listdir(tracking_dir):
-                    with open(tracking_dir + "/tracker.yaml", "r") as stream:
-                        if approach == "Candidates dynamic" or "Candidates static":
-                            try:
-                                configuration = yaml.safe_load(stream)
-                                scale_estimator_conf = configuration["scale_estimator"]
-                                adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
-                                adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
-                                inner_thresh = scale_estimator_conf["inner_punish_threshold"]
-                                outer_thresh = scale_estimator_conf["outer_punish_threshold"]
-                                number_c = scale_estimator_conf["c_number_scales"]
-                                max_diff = scale_estimator_conf["max_scale_difference"]
-                                window_step_size = scale_estimator_conf["scale_window_step_size"]
-                                c_scale_factor = scale_estimator_conf["c_scale_factor"]
+                    if "tracker.yaml" in os.listdir(tracking_dir):
+                        with open(tracking_dir + "/tracker.yaml", "r") as stream:
+                            if approach == "Candidates dynamic" or approach == "Candidates static":
+                                try:
+                                    configuration = yaml.safe_load(stream)
+                                    scale_estimator_conf = configuration["scale_estimator"]
+                                    adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
+                                    adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
+                                    inner_thresh = scale_estimator_conf["inner_punish_threshold"]
+                                    outer_thresh = scale_estimator_conf["outer_punish_threshold"]
+                                    number_c = scale_estimator_conf["c_number_scales"]
+                                    max_diff = scale_estimator_conf["max_scale_difference"]
+                                    window_step_size = scale_estimator_conf["scale_window_step_size"]
+                                    c_scale_factor = scale_estimator_conf["c_scale_factor"]
 
-                            except yaml.YAMLError as exc:
-                                print(exc)
-                        elif approach == "DSST":
-                            try:
-                                configuration = yaml.safe_load(stream)
-                                scale_estimator_conf = configuration["scale_estimator"]
-                                dsst_number_scales = scale_estimator_conf["dsst_number_scales"]
-                                learning_rate = scale_estimator_conf["learning_rate"]
-                                d_scale_factor = scale_estimator_conf["scale_factor"]
-                                scale_model_max = scale_estimator_conf["scale_model_max"]
-                                scale_model_size = scale_estimator_conf["scale_model_size"]
-                                scale_sigma_factor = scale_estimator_conf["scale_sigma_factor"]
+                                except yaml.YAMLError as exc:
+                                    print(exc)
 
+                                writer.writerow({'Avg. Success': avg_succ,
+                                                 'Avg. Precision': avg_prec,
+                                                 'Total Secs': total_secs,
+                                                 'adjust_max_scale_diff': adj_max_dif,
+                                                 'adjust_max_scale_diff_after': adj_max_dif_after,
+                                                 'inner_punish_threshold': inner_thresh,
+                                                 'outer_punish_threshold': outer_thresh,
+                                                 'c_number_scales': number_c,
+                                                 'max_scale_difference': max_diff,
+                                                 'scale_window_step_size': window_step_size,
+                                                 'c_scale_factor': c_scale_factor})
 
-                            except yaml.YAMLError as exc:
-                                print(exc)
+                            elif approach == "DSST":
+                                try:
+                                    configuration = yaml.safe_load(stream)
+                                    scale_estimator_conf = configuration["scale_estimator"]
+                                    dsst_number_scales = scale_estimator_conf["dsst_number_scales"]
+                                    learning_rate = scale_estimator_conf["learning_rate"]
+                                    d_scale_factor = scale_estimator_conf["scale_factor"]
+                                    scale_model_max = scale_estimator_conf["scale_model_max"]
+                                    scale_model_size = scale_estimator_conf["scale_model_size"]
+                                    scale_sigma_factor = scale_estimator_conf["scale_sigma_factor"]
 
-                else:
-                    print("no tracker.yaml configuration found")
+                                except yaml.YAMLError as exc:
+                                    print(exc)
 
-                if approach == "Candidates dynamic" or "Candidates static":
-                    writer.writerow({'Avg. Success': avg_succ,
-                                     'Avg. Precision': avg_prec,
-                                     'Total Secs': total_secs,
-                                     'adjust_max_scale_diff': adj_max_dif,
-                                     'adjust_max_scale_diff_after': adj_max_dif_after,
-                                     'inner_punish_threshold': inner_thresh,
-                                     'outer_punish_threshold': outer_thresh,
-                                     'c_number_scales': number_c,
-                                     'max_scale_difference': max_diff,
-                                     'scale_window_step_size': window_step_size,
-                                     'c_scale_factor': c_scale_factor})
+                                writer.writerow({'Avg. Success': avg_succ,
+                                                 'Avg. Precision': avg_prec,
+                                                 'Total Secs': total_secs,
+                                                 'dsst_number_scales': dsst_number_scales,
+                                                 'learning_rate': learning_rate,
+                                                 'd_scale_factor': d_scale_factor,
+                                                 'scale_model_max': scale_model_max,
+                                                 'scale_model_size': scale_model_size,
+                                                 'scale_sigma_factor': scale_sigma_factor})
 
-                elif approach == "DSST":
-                    writer.writerow({'Avg. Success': avg_succ,
-                                     'Avg. Precision': avg_prec,
-                                     'Total Secs': total_secs,
-                                     'dsst_number_scales': dsst_number_scales,
-                                     'learning_rate': learning_rate,
-                                     'd_scale_factor': d_scale_factor,
-                                     'scale_model_max': scale_model_max,
-                                     'scale_model_size': scale_model_size,
-                                     'scale_sigma_factor': scale_sigma_factor})
+                    else:
+                        print("no tracker.yaml configuration found")
+
 
 # get params for tracking run
 def get_params_of_tracking(experiment_folder):
