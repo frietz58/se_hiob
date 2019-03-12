@@ -332,7 +332,6 @@ class CandidateApproach:
         #TODO also make this use the max of base candidate not entire feature mask...
         max_val = np.amax(feature_mask)
         if max_val < self.inner_punish_threshold:
-            # TODO make custom error class
             raise ValueError('Highest probability is smaller than threshold')
 
         # punish candidate for containing values smaller than threshold
@@ -350,6 +349,7 @@ class CandidateApproach:
         feature_values = candidate_on_mask[mask_filter]
 
         # sum values up to get inner punish score
+        # TODO use 1 - value for inner sum?
         inner_punish_sum = np.sum(feature_values)
 
         # calculate a score that punishes the candidate for not containing values bigger than threshold
@@ -509,6 +509,7 @@ class CandidateApproach:
         capture_img1 = tracking.get_frame_capture_image(decorations=False)
         capture_img2 = tracking.get_frame_capture_image(decorations=False)
 
+        # selection_mask_images = tracking.get_frame_selection_mask_images(decorations=True)
 
         consolidator_draw1 = ImageDraw.Draw(conolidator_img1)
         consolidator_draw2 = ImageDraw.Draw(conolidator_img2)
@@ -558,7 +559,6 @@ class CandidateApproach:
 
                     sroi_pos_width = tracking.capture_to_sroi(scaled_predictions[1][i], frame.roi).inner
                     sroi_draw2.rectangle(sroi_pos_width, None, tracking.colours['candidate'])
-
 
             capture_img1.save(os.path.join(image_dir, "{}-capture_width_candidates.png".format(tracking.get_current_frame_number())))
             capture_img2.save(os.path.join(image_dir, "{}-capture_height_candidates.png".format(tracking.get_current_frame_number())))

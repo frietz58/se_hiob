@@ -8,7 +8,7 @@
 environment_name: dsst
 
 # directory to which execution logs are written:
-log_dir: ../dsst_opt/scale_factor
+log_dir: ../dsst_opt/dsst_number_scales
 
 # directory in which data samples are kept:
 data_dir: ./data

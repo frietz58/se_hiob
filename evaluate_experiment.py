@@ -1,5 +1,5 @@
 import os
-from Rect import Rect
+from core.Rect import Rect
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,15 +12,14 @@ parser = argparse.ArgumentParser(description="Evaluates the results of a HIOB tr
                                              "the tracker. Additionally, precision and success will be calculated for "
                                              "the groups of attributes from the tb100")
 
-parser.add_argument("-ptr", "--pathresults", help="Absolute path to the folder which contains the tracking logs of "
-                                                  "the experiment.")
+parser.add_argument("-ptr", "--pathresults", help="Absolute path to the folder which contains the different tracking "
+                                                  "folder of the experiment (tracking folder = hiob_execution...)")
 
 parser.add_argument("-pta", "--attributes", help="Absolute path to the TB100 collection file, which contains the "
                                                  "attributes for each sequence.")
 
 args = parser.parse_args()
 
-# get the path from the commandline argument
 results_path = args.pathresults
 attributes_path = args.attributes
 
