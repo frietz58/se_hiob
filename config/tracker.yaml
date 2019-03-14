@@ -103,7 +103,7 @@ scale_estimator:
   static_update_val: 20
 
   # Determines which approach to use for scale estimation. candidates or custom_dsst
-  approach: candidates
+  approach: custom_dsst
 
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls
@@ -134,9 +134,9 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 # = Short Test Set = #
-#- tb100/Deer
-#- tb100/DragonBaby
-#- tb100/CarScale
+- tb100/Deer
+- tb100/DragonBaby
+- tb100/CarScale
 - tb100/Walking
 
 # = Training Set = #

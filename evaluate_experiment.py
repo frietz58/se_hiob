@@ -390,6 +390,10 @@ def create_tracking_results_csv(tracking_dir):
 
     # get the results for every sequence into on csv
     csv_name = tracking_dir + '/evaluation/' + approach + '_sequence_results.csv'
+
+    if not os.path.isdir(os.path.join(tracking_dir, "evaluation")):
+        os.mkdir(os.path.join(tracking_dir, "evaluation"))
+
     with open(csv_name, 'w', newline='') as outcsv:
         writer = csv.DictWriter(outcsv,
                                 fieldnames=["Sample", "Frames", "Framerate", "Precision", "Success", "Size Diff"])
@@ -501,6 +505,7 @@ def create_opt_csv(experiment_folder):
                 if is_valid_tracking(tracking_dir):
                     with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
                         lines = evaltxt.readlines()
+                        # TODO go over lines, split and take the one of the name...
                         avg_succ = lines[25].replace("\n", "").split("=")[1]
                         avg_prec = lines[24].replace("\n", "").split("=")[1]
                         total_secs = lines[12].replace("\n", "").split("=")[1]
@@ -620,6 +625,8 @@ def is_valid_tracking(tracking_dir):
 
 
 if __name__ == '__main__':
+    # eval_sequences(["/home/finn/parameter_opt_results/dsst_opt/dsst_number_scales/hiob-execution-wtmgws11-2019-03-07-01.30.26.272361/tracking-0001-tb100-Basketball"])
+    # create_tracking_results_csv("/home/finn/parameter_opt_results/dsst_opt/dsst_number_scales/hiob-execution-wtmgws11-2019-03-07-01.30.26.272361")
     # eval_tracking(results_path)
     # eval_all_trackings()
     create_opt_csv(results_path)

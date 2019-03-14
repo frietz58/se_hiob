@@ -58,6 +58,8 @@ def normalize_size_datapoints(log):
     # normalize each size score
     max_val = max(gt_size_scores)
     min_val = min(gt_size_scores)
+    if min_val == max_val:
+        min_val = 1
 
     for line in log:
         line['result']['size_score'] = (line['result']['size_score'] - min_val) / (max_val - min_val + 0.0025) * 100
@@ -383,6 +385,7 @@ def do_tracker_evaluation(tracker):
     sroi_generation_sum = 0.0
     feature_reduction_sum = 0.0
     feature_consolidation_sum = 0.0
+    se_sum = 0.0
     preparing_sum = 0.0
     precision_sum = 0.0
     relative_precision_sum = 0.0
@@ -416,7 +419,7 @@ def do_tracker_evaluation(tracker):
             feature_extraction_sum += e['feature_extraction_frame_rate']
             feature_reduction_sum += e['feature_reduction_frame_rate']
             feature_consolidation_sum += e['feature_consolidation_frame_rate']
-            se_sum = e['se_frame_rate']
+            se_sum += e['se_frame_rate']
             precision_sum += e['precision_rating']
             relative_precision_sum += e['relative_precision_rating']
             success_sum += e['success_rating']
