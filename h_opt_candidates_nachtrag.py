@@ -236,9 +236,9 @@ def change_adjust_max_scale_diff(start, step, i, direction):
 if __name__ == '__main__':
 
     if args.gpu is None:
-        args.gpu = 0
+        args.gpu = 2
 
-    test = True
+    test = False
 
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='adjust_max_scale_diff', additional_parameters=[
