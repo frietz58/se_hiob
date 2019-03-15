@@ -294,11 +294,11 @@ def create_sequence_score_csv(result_folder, eval_folder):
             score_dict = get_metrics_from_rects(os.path.join(results_path, sequence))
             sequence_name = sequence.split("-")[-1]
             writer.writerow({
-                 "Sample": sequence_name,
-                 "Frames": score_dict["Frames"],
-                 "Precision": score_dict["Total Precision"],
-                 "Success": score_dict["Total Success"],
-                 "Size Score": score_dict["Size Score"]
+                "Sample": sequence_name,
+                "Frames": score_dict["Frames"],
+                "Precision": score_dict["Total Precision"],
+                "Success": score_dict["Total Success"],
+                "Size Score": score_dict["Size Score"]
             })
 
 
@@ -359,7 +359,6 @@ def create_attribute_score_csv(result_folder, eval_folder):
 
 # create a csv comparring the trackings in one csv folder (opt)
 def create_opt_csv(experiment_folder, eval_folder):
-
     filename = experiment_folder.split("/")[-1] + "_opt.csv"
     csv_name = os.path.join(experiment_folder, filename)
 
@@ -369,36 +368,21 @@ def create_opt_csv(experiment_folder, eval_folder):
 
     # create head with parameters
     if approach == "Candidates dynamic" or approach == "Candidates static":
-        with open(csv_name, 'w', newline='') as outcsv:
-            writer = csv.DictWriter(outcsv,
-                                    fieldnames=["Avg. Success",
-                                                "Avg. Precision",
-                                                "Framerate",
-                                                "SE Framerate"
-                                                "adjust_max_scale_diff",
-                                                "adjust_max_scale_diff_after",
-                                                "inner_punish_threshold",
-                                                "outer_punish_threshold",
-                                                "c_number_scales",
-                                                "max_scale_difference",
-                                                "scale_window_step_size",
-                                                "c_scale_factor"])
-            writer.writeheader()
+        with open(csv_name, mode='w') as outcsv:
+            c_fieldnames = ["Avg_Success",
+                            "Avg_Precision",
+                            "Framerate",
+                            "SE_Framerate",
+                            "adjust_max_scale_diff",
+                            "adjust_max_scale_diff_after",
+                            "inner_punish_threshold",
+                            "outer_punish_threshold",
+                            "c_number_scales",
+                            "max_scale_difference",
+                            "scale_window_step_size",
+                            "c_scale_factor"]
 
-    elif approach == "DSST dynamic" or approach == "DSST static":
-        with open(csv_name, 'w', newline='') as outcsv:
-            writer = csv.DictWriter(outcsv,
-                                    fieldnames=["Avg. Success",
-                                                "Avg. Precision",
-                                                "Framerate",
-                                                "SE Framerate",
-                                                "dsst_number_scales",
-                                                "learning_rate",
-                                                "d_scale_factor",
-                                                "scale_model_max",
-                                                "scale_model_size",
-                                                "scale_sigma_factor"])
-
+            writer = csv.DictWriter(outcsv, fieldnames=c_fieldnames)
             writer.writeheader()
 
             for tracking_dir in trackings:
@@ -418,59 +402,92 @@ def create_opt_csv(experiment_folder, eval_folder):
 
                 if "tracker.yaml" in os.listdir(tracking_dir):
                     with open(tracking_dir + "/tracker.yaml", "r") as stream:
-                        if approach == "Candidates dynamic" or approach == "Candidates static":
-                            try:
-                                configuration = yaml.safe_load(stream)
-                                scale_estimator_conf = configuration["scale_estimator"]
-                                adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
-                                adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
-                                inner_thresh = scale_estimator_conf["inner_punish_threshold"]
-                                outer_thresh = scale_estimator_conf["outer_punish_threshold"]
-                                number_c = scale_estimator_conf["c_number_scales"]
-                                max_diff = scale_estimator_conf["max_scale_difference"]
-                                window_step_size = scale_estimator_conf["scale_window_step_size"]
-                                c_scale_factor = scale_estimator_conf["c_scale_factor"]
+                        try:
+                            configuration = yaml.safe_load(stream)
+                            scale_estimator_conf = configuration["scale_estimator"]
+                            adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
+                            adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
+                            inner_thresh = scale_estimator_conf["inner_punish_threshold"]
+                            outer_thresh = scale_estimator_conf["outer_punish_threshold"]
+                            number_c = scale_estimator_conf["c_number_scales"]
+                            max_diff = scale_estimator_conf["max_scale_difference"]
+                            window_step_size = scale_estimator_conf["scale_window_step_size"]
+                            c_scale_factor = scale_estimator_conf["c_scale_factor"]
 
-                            except yaml.YAMLError as exc:
-                                print(exc)
+                        except yaml.YAMLError as exc:
+                            print(exc)
 
-                            writer.writerow({'Avg. Success': avg_succ,
-                                             'Avg. Precision': avg_prec,
-                                             'Framerate': frame_rate,
-                                             'SE Framerate': se_framerate,
-                                             'adjust_max_scale_diff': adj_max_dif,
-                                             'adjust_max_scale_diff_after': adj_max_dif_after,
-                                             'inner_punish_threshold': inner_thresh,
-                                             'outer_punish_threshold': outer_thresh,
-                                             'c_number_scales': number_c,
-                                             'max_scale_difference': max_diff,
-                                             'scale_window_step_size': window_step_size,
-                                             'c_scale_factor': c_scale_factor})
+                        writer.writerow({'Avg_Success': avg_succ,
+                                         'Avg_Precision': avg_prec,
+                                         'Framerate': frame_rate,
+                                         'SE_Framerate': se_framerate,
+                                         'adjust_max_scale_diff': adj_max_dif,
+                                         'adjust_max_scale_diff_after': adj_max_dif_after,
+                                         'inner_punish_threshold': inner_thresh,
+                                         'outer_punish_threshold': outer_thresh,
+                                         'c_number_scales': number_c,
+                                         'max_scale_difference': max_diff,
+                                         'scale_window_step_size': window_step_size,
+                                         'c_scale_factor': c_scale_factor})
 
-                        elif approach == "DSST dynamic" or approach == "DSST static":
-                            try:
-                                configuration = yaml.safe_load(stream)
-                                scale_estimator_conf = configuration["scale_estimator"]
-                                dsst_number_scales = scale_estimator_conf["dsst_number_scales"]
-                                learning_rate = scale_estimator_conf["learning_rate"]
-                                d_scale_factor = scale_estimator_conf["scale_factor"]
-                                scale_model_max = scale_estimator_conf["scale_model_max"]
-                                scale_model_size = scale_estimator_conf["scale_model_size"]
-                                scale_sigma_factor = scale_estimator_conf["scale_sigma_factor"]
+    elif approach == "DSST dynamic" or approach == "DSST static":
+        with open(csv_name, "w", newline='') as outcsv:
+            fieldnames = ["Avg_Success",
+                          "Avg_Precision",
+                          "Framerate",
+                          "SE_Framerate",
+                          "dsst_number_scales",
+                          "learning_rate",
+                          "d_scale_factor",
+                          "scale_model_max",
+                          "scale_model_size",
+                          "scale_sigma_factor"]
 
-                            except yaml.YAMLError as exc:
-                                print(exc)
+            writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
+            writer.writeheader()
 
-                            writer.writerow({'Avg. Success': avg_succ,
-                                             'Avg. Precision': avg_prec,
-                                             'Framerate': frame_rate,
-                                             'SE Framerate': se_framerate,
-                                             'dsst_number_scales': dsst_number_scales,
-                                             'learning_rate': learning_rate,
-                                             'd_scale_factor': d_scale_factor,
-                                             'scale_model_max': scale_model_max,
-                                             'scale_model_size': scale_model_size,
-                                             'scale_sigma_factor': scale_sigma_factor})
+            for tracking_dir in trackings:
+                with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
+                    lines = evaltxt.readlines()
+                    for line in lines:
+                        line = line.replace("\n", "")
+                        key_val = line.split("=")
+                        if key_val[0] == "average_precision_rating":
+                            avg_prec = key_val[1]
+                        elif key_val[0] == "average_success_rating":
+                            avg_succ = key_val[1]
+                        elif key_val[0] == "frame_rate":
+                            frame_rate = key_val[1]
+                        elif key_val[0] == "se_frame_rate":
+                            se_framerate = key_val[1]
+
+                if "tracker.yaml" in os.listdir(tracking_dir):
+                    with open(tracking_dir + "/tracker.yaml", "r") as stream:
+                        try:
+                            configuration = yaml.safe_load(stream)
+                            scale_estimator_conf = configuration["scale_estimator"]
+                            dsst_number_scales = scale_estimator_conf["dsst_number_scales"]
+                            learning_rate = scale_estimator_conf["learning_rate"]
+                            d_scale_factor = scale_estimator_conf["scale_factor"]
+                            scale_model_max = scale_estimator_conf["scale_model_max"]
+                            scale_model_size = scale_estimator_conf["scale_model_size"]
+                            scale_sigma_factor = scale_estimator_conf["scale_sigma_factor"]
+
+                        except yaml.YAMLError as exc:
+                            print(exc)
+
+                        writer.writerow({'Avg. Success': avg_succ,
+                                         'Avg. Precision': avg_prec,
+                                         'Framerate': frame_rate,
+                                         'SE Framerate': se_framerate,
+                                         'dsst_number_scales': dsst_number_scales,
+                                         'learning_rate': learning_rate,
+                                         'd_scale_factor': d_scale_factor,
+                                         'scale_model_max': scale_model_max,
+                                         'scale_model_size': scale_model_size,
+                                         'scale_sigma_factor': scale_sigma_factor})
+
+    return None
 
 
 # create the graphs from rects
@@ -533,7 +550,7 @@ def create_graphs_from_rects(result_folder, eval_folder):
     plt.xlabel("frame")
     plt.ylabel("size")
     plt.text(x=10, y=10, s="abc={0}".format(abc))
-    plt.plot(dim, normalized_size_score, 'r-', label='predicted size')
+    plt.plot(dim, normalized_size_score, 'r-', label='predi                                    cted size')
     plt.plot(dim, normalized_gt_size_scores, 'g-', label='groundtruth size', alpha=0.7)
     plt.fill_between(dim, normalized_size_score, normalized_gt_size_scores, color="y")
     plt.axhline(y=normalized_size_score[0], color='c', linestyle=':', label='initial size')
@@ -650,16 +667,19 @@ def determine_folder_type(folder):
             elif "hiob-execution" in file:
                 found_hiob_execution = True
 
-
-    if found_positions_txt and not (found_mat_files or found_tracker_config or found_tracking_folder or found_hiob_execution):
+    if found_positions_txt and not (
+            found_mat_files or found_tracker_config or found_tracking_folder or found_hiob_execution):
         return "hiob_sequence_folder"
-    elif found_tracker_config and found_tracking_folder and not (found_mat_files or found_positions_txt or found_hiob_execution):
+    elif found_tracker_config and found_tracking_folder and not (
+            found_mat_files or found_positions_txt or found_hiob_execution):
         return "hiob_tracking_folder"
-    elif found_mat_files and not (found_positions_txt or found_tracking_folder or found_tracker_config or found_hiob_execution):
+    elif found_mat_files and not (
+            found_positions_txt or found_tracking_folder or found_tracker_config or found_hiob_execution):
         return "matlab_tracking_folder"
     elif not_a_folder and "results.mat" in folder:
         return "matlab_sequnce_file"
-    elif found_hiob_execution and not (found_positions_txt or found_tracker_config or found_tracking_folder or found_mat_files):
+    elif found_hiob_execution and not (
+            found_positions_txt or found_tracker_config or found_tracking_folder or found_mat_files):
         return "multiple_hiob_executions"
 
 
@@ -691,7 +711,7 @@ def get_approach_from_yaml(tracking_dir):
             algorithm = "DSST static"
 
         elif scale_estimator_conf["use_scale_estimation"] \
-                and scale_estimator_conf["approach"] == "custom_dsst"\
+                and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
             algorithm = "DSST dynamic"
 
@@ -757,7 +777,7 @@ def get_tracking_folder(experiment_dir):
         if os.path.isdir(os.path.join(experiment_dir, item)):
             tracking_items = os.listdir(os.path.join(experiment_dir, item))
 
-            if "tracker.yaml"in tracking_items and "trackings.txt" in tracking_items \
+            if "tracker.yaml" in tracking_items and "trackings.txt" in tracking_items \
                     and "evaluation.txt" in tracking_items:
                 trackings.append(os.path.join(experiment_dir, item))
 
@@ -785,3 +805,4 @@ if __name__ == "__main__":
     # experiment folder containing multiple hiob executions, h_opt for example
     elif folder_type == "multiple_hiob_executions":
         create_opt_csv(results_path, "opt")
+        print("here")

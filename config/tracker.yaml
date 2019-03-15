@@ -103,7 +103,7 @@ scale_estimator:
   static_update_val: 20
 
   # Determines which approach to use for scale estimation. candidates or custom_dsst
-  approach: custom_dsst
+  approach: candidates
 
   #dsst params:
   scale_factor: 1.02  # scale factor between scale lvls
