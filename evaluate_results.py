@@ -476,10 +476,10 @@ def create_opt_csv(experiment_folder, eval_folder):
                         except yaml.YAMLError as exc:
                             print(exc)
 
-                        writer.writerow({'Avg. Success': avg_succ,
-                                         'Avg. Precision': avg_prec,
+                        writer.writerow({'Avg_Success': avg_succ,
+                                         'Avg_Precision': avg_prec,
                                          'Framerate': frame_rate,
-                                         'SE Framerate': se_framerate,
+                                         'SE_Framerate': se_framerate,
                                          'dsst_number_scales': dsst_number_scales,
                                          'learning_rate': learning_rate,
                                          'd_scale_factor': d_scale_factor,
