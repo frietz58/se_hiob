@@ -159,32 +159,30 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
     gc.collect()
 
     # make val smaller
-    print("Decreasing Parameter Value: ")
-    for i in range(1, times + 1):
+    if not only_one_dir:
+        print("Decreasing Parameter Value: ")
+        for i in range(1, times + 1):
 
-        if only_one_dir:
-            break
+            # val_change = start  (step ** i) - 1
+            val_change = change_function(start, step, i, "smaller")
+            if val_change is None:
+                continue
+            print(val_change)
 
-        # val_change = start  (step ** i) - 1
-        val_change = change_function(start, step, i, "smaller")
-        if val_change is None:
-            continue
-        print(val_change)
+            val_changes_smaller = additional_parameters
+            val_changes_smaller.append([str(parameter_name), val_change])
 
-        val_changes_smaller = additional_parameters
-        val_changes_smaller.append([str(parameter_name), val_change])
+            set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
+                       save_to=args.tracker)
 
-        set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
-                   save_to=args.tracker)
+            environment_change = [["environment_name", "candidates"],
+                                  ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+            set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
-        environment_change = [["environment_name", "candidates"],
-                              ["log_dir", "../candidates_opt/" + str(parameter_name)]]
-        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
-
-        if not test:
-            subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
-        gc.collect()
-    print()
+            if not test:
+                subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
+            gc.collect()
+        print()
 
 
 def change_c_number_scales(start, step, i, direction):
@@ -252,19 +250,11 @@ if __name__ == '__main__':
     ], start=True, step=1, times=1, change_function=change_adjust_max_scale_diff, test=test, only_one_dir=True)
 
     print("==== new parameter ==== \n")
-    change_parameter(parameter_name='inner_punish_threshold', additional_parameters=[
+    change_parameter(parameter_name='scale_window_step_size', additional_parameters=[
         ["use_scale_estimation", True],
         ["update_strategy", "cont"],
         ["approach", "candidates"],
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
-    ], start=0.5, step=1.05, times=7, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
+    ], start=0.005, step=1.02, times=10, change_function=change_scale_window_step_size, test=test, only_one_dir=True)
 
-    print("==== new parameter ==== \n")
-    change_parameter(parameter_name='outer_punish_threshold', additional_parameters=[
-        ["use_scale_estimation", True],
-        ["update_strategy", "cont"],
-        ["approach", "candidates"],
-        ["c_change_aspect_ratio", False],
-        ["adjust_max_scale_diff", False]
-    ], start=0.5, step=1.05, times=7, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)

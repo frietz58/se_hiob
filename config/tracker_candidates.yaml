@@ -122,10 +122,11 @@ scale_estimator:
   outer_punish_threshold: 0.78 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
   c_number_scales: 25 # number of scaled candidates to generate
   max_scale_difference: 0.01 # max value the scale may change between two frames
-  scale_window_step_size: 0.066 # the deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
+  scale_window_step_size: 0.005 # the deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
   adjust_max_scale_diff: false # adjust the max_scale_difference value if the factor has been limited n time sin a row, necessary for extreme scale changes that exceed the max_scale_difference between frames
   adjust_max_scale_diff_after: 10 # the number after how many times of the scale factor being limited the max scale_difference gets adjusted
   c_change_aspect_ratio: false # change aspect ratio of bouding box
+
 
 
 # = tracking =
