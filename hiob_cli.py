@@ -66,7 +66,7 @@ def main():
 
     if args.gpu is not None:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
-        logger.info("GPU specified, setting cuda_visivle_devices = {0}".format(args.gpu))
+        print("GPU specified, setting cuda_visivle_devices = {0}".format(args.gpu))
 
     ev = track(environment_path=args.environment, tracker_path=args.tracker,
                ros_config=None if args.ros_subscribe is None and args.ros_publish is None
