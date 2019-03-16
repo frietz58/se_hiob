@@ -238,7 +238,7 @@ if __name__ == '__main__':
     if args.gpu is None:
         args.gpu = 2
 
-    test = False
+    test = True
 
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='adjust_max_scale_diff', additional_parameters=[
