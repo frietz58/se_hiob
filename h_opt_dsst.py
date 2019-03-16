@@ -85,37 +85,34 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
     gc.collect()
 
     # make val smaller
+    if not only_one_dir:
+        print("Decreasing Parameter Value: ")
+        for i in range(1, times_per_dir + 1):
 
-    print("Decreasing Parameter Value: ")
-    for i in range(1, times_per_dir + 1):
+            # val_change = start  (step ** i) - 1
+            try:
+                val_change = change_function(start, step, i, "smaller")
+            except ValueTooSmallError:
+                print("Value resulting from decrease function is smaller than threshold, stopping decrease for the "
+                      "current parameter")
+                break
 
-        if only_one_dir:
-            break
+            print(val_change)
 
-        # val_change = start  (step ** i) - 1
-        try:
-            val_change = change_function(start, step, i, "smaller")
-        except ValueTooSmallError:
-            print("Value resulting from decrease function is smaller than threshold, stopping decrease for the "
-                  "current parameter")
-            break
+            val_changes_smaller = additional_parameters
+            val_changes_smaller.append([str(parameter_name), val_change])
 
-        print(val_change)
+            set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
+                       save_to=args.tracker)
 
-        val_changes_smaller = additional_parameters
-        val_changes_smaller.append([str(parameter_name), val_change])
+            environment_change = [["environment_name", "dsst"],
+                                  ["log_dir", "../dsst_opt/" + str(parameter_name)]]
+            set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
-        set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
-                   save_to=args.tracker)
-
-        environment_change = [["environment_name", "dsst"],
-                              ["log_dir", "../dsst_opt/" + str(parameter_name)]]
-        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
-
-        if not test:
-            subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
-        gc.collect()
-    print()
+            if not test:
+                subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
+            gc.collect()
+        print()
 
 
 def change_c_number_scales(start, step, i, direction):

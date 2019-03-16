@@ -25,6 +25,7 @@ class CustomDsst:
         self.padding = None
         self.static_model_size = None
         self.d_change_aspect_ratio = None
+        self.hog_cell_size = None
 
         # run time
         self.img_frames = None
@@ -85,6 +86,7 @@ class CustomDsst:
         self.scale_model_factor = None
         self.scale_model_max_area = None
         self.initialized_model = False
+        self.hog_cell_size = None
 
         self.number_scales = conf['dsst_number_scales']
         self.scale_step = conf['scale_factor']
@@ -96,6 +98,13 @@ class CustomDsst:
         self.padding = conf['padding']
         self.scale_model_max_area = conf['scale_model_max']
         self.d_change_aspect_ratio = conf['d_change_aspect_ratio']
+        self.hog_cell_size = conf['hog_cell_size']
+        hog_cell_size_tuple = ()
+        for char in self.hog_cell_size:
+            if str.isdigit(char):
+                hog_cell_size_tuple = hog_cell_size_tuple + (int(char),)
+
+        self.hog_cell_size = hog_cell_size_tuple
 
     def handle_initial_frame(self, frame):
         self.init_target_size = [frame.ground_truth.w, frame.ground_truth.h]
@@ -132,9 +141,9 @@ class CustomDsst:
 
         self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
 
-        # find a size that is closest to multiple of 4 (dsst uses that as bin size)
-        x_dim = self.get_closest_match(base=4, val=self.scale_model_size[0])
-        y_dim = self.get_closest_match(base=4, val=self.scale_model_size[1])
+        # find a size that is closest to multiple of 4 (dsst uses that as cell size)
+        x_dim = self.get_closest_match(base=self.hog_cell_size[0], val=self.scale_model_size[0])
+        y_dim = self.get_closest_match(base=self.hog_cell_size[1], val=self.scale_model_size[1])
 
         self.scale_model_size = [x_dim, y_dim]
 
@@ -446,7 +455,7 @@ class CustomDsst:
 
                 # punish each candidate based on its divergence to 1
                 out['x'][:, i] = np.multiply(x_hog.flatten(), self.scale_window[i])
-                out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])
+                out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])(self.hog_cell_size[0], self.hog_cell_size[1])
 
         return out
 
@@ -455,7 +464,7 @@ class CustomDsst:
         winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
         blockSize = (4, 4)  # for illumination: large block = local changes less significant
         blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
-        cellSize = (1, 1)  # defines how big the features are that get extracted
+        cellSize = self.hog_cell_size  # defines how big the features are that get extracted
         nbins = 9  # number of bins in histogram
         derivAperture = 1  # shouldn't be relevant
         winSigma = -1.  # shouldn't be relevant
