@@ -135,32 +135,32 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 # = Short Test Set = #
-- tb100/Deer
-- tb100/DragonBaby
-- tb100/CarScale
-- tb100/Walking
+#- tb100/Deer
+#- tb100/DragonBaby
+#- tb100/CarScale
+#- tb100/Walking
 
 # = Training Set = #
-#- tb100/Basketball
-#- tb100/Biker
-#- tb100/Bird2
-#- tb100/Box
-#- tb100/Freeman3
-#- tb100/Panda
-#- tb100/ClifBar
-#- tb100/Crowds
-#- tb100/RedTeam
-#- tb100/BlurFace
-#- tb100/Singer2
-#- tb100/Soccer
-#- tb100/Car1
-#- tb100/Liquor
-#- tb100/Bird1
-#- tb100/DragonBaby
-#- tb100/Deer
-#- tb100/Diving
-#- tb100/Dudek
-#- tb100/David
+- tb100/Basketball
+- tb100/Biker
+- tb100/Bird2
+- tb100/Box
+- tb100/Freeman3
+- tb100/Panda
+- tb100/ClifBar
+- tb100/Crowds
+- tb100/RedTeam
+- tb100/BlurFace
+- tb100/Singer2
+- tb100/Soccer
+- tb100/Car1
+- tb100/Liquor
+- tb100/Bird1
+- tb100/DragonBaby
+- tb100/Deer
+- tb100/Diving
+- tb100/Dudek
+- tb100/David
 
 # = TB100 = #
 #- tb100/Basketball

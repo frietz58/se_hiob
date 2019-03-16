@@ -141,9 +141,9 @@ class CustomDsst:
 
         self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
 
-        # find a size that is closest to multiple of 4 (dsst uses that as cell size)
-        x_dim = self.get_closest_match(base=self.hog_cell_size[0], val=self.scale_model_size[0])
-        y_dim = self.get_closest_match(base=self.hog_cell_size[1], val=self.scale_model_size[1])
+        # find a size that is closest to multiple of 4 (dsst uses that as block size)
+        x_dim = self.get_closest_match(base=4, val=self.scale_model_size[0])
+        y_dim = self.get_closest_match(base=4, val=self.scale_model_size[1])
 
         self.scale_model_size = [x_dim, y_dim]
 
@@ -460,7 +460,6 @@ class CustomDsst:
         return out
 
     def hog_vector(self, img_patch_resized):
-        # TODO use original model size
         winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
         blockSize = (4, 4)  # for illumination: large block = local changes less significant
         blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize

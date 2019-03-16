@@ -550,7 +550,7 @@ def create_graphs_from_rects(result_folder, eval_folder):
     plt.xlabel("frame")
     plt.ylabel("size")
     plt.text(x=10, y=10, s="abc={0}".format(abc))
-    plt.plot(dim, normalized_size_score, 'r-', label='predi                                    cted size')
+    plt.plot(dim, normalized_size_score, 'r-', label='predicted size')
     plt.plot(dim, normalized_gt_size_scores, 'g-', label='groundtruth size', alpha=0.7)
     plt.fill_between(dim, normalized_size_score, normalized_gt_size_scores, color="y")
     plt.axhline(y=normalized_size_score[0], color='c', linestyle=':', label='initial size')
@@ -782,6 +782,11 @@ def get_tracking_folder(experiment_dir):
                 trackings.append(os.path.join(experiment_dir, item))
 
     return trackings
+
+
+# check whether tracking run completed
+def is_valid_tracking(tracking_dir):
+    return "evaluation.txt" in os.listdir(tracking_dir)
 
 
 if __name__ == "__main__":
