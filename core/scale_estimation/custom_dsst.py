@@ -158,7 +158,7 @@ class CustomDsst:
             (np.shape(frame.capture_image)[0], np.shape(frame.capture_image)[1]), self.base_target_size)))
                                                               / np.log(self.scale_step)))
         #self.min_scale_factor = 0.15
-        +self.max_scale_factor = 13.6528
+        #self.max_scale_factor = 13.6528
 
     def dsst(self, frame, tracking):
 
