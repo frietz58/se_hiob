@@ -362,7 +362,7 @@ def create_opt_csv(experiment_folder, eval_folder):
     filename = experiment_folder.split("/")[-1] + "_opt.csv"
     csv_name = os.path.join(experiment_folder, filename)
 
-    trackings = get_tracking_folder(experiment_folder)
+    trackings = get_tracking_folders(experiment_folder)
 
     approach = get_approach_from_yaml(trackings[0])
 
@@ -384,6 +384,9 @@ def create_opt_csv(experiment_folder, eval_folder):
 
             writer = csv.DictWriter(outcsv, fieldnames=c_fieldnames)
             writer.writeheader()
+
+            # find dirs with same parameter value
+            same_parameter_collection = get_same_parameter_values(trackings)
 
             for tracking_dir in trackings:
                 with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
@@ -431,61 +434,95 @@ def create_opt_csv(experiment_folder, eval_folder):
                                          'c_scale_factor': c_scale_factor})
 
     elif approach == "DSST dynamic" or approach == "DSST static":
+
+        # find dirs with same parameter value
+        same_parameter_value_collection = get_same_parameter_values(trackings)
+        changing_parameter = same_parameter_value_collection[list(same_parameter_value_collection.keys())[0]][0]["parameter"]
+
         with open(csv_name, "w", newline='') as outcsv:
             fieldnames = ["Avg_Success",
                           "Avg_Precision",
                           "Framerate",
                           "SE_Framerate",
-                          "dsst_number_scales",
-                          "learning_rate",
-                          "d_scale_factor",
-                          "scale_model_max",
-                          "scale_model_size",
-                          "scale_sigma_factor"]
+                          changing_parameter]
 
             writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
             writer.writeheader()
 
-            for tracking_dir in trackings:
-                with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
-                    lines = evaltxt.readlines()
-                    for line in lines:
-                        line = line.replace("\n", "")
-                        key_val = line.split("=")
-                        if key_val[0] == "average_precision_rating":
-                            avg_prec = key_val[1]
-                        elif key_val[0] == "average_success_rating":
-                            avg_succ = key_val[1]
-                        elif key_val[0] == "frame_rate":
-                            frame_rate = key_val[1]
-                        elif key_val[0] == "se_frame_rate":
-                            se_framerate = key_val[1]
+            # get the average values for the same parameter value for a row in the opt csv
+            avg_succs = []
+            avg_precs = []
+            se_framerates = []
+            framerates = []
+            for value in same_parameter_value_collection.values():
+                # get value for one row
+                for single_tracking in value:
+                    with open(single_tracking["tracking"] + "/evaluation.txt", "r") as evaltxt:
+                        lines = evaltxt.readlines()
+                        for line in lines:
+                            line = line.replace("\n", "")
+                            key_val = line.split("=")
+                            if key_val[0] == "average_precision_rating":
+                                avg_precs.append(float(key_val[1]))
+                            elif key_val[0] == "average_success_rating":
+                                avg_succs.append(float(key_val[1]))
+                            elif key_val[0] == "frame_rate":
+                                framerates.append(float(key_val[1]))
+                            elif key_val[0] == "se_frame_rate":
+                                se_framerates.append(float(key_val[1]))
 
-                if "tracker.yaml" in os.listdir(tracking_dir):
-                    with open(tracking_dir + "/tracker.yaml", "r") as stream:
-                        try:
-                            configuration = yaml.safe_load(stream)
-                            scale_estimator_conf = configuration["scale_estimator"]
-                            dsst_number_scales = scale_estimator_conf["dsst_number_scales"]
-                            learning_rate = scale_estimator_conf["learning_rate"]
-                            d_scale_factor = scale_estimator_conf["scale_factor"]
-                            scale_model_max = scale_estimator_conf["scale_model_max"]
-                            scale_model_size = scale_estimator_conf["scale_model_size"]
-                            scale_sigma_factor = scale_estimator_conf["scale_sigma_factor"]
+                final_avg_succ = sum(avg_succs) / len(avg_succs) # sidn strings dirn, braucht ints...^^^^^^^^^
+                final_avg_precc = sum(avg_precs) / len(avg_precs)
+                final_framerate = sum(framerates) / len(framerates)
+                final_se_framerate = sum(se_framerates) / len(se_framerates)
 
-                        except yaml.YAMLError as exc:
-                            print(exc)
+                writer.writerow({'Avg_Success': final_avg_succ,
+                                 'Avg_Precision': final_avg_precc,
+                                 'Framerate': final_framerate,
+                                 'SE_Framerate': final_se_framerate,
+                                 changing_parameter: value[0]["value"]})
 
-                        writer.writerow({'Avg_Success': avg_succ,
-                                         'Avg_Precision': avg_prec,
-                                         'Framerate': frame_rate,
-                                         'SE_Framerate': se_framerate,
-                                         'dsst_number_scales': dsst_number_scales,
-                                         'learning_rate': learning_rate,
-                                         'd_scale_factor': d_scale_factor,
-                                         'scale_model_max': scale_model_max,
-                                         'scale_model_size': scale_model_size,
-                                         'scale_sigma_factor': scale_sigma_factor})
+
+
+            # for tracking_dir in trackings:
+            #     with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
+            #         lines = evaltxt.readlines()
+            #         for line in lines:
+            #             line = line.replace("\n", "")
+            #             key_val = line.split("=")
+            #             if key_val[0] == "average_precision_rating":
+            #                 avg_prec = key_val[1]
+            #             elif key_val[0] == "average_success_rating":
+            #                 avg_succ = key_val[1]
+            #             elif key_val[0] == "frame_rate":
+            #                 frame_rate = key_val[1]
+            #             elif key_val[0] == "se_frame_rate":
+            #                 se_framerate = key_val[1]
+            #     if "tracker.yaml" in os.listdir(tracking_dir):
+            #         with open(tracking_dir + "/tracker.yaml", "r") as stream:
+            #             try:
+            #                 configuration = yaml.safe_load(stream)
+            #                 scale_estimator_conf = configuration["scale_estimator"]
+            #                 dsst_number_scales = scale_estimator_conf["dsst_number_scales"]
+            #                 learning_rate = scale_estimator_conf["learning_rate"]
+            #                 d_scale_factor = scale_estimator_conf["scale_factor"]
+            #                 scale_model_max = scale_estimator_conf["scale_model_max"]
+            #                 scale_model_size = scale_estimator_conf["scale_model_size"]
+            #                 scale_sigma_factor = scale_estimator_conf["scale_sigma_factor"]
+            #
+            #             except yaml.YAMLError as exc:
+            #                 print(exc)
+            #
+            #             writer.writerow({'Avg_Success': avg_succ,
+            #                              'Avg_Precision': avg_prec,
+            #                              'Framerate': frame_rate,
+            #                              'SE_Framerate': se_framerate,
+            #                              'dsst_number_scales': dsst_number_scales,
+            #                              'learning_rate': learning_rate,
+            #                              'd_scale_factor': d_scale_factor,
+            #                              'scale_model_max': scale_model_max,
+            #                              'scale_model_size': scale_model_size,
+            #                              'scale_sigma_factor': scale_sigma_factor})
 
     return None
 
@@ -764,7 +801,7 @@ def get_attribute_collections(tracking_dir):
 
 
 # get the tracking folders of one experiment
-def get_tracking_folder(experiment_dir):
+def get_tracking_folders(experiment_dir):
     if os.path.isdir(experiment_dir):
         files_in_dir = os.listdir(experiment_dir)
     else:
@@ -782,6 +819,67 @@ def get_tracking_folder(experiment_dir):
                 trackings.append(os.path.join(experiment_dir, item))
 
     return trackings
+
+
+def get_same_parameter_values(trackings):
+    changing_parameter_values = {}
+    tracker_configs = []
+
+    # load all tracking_configurations
+    print("loading all tracker configurations...")
+    for tracking in trackings:
+        with open(tracking + "/tracker.yaml", "r") as stream:
+            try:
+                configuration = yaml.safe_load(stream)
+                scale_estimator_conf = configuration["scale_estimator"]
+                tracker_configs.append({"tracking": tracking, "conf": scale_estimator_conf})
+            except yaml.YAMLError as exc:
+                print(exc)
+
+    # find parameter that is changed in the current optimization folder
+    all_parameter_values = {}
+    for parameter in tracker_configs[0]["conf"].keys():
+        #all_parameter_values[str(parameter)] = {"tracking": tracking, "parameter": parameter}
+        all_parameter_values[str(parameter)] = []
+        for curr_dict in tracker_configs:
+            all_parameter_values[str(parameter)].append({"tracking": curr_dict["tracking"], "parameter": parameter, "value": curr_dict["conf"][parameter]})
+            #all_parameter_values[str(parameter)]["value"] = curr_dict["conf"][parameter]
+
+    print("finding tracker configuration which have the same value for the optimization parameter...")
+    # if the parameter has different values, it is a parameter changed in opt (hog opt changes multiple parameters)
+    for parameter in all_parameter_values:
+        # for special case adjust_max_scale_diff_after, which has different values but no impact
+        if parameter == 'adjust_max_scale_diff':
+            adjust_scale_diff_values = all_parameter_values[parameter]
+            adjust_scale_diff_values = [curr_dict["value"] for curr_dict in all_parameter_values[parameter]]
+        parameter_values = [curr_dict["value"] for curr_dict in all_parameter_values[parameter]]
+        if not only_item_in_list(all_parameter_values[parameter][0]["value"], parameter_values):
+            changing_parameter_values[str(parameter)] = all_parameter_values[parameter]
+
+    if 'adjust_max_scale_diff_after' in changing_parameter_values and only_item_in_list(False, adjust_scale_diff_values):
+        del changing_parameter_values["adjust_max_scale_diff_after"]
+
+    if 'hog_block_norm_size' in changing_parameter_values:
+        del changing_parameter_values["hog_block_norm_size"]
+
+    # get trackings where value is the same to average over those
+    parameter_value_trackings = {}
+    for item in changing_parameter_values:
+        for entry in changing_parameter_values[item]:
+            if str(entry["value"]) not in parameter_value_trackings.keys():
+                parameter_value_trackings[str(entry["value"])] = []
+            parameter_value_trackings[str(entry["value"])].append(entry)
+
+    # for each value of the changing parameter return the collection of trackings
+    return parameter_value_trackings
+
+
+def only_item_in_list(item, list_of_items):
+    for item_of_list in list_of_items:
+        if item_of_list != item:
+            return False
+    return True
+
 
 
 # check whether tracking run completed
