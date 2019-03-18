@@ -7,6 +7,12 @@ import numpy as np
 import csv
 import zipfile36
 import yaml
+import pandas as pd
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import numpy as np
 
 parser = argparse.ArgumentParser(description="Evaluates tracking results. Can be used on either a matlab result folder,"
                                              " a hiob sequence folder, a hiob tracking folder, or a hiob experiment "
@@ -482,48 +488,6 @@ def create_opt_csv(experiment_folder, eval_folder):
                                  'SE_Framerate': final_se_framerate,
                                  changing_parameter: value[0]["value"]})
 
-
-
-            # for tracking_dir in trackings:
-            #     with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
-            #         lines = evaltxt.readlines()
-            #         for line in lines:
-            #             line = line.replace("\n", "")
-            #             key_val = line.split("=")
-            #             if key_val[0] == "average_precision_rating":
-            #                 avg_prec = key_val[1]
-            #             elif key_val[0] == "average_success_rating":
-            #                 avg_succ = key_val[1]
-            #             elif key_val[0] == "frame_rate":
-            #                 frame_rate = key_val[1]
-            #             elif key_val[0] == "se_frame_rate":
-            #                 se_framerate = key_val[1]
-            #     if "tracker.yaml" in os.listdir(tracking_dir):
-            #         with open(tracking_dir + "/tracker.yaml", "r") as stream:
-            #             try:
-            #                 configuration = yaml.safe_load(stream)
-            #                 scale_estimator_conf = configuration["scale_estimator"]
-            #                 dsst_number_scales = scale_estimator_conf["dsst_number_scales"]
-            #                 learning_rate = scale_estimator_conf["learning_rate"]
-            #                 d_scale_factor = scale_estimator_conf["scale_factor"]
-            #                 scale_model_max = scale_estimator_conf["scale_model_max"]
-            #                 scale_model_size = scale_estimator_conf["scale_model_size"]
-            #                 scale_sigma_factor = scale_estimator_conf["scale_sigma_factor"]
-            #
-            #             except yaml.YAMLError as exc:
-            #                 print(exc)
-            #
-            #             writer.writerow({'Avg_Success': avg_succ,
-            #                              'Avg_Precision': avg_prec,
-            #                              'Framerate': frame_rate,
-            #                              'SE_Framerate': se_framerate,
-            #                              'dsst_number_scales': dsst_number_scales,
-            #                              'learning_rate': learning_rate,
-            #                              'd_scale_factor': d_scale_factor,
-            #                              'scale_model_max': scale_model_max,
-            #                              'scale_model_size': scale_model_size,
-            #                              'scale_sigma_factor': scale_sigma_factor})
-
     return None
 
 
@@ -602,6 +566,55 @@ def create_graphs_from_rects(result_folder, eval_folder):
 def create_graphs_metrics_for_set(set_of_results, set_name):
     create_avg_score_csv(set_of_results, set_name)
     create_graphs_from_rects(set_of_results, set_name)
+
+
+# create the graphs for the opt plotting parameter value vs success
+def create_graphs_from_opt_csv(obt_folder):
+
+    # obt folder are named like the parameter that is obtimized, this:
+    parameter_name = obt_folder.split("/")[-1]
+
+    if os.path.isdir(obt_folder):
+        files_in_dir = os.listdir(obt_folder)
+
+    csv_name = parameter_name + "_opt.csv"
+
+    if csv_name in files_in_dir:
+        df = pd.read_csv(os.path.join(obt_folder, csv_name))
+
+        for row in df.iloc[:,:]:
+            print("df...")
+
+
+    # make plot
+    # success = list(df['Avg_Success'].values).sort()
+    # parameter_values = list(df[parameter_name].values).sort()
+    # plt.plot(parameter_values, success, "-ok")
+
+    # n_groups = len(success)
+    #
+    # fig, ax = plt.subplots()
+    #
+    # index = np.arange(n_groups)
+    # bar_width = 0.35
+    #
+    # opacity = 0.4
+    # error_config = {'ecolor': '0.3'}
+    #
+    # rects1 = ax.bar(index, parameter_values, bar_width,
+    #                 alpha=opacity, color='b',
+    #                 error_kw=error_config,
+    #                 label='Men')
+    #
+    # ax.set_xlabel('Group')
+    # ax.set_ylabel('Scores')
+    # ax.set_title('Scores by group and gender')
+    # ax.set_xticks(index + bar_width / 2)
+    # ax.set_xticklabels(parameter_values)
+    # ax.legend()
+    #
+    # fig.tight_layout()
+    # plt.show()
 
 
 # ================================= HELPER FUNCTIONS =================================
@@ -881,7 +894,6 @@ def only_item_in_list(item, list_of_items):
     return True
 
 
-
 # check whether tracking run completed
 def is_valid_tracking(tracking_dir):
     return "evaluation.txt" in os.listdir(tracking_dir)
@@ -912,3 +924,5 @@ if __name__ == "__main__":
     elif folder_type == "multiple_hiob_executions":
         print("detected multiple hiob executions -> parameter opt")
         create_opt_csv(results_path, "opt")
+        print("creating graphs for parameter results")
+        create_graphs_from_opt_csv(results_path)
