@@ -26,6 +26,7 @@ class CustomDsst:
         self.static_model_size = None
         self.d_change_aspect_ratio = None
         self.hog_cell_size = None
+        self.hog_block_norm_size = None
 
         # run time
         self.img_frames = None
@@ -98,13 +99,12 @@ class CustomDsst:
         self.padding = conf['padding']
         self.scale_model_max_area = conf['scale_model_max']
         self.d_change_aspect_ratio = conf['d_change_aspect_ratio']
-        self.hog_cell_size = conf['hog_cell_size']
-        hog_cell_size_tuple = ()
-        for char in self.hog_cell_size:
-            if str.isdigit(char):
-                hog_cell_size_tuple = hog_cell_size_tuple + (int(char),)
 
+        hog_cell_size_tuple = (int(conf['hog_cell_size']), int(conf['hog_cell_size']))
         self.hog_cell_size = hog_cell_size_tuple
+
+        hog_block_norm_tuple = (int(conf['hog_block_norm_size']), int(conf['hog_block_norm_size']))
+        self.hog_block_norm_size = hog_block_norm_tuple
 
     def handle_initial_frame(self, frame):
         self.init_target_size = [frame.ground_truth.w, frame.ground_truth.h]
@@ -141,9 +141,9 @@ class CustomDsst:
 
         self.scale_model_size = np.floor(np.multiply(self.init_target_size, self.scale_model_factor))
 
-        # find a size that is closest to multiple of 4 (dsst uses that as block size)
-        x_dim = self.get_closest_match(base=4, val=self.scale_model_size[0])
-        y_dim = self.get_closest_match(base=4, val=self.scale_model_size[1])
+        # find a size that is closest to multiple of the block size, which is the highest
+        x_dim = self.get_closest_match(base=self.hog_block_norm_size[0], val=self.scale_model_size[0])
+        y_dim = self.get_closest_match(base=self.hog_block_norm_size[0], val=self.scale_model_size[1])
 
         self.scale_model_size = [x_dim, y_dim]
 
@@ -461,8 +461,8 @@ class CustomDsst:
 
     def hog_vector(self, img_patch_resized):
         winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
-        blockSize = (4, 4)  # for illumination: large block = local changes less significant
-        blockStride = (2, 2)  # overlap between blocks, typically 50% blocksize
+        blockSize = self.hog_block_norm_size  # for illumination: large block = local changes less significant
+        blockStride = (int(self.hog_block_norm_size[0]/2), int(self.hog_block_norm_size[1]/2))  # overlap between blocks, typically 50% blocksize
         cellSize = self.hog_cell_size  # defines how big the features are that get extracted
         nbins = 9  # number of bins in histogram
         derivAperture = 1  # shouldn't be relevant
