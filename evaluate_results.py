@@ -891,21 +891,24 @@ if __name__ == "__main__":
     folder_type = determine_folder_type(results_path)
     # just one sequence folder from one tracking folder
     if folder_type == "hiob_sequence_folder":
+        print("detected single sequence folder")
         create_graphs_metrics_for_set(results_path, "avg_full_set")
 
     # one hiob execution containing multiple sequence folders
     elif folder_type == "hiob_tracking_folder":
+        print("detected hiob execution folder")
         create_graphs_metrics_for_set(results_path, "avg_full_set")
         create_sequence_score_csv(results_path, "sequence_results")
         create_attribute_score_csv(results_path, "attribute_results")
 
     # matlab tracking folder, containing the saved workplaces from each sequence
     elif folder_type == "matlab_tracking_folder":
+        print("detected matlab workplace folder")
         create_graphs_metrics_for_set(results_path, "avg_full_set")
         create_sequence_score_csv(results_path, "sequence_results")
         create_attribute_score_csv(results_path, "attribute_results")
 
     # experiment folder containing multiple hiob executions, h_opt for example
     elif folder_type == "multiple_hiob_executions":
+        print("detected multiple hiob executions -> parameter opt")
         create_opt_csv(results_path, "opt")
-        print("here")
