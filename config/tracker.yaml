@@ -115,8 +115,8 @@ scale_estimator:
   padding: 1.0
   dsst_number_scales: 33 # number of scaled candidates to generate
   d_change_aspect_ratio: false
-  hog_cell_size: 8
-  hog_block_norm_size: 16
+  hog_cell_size: 1
+  hog_block_norm_size: 4
 
   # candidate params:
   c_scale_factor: 1.02 # scale factor between candidates

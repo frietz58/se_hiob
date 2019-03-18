@@ -153,8 +153,8 @@ class CustomDsst:
             self.current_x_scale_factor = 1
             self.current_y_scale_factor = 1
 
-        min_scale_factor = np.power(self.scale_step, np.ceil(np.log(max(np.divide(5, self.sz))) / np.log(self.scale_step)))
-        max_scale_factor = np.power(self.scale_step, np.floor(np.log(min(np.divide(
+        self.min_scale_factor = np.power(self.scale_step, np.ceil(np.log(max(np.divide(5, self.sz))) / np.log(self.scale_step)))
+        self.max_scale_factor = np.power(self.scale_step, np.floor(np.log(min(np.divide(
             (np.shape(frame.capture_image)[0], np.shape(frame.capture_image)[1]), self.base_target_size)))
                                                               / np.log(self.scale_step)))
         #self.min_scale_factor = 0.15
