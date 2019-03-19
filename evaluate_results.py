@@ -29,11 +29,15 @@ parser.add_argument("-pta", "--attributes", help="Absolute path to the TB100 col
                                                  "attributes for each sequence. Those are needed to create CSVs based "
                                                  "the attributes of the sequences")
 
+parser.add_argument("-m", "--mode", help="To differentiate between an opt folder with multiple hiob executions and an "
+                                         "experiment folder with multiple hiob executions")
+
 args = parser.parse_args()
 
 results_path = args.pathresults
 tb100_gt_path = args.pathgt
 tb100_attributes_path = args.attributes
+mode = args.mode
 
 
 # get all workplace files
@@ -365,7 +369,7 @@ def create_attribute_score_csv(result_folder, eval_folder):
 
 # create a csv comparring the trackings in one csv folder (opt)
 def create_opt_csv(experiment_folder, eval_folder):
-    filename = experiment_folder.split("/")[-1] + "_opt.csv"
+    filename = os.path.dirname(experiment_folder)
     csv_name = os.path.join(experiment_folder, filename)
 
     trackings = get_tracking_folders(experiment_folder)
@@ -374,6 +378,7 @@ def create_opt_csv(experiment_folder, eval_folder):
 
     # create head with parameters
     if approach == "Candidates dynamic" or approach == "Candidates static":
+        # TODO wie bei dsst
         with open(csv_name, mode='w') as outcsv:
             c_fieldnames = ["Avg_Success",
                             "Avg_Precision",
@@ -922,7 +927,12 @@ if __name__ == "__main__":
 
     # experiment folder containing multiple hiob executions, h_opt for example
     elif folder_type == "multiple_hiob_executions":
-        print("detected multiple hiob executions -> parameter opt")
-        create_opt_csv(results_path, "opt")
-        print("creating graphs for parameter results")
-        create_graphs_from_opt_csv(results_path)
+
+        if mode == "opt":
+            print("detected multiple hiob executions, mode = opt")
+            create_opt_csv(results_path, "opt")
+            print("creating graphs for parameter results")
+            create_graphs_from_opt_csv(results_path)
+        elif mode == "exp":
+            print("todo")
+

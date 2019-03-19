@@ -230,20 +230,18 @@ if __name__ == '__main__':
 
     test = False
 
-    print("==== execution 0 ==== \n")
-    change_hog_conf(change_dict={"hog_cell_size":       [1, 2, 4, 8],
-                                 "hog_block_norm_size": [4, 4, 8, 16]})
-
-    print("==== execution 1 ==== \n")
-    change_hog_conf(change_dict={"hog_cell_size": [1, 2, 4, 8],
-                                 "hog_block_norm_size": [4, 4, 8, 16]})
-
-    print("==== execution 2 ==== \n")
-    change_hog_conf(change_dict={"hog_cell_size": [1, 2, 4, 8],
-                                 "hog_block_norm_size": [4, 4, 8, 16]})
-
-
-
+    # print("==== execution 0 ==== \n")
+    # change_hog_conf(change_dict={"hog_cell_size":       [1, 2, 4, 8],
+    #                              "hog_block_norm_size": [4, 4, 8, 16]})
+    #
+    # print("==== execution 1 ==== \n")
+    # change_hog_conf(change_dict={"hog_cell_size": [1, 2, 4, 8],
+    #                              "hog_block_norm_size": [4, 4, 8, 16]})
+    #
+    # print("==== execution 2 ==== \n")
+    # change_hog_conf(change_dict={"hog_cell_size": [1, 2, 4, 8],
+    #                              "hog_block_norm_size": [4, 4, 8, 16]})
+    #
     # change_parameter(parameter_name='scale_factor', additional_parameters=[
     #     ["use_scale_estimation", True],
     #     ["update_strategy", "cont"],
@@ -258,36 +256,36 @@ if __name__ == '__main__':
     #     ["approach", "custom_dsst"],
     #     ["d_change_aspect_ratio", False]
     # ], start=0.25, step=1.02, times_per_dir=5, change_function=change_scale_sigma_factor, test=test, only_one_dir=False)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='learning_rate', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "custom_dsst"],
-    #     ["d_change_aspect_ratio", False]
-    # ], start=0.05, step=1.02, times_per_dir=5, change_function=change_learning_rate, test=test, only_one_dir=False)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='scale_model_max', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "custom_dsst"],
-    #     ["d_change_aspect_ratio", False]
-    # ], start=512, step=1.1, times_per_dir=5, change_function=change_scale_model_max, test=test, only_one_dir=False)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='scale_model_size', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["use_update_strategies", False],
-    #     ["approach", "custom_dsst"],
-    #     ["d_change_aspect_ratio", False]
-    # ], start=16, step=2, times_per_dir=5, change_function=change_scale_model_size, test=test, only_one_dir=False)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='dsst_number_scales', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "custom_dsst"],
-    #     ["d_change_aspect_ratio", False]
-    # ], start=33, step=2, times_per_dir=5, change_function=change_dsst_number_scales, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='learning_rate', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=0.05, step=1.02, times_per_dir=5, change_function=change_learning_rate, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='scale_model_max', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=512, step=1.1, times_per_dir=5, change_function=change_scale_model_max, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='scale_model_size', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["use_update_strategies", False],
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=16, step=2, times_per_dir=5, change_function=change_scale_model_size, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='dsst_number_scales', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "custom_dsst"],
+        ["d_change_aspect_ratio", False]
+    ], start=33, step=2, times_per_dir=5, change_function=change_dsst_number_scales, test=test, only_one_dir=False)
 
