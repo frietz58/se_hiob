@@ -39,6 +39,7 @@ tb100_gt_path = args.pathgt
 tb100_attributes_path = args.attributes
 mode = args.mode
 
+
 # ================================= GET FUNCTIONS =================================
 # get all workplace files
 def get_saved_workplaces(result_dir):
@@ -134,7 +135,7 @@ def get_pred_rects_from_sequence(sequence_folder):
 
 
 # get all sequence from one tracking folder
-def get_sequences(tracking_dir):
+def get_sequences(tracking_dir, came_from_experiment=False):
     if os.path.isdir(tracking_dir):
         files_in_dir = os.listdir(tracking_dir)
     else:
@@ -148,13 +149,19 @@ def get_sequences(tracking_dir):
 
         if folder_type == "hiob_tracking_folder":
             if os.path.isdir(os.path.join(tracking_dir, file)) and "tracking" in file:
-                sequences.append(file)
+                if came_from_experiment:
+                    sequences.append(os.path.join(tracking_dir, file))
+                else:
+                    sequences.append(file)
         elif folder_type == "matlab_tracking_folder":
             if "results.mat" in file:
                 sequences.append(file)
         elif folder_type == "hiob_sequence_folder" or folder_type == "matlab_sequence_file":
             sequences.append([tracking_dir])
             break
+        elif folder_type == "multiple_hiob_executions":
+            if os.path.isdir(os.path.join(tracking_dir, file)) and "hiob-execution" in file:
+                sequences.append(get_sequences(os.path.join(tracking_dir, file), came_from_experiment=True))
 
     return sequences
 
@@ -196,7 +203,7 @@ def get_all_rects(result_dir):
             sequence_folders = get_sequences(hiob_execution)
             for sequence in sequence_folders:
                 sequence_folder = os.path.join(hiob_execution, sequence)
-                sequence_name = os.path.basename(sequence_folder)
+                sequence_name = os.path.basename(sequence_folder).split("-")[-1]
                 preds = get_pred_rects_from_sequence(os.path.join(result_dir, sequence_folder))
                 gts = get_tb100_gt_rects_from_zip(sequence_name)
                 pred_gt_rects["preds"].append(preds)
@@ -222,7 +229,7 @@ def get_all_rects(result_dir):
 
 
 # get the evaluation values from each tracking in an excperiment
-def get_avg_results_from_tracking(experiment_folder):
+def get_avg_results_from_experiment(experiment_folder):
     hiob_executions = get_tracking_folders(experiment_folder)
     # get the raw values from evaluation.txt
     experiment_results = {}
@@ -261,6 +268,7 @@ def get_avg_results_from_tracking(experiment_folder):
                  "updates": sequence["updates_total"]})
 
     # create csv with the average values for each sequence
+    print("creating average over sequences scv")
     eval_folder = "evaluation"
     eval_path = os.path.join(experiment_folder, eval_folder)
     if not os.path.isdir(eval_path):
@@ -290,7 +298,8 @@ def get_avg_results_from_tracking(experiment_folder):
             avg_prec = np.around(sum(prec_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
             avg_succ = np.around(sum(succ_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
             avg_ss_rating = np.around(sum(ss_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
-            avg_fail_percentages = np.around(sum(fail_percentages) / len(sequence_result_collection[sequence_result]), decimals=3)
+            avg_fail_percentages = np.around(sum(fail_percentages) / len(sequence_result_collection[sequence_result]),
+                                             decimals=3)
             avg_updates = np.around(sum(update_totals) / len(sequence_result_collection[sequence_result]), decimals=3)
 
             row_dict = {
@@ -304,6 +313,55 @@ def get_avg_results_from_tracking(experiment_folder):
 
             writer.writerow(row_dict)
             rows.append(row_dict)
+
+    # create csv with the average values for each attribute
+    print("creating average over attributes csv")
+    out_csv = os.path.join(eval_path, "attribute_averages.csv")
+    csv_fields = ["Attribute", "Samples", "Frames", "Precision", "Success", "Size Score"]
+    with open(out_csv, 'w', newline='') as outcsv:
+        writer = csv.DictWriter(outcsv, fieldnames=csv_fields)
+        writer.writeheader()
+        attribute_sequences = get_attribute_collections(experiment_folder)
+        unique_samples = []
+        for attribute in attribute_sequences:
+            print("attribute: {0}".format(attribute))
+            print("loading all rects for sequences with same attribute")
+            specific_attribute_sequences = attribute_sequences[attribute]
+            if attribute_sequences != []:
+                all_preds = []
+                all_gts = []
+            for sequence in specific_attribute_sequences:
+                if sequence.split("/")[-1].split("-")[-1] not in unique_samples:
+                    unique_samples.append(sequence.split("/")[-1].split("-")[-1])
+
+                sequence_preds, sequence_gts = get_all_rects(sequence)
+                all_preds.append(sequence_preds)
+                all_gts.append(sequence_gts)
+
+            # flatten lists
+            flat_preds = []
+            flat_gts = []
+            for sublist in all_preds:
+                for item in sublist:
+                    flat_preds.append(item)
+
+            for sublist in all_gts:
+                for item in sublist:
+                    flat_gts.append(item)
+
+            score_dict = get_metrics_from_rects("attribute", all_preds=flat_preds, all_gts=flat_gts)
+
+
+            writer.writerow({
+                "Attribute": attribute,
+                "Samples": len(attribute_sequences[attribute]),
+                "Frames": score_dict["Frames"],
+                "Precision": score_dict["Total Precision"],
+                "Success": score_dict["Total Success"],
+                "Size Score": score_dict["Size Score"]
+            })
+
+
 
         # get the average values of the rows:
         # final_precs = []
@@ -340,6 +398,7 @@ def get_avg_results_from_tracking(experiment_folder):
 
     return None
 
+
 # get metric from rects
 def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
     print("getting metrics for {0}".format(result_folder))
@@ -347,14 +406,14 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
     if all_preds is None and all_gts is None:
         all_preds, all_gts = get_all_rects(result_folder)
 
-    if result_folder != "no_folder_needed":
+    if result_folder != "attribute":
         folder_type = determine_folder_type(result_folder)
     center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
 
     # calculate the metrics based on the results for each frame of the sequences in the collection
     scores_for_rects = {}
 
-    if result_folder != "no_folder_needed":
+    if result_folder != "attribute":
         sequences = get_sequences(result_folder)
         scores_for_rects["Samples"] = len(sequences)
     else:
@@ -372,7 +431,7 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
     auc = np.trapz(y, x)
     scores_for_rects["Total Success"] = auc
 
-    if result_folder != "no_folder_needed":
+    if result_folder != "attribute":
         if folder_type == "hiob_tracking_folder" or folder_type == "matlab_tracking_folder":
             prec_sum = 0
             succ_sum = 0
@@ -390,6 +449,7 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
     scores_for_rects["Size Score"] = abc
 
     return scores_for_rects
+
 
 # ================================= CREATE FUNCTIONS =================================
 # create a csv for the scores
@@ -486,7 +546,7 @@ def create_attribute_score_csv(result_folder, eval_folder):
                     for item in sublist:
                         flat_gts.append(item)
 
-                score_dict = get_metrics_from_rects("no_folder_needed",
+                score_dict = get_metrics_from_rects("attribute",
                                                     all_preds=flat_preds, all_gts=flat_gts)
 
                 writer.writerow({
@@ -501,8 +561,8 @@ def create_attribute_score_csv(result_folder, eval_folder):
 
 # create a csv comparring the trackings in one csv folder (opt)
 def create_opt_csv(experiment_folder, eval_folder):
-    filename = os.path.dirname(experiment_folder)
-    csv_name = os.path.join(experiment_folder, filename)
+    filename = os.path.basename(experiment_folder)
+    csv_name = os.path.join(experiment_folder, filename + "_opt.csv")
 
     trackings = get_tracking_folders(experiment_folder)
 
@@ -706,7 +766,7 @@ def create_graphs_metrics_for_set(set_of_results, set_name):
     create_graphs_from_rects(set_of_results, set_name)
 
 
-# create the graphs for the opt plotting parameter value vs success
+# create the graphs for the opt plotting parameter value vs x
 def create_graphs_from_opt_csv(obt_folder):
     # obt folder are named like the parameter that is obtimized, this:
     parameter_name = obt_folder.split("/")[-1]
@@ -718,39 +778,85 @@ def create_graphs_from_opt_csv(obt_folder):
 
     if csv_name in files_in_dir:
         df = pd.read_csv(os.path.join(obt_folder, csv_name))
+        sorted_df = df.sort_values(parameter_name)
 
-        for row in df.iloc[:, :]:
-            print("df...")
+        # ================ PARAMETER vs METRIC ================
+        success = sorted_df["Avg_Success"]
+        precision = sorted_df["Avg_Precision"]
 
-    # make plot
-    # success = list(df['Avg_Success'].values).sort()
-    # parameter_values = list(df[parameter_name].values).sort()
-    # plt.plot(parameter_values, success, "-ok")
 
-    # n_groups = len(success)
-    #
-    # fig, ax = plt.subplots()
-    #
-    # index = np.arange(n_groups)
-    # bar_width = 0.35
-    #
-    # opacity = 0.4
-    # error_config = {'ecolor': '0.3'}
-    #
-    # rects1 = ax.bar(index, parameter_values, bar_width,
-    #                 alpha=opacity, color='b',
-    #                 error_kw=error_config,
-    #                 label='Men')
-    #
-    # ax.set_xlabel('Group')
-    # ax.set_ylabel('Scores')
-    # ax.set_title('Scores by group and gender')
-    # ax.set_xticks(index + bar_width / 2)
-    # ax.set_xticklabels(parameter_values)
-    # ax.legend()
-    #
-    # fig.tight_layout()
-    # plt.show()
+        ind = np.arange(len(success))  # the x locations for the groups
+        width = 0.35  # the width of the bars
+
+        fig, ax = plt.subplots()
+
+        rects1 = ax.bar(ind, success, width, color='#648fff')
+        rects2 = ax.bar(ind + width, precision, width, color='#ffb000')
+
+        # add some text for labels, title and axes ticks
+        ax.set_ylabel('Scores')
+        ax.set_title('Avg. Precision and Success over parameter values')
+        ax.set_xticks(ind + width / 2)
+        ax.set_xticklabels(sorted_df[parameter_name])
+
+        ax.legend((rects1[0], rects2[0]), ('Avg. Success', 'Avg. Precision'))
+        ax.set_ylim(0, 1)
+
+        def autolabel(rects):
+            """
+            Attach a text label above each bar displaying its height
+            """
+            for rect in rects:
+                height = rect.get_height()
+                ax.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
+                        '%d' % int(height),
+                        ha='center', va='bottom')
+
+        #autolabel(rects1)
+        #autolabel(rects2)
+
+        # plt.show()
+        figure_file3 = os.path.join(obt_folder, 'parameter_vs_metrics.pdf')
+        plt.savefig(figure_file3)
+
+        # ================ PARAMETER vs FRAMERATE ================
+        framerate = sorted_df["Framerate"]
+        se_framerate = sorted_df["SE_Framerate"]
+
+        ind = np.arange(len(framerate))  # the x locations for the groups
+        width = 0.35  # the width of the bars
+
+        fig, ax = plt.subplots()
+
+        rects1 = ax.bar(ind, framerate, width, color='#785ef0')
+        rects2 = ax.bar(ind + width, se_framerate, width, color='#fe6100')
+
+        # add some text for labels, title and axes ticks
+        ax.set_ylabel('Frame-rate')
+        ax.set_title('Avg. Frame-rate complete Tracker and Frame-rate of SE module over parameter values')
+        ax.set_xticks(ind + width / 2)
+        ax.set_xticklabels(sorted_df[parameter_name])
+
+        ax.legend((rects1[0], rects2[0]), ('Avg. Frame-rate', 'Avg. SE Frame-rate'))
+        ax.set_ylim(0, max(se_framerate) + 5)
+
+        def autolabel(rects):
+            """
+            Attach a text label above each bar displaying its height
+            """
+            for rect in rects:
+                height = rect.get_height()
+                ax.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
+                        '%d' % int(height),
+                        ha='center', va='bottom')
+
+        # autolabel(rects1)
+        # autolabel(rects2)
+
+        # plt.show()
+        figure_file3 = os.path.join(obt_folder, 'parameter_vs_framerate.pdf')
+        plt.savefig(figure_file3)
+
 
 
 # ================================= HELPER FUNCTIONS =================================
@@ -936,7 +1042,11 @@ def get_attribute_collections(tracking_dir):
         except yaml.YAMLError as exc:
             print(exc)
 
-        for sequence in sequences:
+        if determine_folder_type(tracking_dir) == "multiple_hiob_executions":
+            flat_list = [item for sublist in sequences for item in sublist]
+        else:
+            flat_list = sequences
+        for sequence in flat_list:
             if ".mat" in sequence:
                 sequence_name = sequence.split("_")[0]
             else:
@@ -1062,8 +1172,13 @@ if __name__ == "__main__":
     elif folder_type == "multiple_hiob_executions":
         if mode == "opt":
             print("detected multiple hiob executions, mode = opt")
+            print("creating opt csv")
             create_opt_csv(results_path, "opt")
             print("creating graphs for parameter results")
             create_graphs_from_opt_csv(results_path)
         elif mode == "exp":
-            get_avg_results_from_tracking(results_path)
+            print("detected multiple hiob executions, mode = exp")
+            get_avg_results_from_experiment(results_path)
+            print("creating graphs for average experiment metrics")
+            create_graphs_metrics_for_set(results_path, "avg_full_set")
+
