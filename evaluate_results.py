@@ -39,7 +39,7 @@ tb100_gt_path = args.pathgt
 tb100_attributes_path = args.attributes
 mode = args.mode
 
-
+# ================================= GET FUNCTIONS =================================
 # get all workplace files
 def get_saved_workplaces(result_dir):
     files_in_dir = os.listdir(result_dir)
@@ -189,6 +189,19 @@ def get_all_rects(result_dir):
             pred_gt_rects["preds"].append(preds)
             pred_gt_rects["gts"].append(gts)
 
+    elif current_folder_type == "multiple_hiob_executions":
+        hiob_executions = get_tracking_folders(result_dir)
+
+        for hiob_execution in hiob_executions:
+            sequence_folders = get_sequences(hiob_execution)
+            for sequence in sequence_folders:
+                sequence_folder = os.path.join(hiob_execution, sequence)
+                sequence_name = os.path.basename(sequence_folder)
+                preds = get_pred_rects_from_sequence(os.path.join(result_dir, sequence_folder))
+                gts = get_tb100_gt_rects_from_zip(sequence_name)
+                pred_gt_rects["preds"].append(preds)
+                pred_gt_rects["gts"].append(gts)
+
     elif current_folder_type == "matlab_sequnce_file":
         preds, gts = get_rects_from_workplace(result_dir)
         pred_gt_rects["preds"].append(preds)
@@ -207,6 +220,125 @@ def get_all_rects(result_dir):
 
     return all_preds, all_gts
 
+
+# get the evaluation values from each tracking in an excperiment
+def get_avg_results_from_tracking(experiment_folder):
+    hiob_executions = get_tracking_folders(experiment_folder)
+    # get the raw values from evaluation.txt
+    experiment_results = {}
+    for hiob_execution in hiob_executions:
+        execution_results = {}
+        sequence_folders = get_sequences(hiob_execution)
+
+        for sequence in sequence_folders:
+            sequence_folder = os.path.join(hiob_execution, sequence)
+            sequence_name = os.path.basename(sequence_folder)
+            with open(os.path.join(sequence_folder, "evaluation.txt"), "r") as evaltxt:
+                sequence_results = {}
+                lines = evaltxt.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    key_val = line.split("=")
+                    sequence_results[str(key_val[0])] = key_val[1]
+
+            execution_results[sequence_name] = sequence_results
+        experiment_results[hiob_execution] = execution_results
+
+    # calculate average metrics each sequence sequence
+    sequence_result_collection = {}
+    for execution in experiment_results.values():
+        for sequence in execution.values():
+            if not str(sequence["sample_name"]) in sequence_result_collection.keys():
+                sequence_result_collection[str(sequence["sample_name"])] = []
+            sequence_result_collection[str(sequence["sample_name"])].append(
+                {"frame_rate": sequence["frame_rate"],
+                 "frames": sequence["sample_frames"],
+                 "se_frame_rate": sequence["se_frame_rate"],
+                 "failure_percentage": sequence["failurePercentage"],
+                 "size_score": sequence["area_between_size_curves"],
+                 "success": sequence["success_rating"],
+                 "precision": sequence["precision_rating"],
+                 "updates": sequence["updates_total"]})
+
+    # create csv with the average values for each sequence
+    eval_folder = "evaluation"
+    eval_path = os.path.join(experiment_folder, eval_folder)
+    if not os.path.isdir(eval_path):
+        os.mkdir(eval_path)
+
+    out_csv = os.path.join(eval_path, "sequence_averages.csv")
+    with open(out_csv, 'w', newline='') as outcsv:
+        csv_fields = ["Sample", "Frames", "Precision", "Success", "Size Score", "Fail %", "Updates"]
+        writer = csv.DictWriter(outcsv, fieldnames=csv_fields)
+        writer.writeheader()
+
+        rows = []
+        for sequence_result in sequence_result_collection:
+            prec_ratings = []
+            succ_ratings = []
+            ss_ratings = []
+            fail_percentages = []
+            update_totals = []
+            sample = str(sequence_result)
+            frames = sequence_result_collection[sequence_result][0]["frames"]
+            for result in sequence_result_collection[sequence_result]:
+                prec_ratings.append(float(result["precision"]))
+                succ_ratings.append(float(result["success"]))
+                ss_ratings.append(float(result["size_score"]))
+                fail_percentages.append(float(result["failure_percentage"]))
+                update_totals.append(float(result["updates"]))
+            avg_prec = np.around(sum(prec_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
+            avg_succ = np.around(sum(succ_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
+            avg_ss_rating = np.around(sum(ss_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
+            avg_fail_percentages = np.around(sum(fail_percentages) / len(sequence_result_collection[sequence_result]), decimals=3)
+            avg_updates = np.around(sum(update_totals) / len(sequence_result_collection[sequence_result]), decimals=3)
+
+            row_dict = {
+                "Sample": sample,
+                "Frames": frames,
+                "Precision": avg_prec,
+                "Success": avg_succ,
+                "Size Score": avg_ss_rating,
+                "Fail %": avg_fail_percentages,
+                "Updates": avg_updates}
+
+            writer.writerow(row_dict)
+            rows.append(row_dict)
+
+        # get the average values of the rows:
+        # final_precs = []
+        # final_succs = []
+        # final_ss = []
+        # final_fails = []
+        # final_updates = []
+        # samples = 0
+        # frames = 0
+        # for row in rows:
+        #     final_precs.append(row["Avg. Precision"])
+        #     final_succs.append(row["Avg. Success"])
+        #     final_ss.append(row["Avg. Size Score"])
+        #     final_fails.append(row["Avg. Failure Percentage"])
+        #     final_updates.append(row["Avg. Updates"])
+        #     samples += 1
+        #     frames += int(row["Frames"])
+        # final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
+        # final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
+        # final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
+        # final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
+        # final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
+        #
+        # summarizing_row = {
+        #     "Sample": samples,
+        #     "Frames": frames,
+        #     "Precision": final_avg_precs,
+        #     "Success": final_avg_succs,
+        #     "Size Score": final_avg_ss,
+        #     "Fail %": final_avg_fails,
+        #     "Updates": final_avg_updates}
+        #
+        # writer.writerow(summarizing_row)
+
+    return None
 
 # get metric from rects
 def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
@@ -259,7 +391,7 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
 
     return scores_for_rects
 
-
+# ================================= CREATE FUNCTIONS =================================
 # create a csv for the scores
 def create_avg_score_csv(results_folder, eval_folder):
     score_dict = get_metrics_from_rects(results_folder)
@@ -448,7 +580,8 @@ def create_opt_csv(experiment_folder, eval_folder):
 
         # find dirs with same parameter value
         same_parameter_value_collection = get_same_parameter_values(trackings)
-        changing_parameter = same_parameter_value_collection[list(same_parameter_value_collection.keys())[0]][0]["parameter"]
+        changing_parameter = same_parameter_value_collection[list(same_parameter_value_collection.keys())[0]][0][
+            "parameter"]
 
         with open(csv_name, "w", newline='') as outcsv:
             fieldnames = ["Avg_Success",
@@ -482,7 +615,7 @@ def create_opt_csv(experiment_folder, eval_folder):
                             elif key_val[0] == "se_frame_rate":
                                 se_framerates.append(float(key_val[1]))
 
-                final_avg_succ = sum(avg_succs) / len(avg_succs) # sidn strings dirn, braucht ints...^^^^^^^^^
+                final_avg_succ = sum(avg_succs) / len(avg_succs)  # sidn strings dirn, braucht ints...^^^^^^^^^
                 final_avg_precc = sum(avg_precs) / len(avg_precs)
                 final_framerate = sum(framerates) / len(framerates)
                 final_se_framerate = sum(se_framerates) / len(se_framerates)
@@ -575,7 +708,6 @@ def create_graphs_metrics_for_set(set_of_results, set_name):
 
 # create the graphs for the opt plotting parameter value vs success
 def create_graphs_from_opt_csv(obt_folder):
-
     # obt folder are named like the parameter that is obtimized, this:
     parameter_name = obt_folder.split("/")[-1]
 
@@ -587,9 +719,8 @@ def create_graphs_from_opt_csv(obt_folder):
     if csv_name in files_in_dir:
         df = pd.read_csv(os.path.join(obt_folder, csv_name))
 
-        for row in df.iloc[:,:]:
+        for row in df.iloc[:, :]:
             print("df...")
-
 
     # make plot
     # success = list(df['Avg_Success'].values).sort()
@@ -857,11 +988,12 @@ def get_same_parameter_values(trackings):
     # find parameter that is changed in the current optimization folder
     all_parameter_values = {}
     for parameter in tracker_configs[0]["conf"].keys():
-        #all_parameter_values[str(parameter)] = {"tracking": tracking, "parameter": parameter}
+        # all_parameter_values[str(parameter)] = {"tracking": tracking, "parameter": parameter}
         all_parameter_values[str(parameter)] = []
         for curr_dict in tracker_configs:
-            all_parameter_values[str(parameter)].append({"tracking": curr_dict["tracking"], "parameter": parameter, "value": curr_dict["conf"][parameter]})
-            #all_parameter_values[str(parameter)]["value"] = curr_dict["conf"][parameter]
+            all_parameter_values[str(parameter)].append(
+                {"tracking": curr_dict["tracking"], "parameter": parameter, "value": curr_dict["conf"][parameter]})
+            # all_parameter_values[str(parameter)]["value"] = curr_dict["conf"][parameter]
 
     print("finding tracker configuration which have the same value for the optimization parameter...")
     # if the parameter has different values, it is a parameter changed in opt (hog opt changes multiple parameters)
@@ -874,7 +1006,8 @@ def get_same_parameter_values(trackings):
         if not only_item_in_list(all_parameter_values[parameter][0]["value"], parameter_values):
             changing_parameter_values[str(parameter)] = all_parameter_values[parameter]
 
-    if 'adjust_max_scale_diff_after' in changing_parameter_values and only_item_in_list(False, adjust_scale_diff_values):
+    if 'adjust_max_scale_diff_after' in changing_parameter_values and only_item_in_list(False,
+                                                                                        adjust_scale_diff_values):
         del changing_parameter_values["adjust_max_scale_diff_after"]
 
     if 'hog_block_norm_size' in changing_parameter_values:
@@ -927,12 +1060,10 @@ if __name__ == "__main__":
 
     # experiment folder containing multiple hiob executions, h_opt for example
     elif folder_type == "multiple_hiob_executions":
-
         if mode == "opt":
             print("detected multiple hiob executions, mode = opt")
             create_opt_csv(results_path, "opt")
             print("creating graphs for parameter results")
             create_graphs_from_opt_csv(results_path)
         elif mode == "exp":
-            print("todo")
-
+            get_avg_results_from_tracking(results_path)
