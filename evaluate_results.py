@@ -39,6 +39,12 @@ tb100_gt_path = args.pathgt
 tb100_attributes_path = args.attributes
 mode = args.mode
 
+# ======= csv names =======
+csv_avg_success = "Avg. Success"
+csv_avg_precision = "Avg. Precision"
+csv_avg_fps = "Avg. Frame rate"
+csv_avg_se_fps = "Avg. SE Frame rate"
+
 
 # ================================= GET FUNCTIONS =================================
 # get all workplace files
@@ -372,8 +378,8 @@ def get_avg_results_from_experiment(experiment_folder):
         # samples = 0
         # frames = 0
         # for row in rows:
-        #     final_precs.append(row["Avg. Precision"])
-        #     final_succs.append(row["Avg. Success"])
+        #     final_precs.append(row[csv_avg_precision])
+        #     final_succs.append(row[csv_avg_success])
         #     final_ss.append(row["Avg. Size Score"])
         #     final_fails.append(row["Avg. Failure Percentage"])
         #     final_updates.append(row["Avg. Updates"])
@@ -441,8 +447,8 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
                 prec_sum += sequence_metrics["Total Precision"]
                 succ_sum += sequence_metrics["Total Success"]
 
-            scores_for_rects["Avg. Precision"] = prec_sum / scores_for_rects["Samples"]
-            scores_for_rects["Avg. Success"] = succ_sum / scores_for_rects["Samples"]
+            scores_for_rects[csv_avg_precision] = prec_sum / scores_for_rects["Samples"]
+            scores_for_rects[csv_avg_success] = succ_sum / scores_for_rects["Samples"]
 
     normalized_size_score, normalized_gt_size_scores = normalize_size_datapoints(size_scores, gt_size_scores)
     abc = area_between_curves(normalized_gt_size_scores, normalized_size_score)
@@ -498,8 +504,8 @@ def create_sequence_score_csv(result_folder, eval_folder):
             writer.writerow({
                 "Sample": sequence_name,
                 "Frames": score_dict["Frames"],
-                "Precision": score_dict["Total Precision"],
-                "Success": score_dict["Total Success"],
+                "Precision": np.around(score_dict["Total Precision"], decimals=3),
+                "Success": np.around(score_dict["Total Success"], decimals=3),
                 "Size Score": score_dict["Size Score"]
             })
 
@@ -516,7 +522,7 @@ def create_attribute_score_csv(result_folder, eval_folder):
     if not os.path.isdir(full_eval_path):
         os.mkdir(full_eval_path)
 
-    csv_fields = ["Attribute", "Samples", "Frames", "Precision", "Success", "Size Score"]
+    csv_fields = ["Attribute", "Samples", "Frames", csv_avg_precision, csv_avg_success, "Avg. Size Score"]
 
     out_csv = os.path.join(full_eval_path, eval_folder + ".csv")
     with open(out_csv, 'w', newline='') as outcsv:
@@ -553,13 +559,13 @@ def create_attribute_score_csv(result_folder, eval_folder):
                     "Attribute": attribute,
                     "Samples": len(attribute_sequences),
                     "Frames": score_dict["Frames"],
-                    "Precision": score_dict["Total Precision"],
-                    "Success": score_dict["Total Success"],
-                    "Size Score": score_dict["Size Score"]
+                    csv_avg_precision: np.around(score_dict["Total Precision"], decimals=3),
+                    csv_avg_success: np.around(score_dict["Total Success"], decimals=3),
+                    "Avg. Size Score": score_dict["Size Score"]
                 })
 
 
-# create a csv comparring the trackings in one csv folder (opt)
+# create a csv comparing the trackings in one csv folder (opt)
 def create_opt_csv(experiment_folder, eval_folder):
     filename = os.path.basename(experiment_folder)
     csv_name = os.path.join(experiment_folder, filename + "_opt.csv")
@@ -576,10 +582,10 @@ def create_opt_csv(experiment_folder, eval_folder):
             "parameter"]
 
         with open(csv_name, "w", newline='') as outcsv:
-            fieldnames = ["Avg_Success",
-                          "Avg_Precision",
-                          "Framerate",
-                          "SE_Framerate",
+            fieldnames = [csv_avg_success,
+                          csv_avg_precision,
+                          csv_avg_fps,
+                          csv_avg_se_fps,
                           changing_parameter]
 
             writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
@@ -612,10 +618,10 @@ def create_opt_csv(experiment_folder, eval_folder):
                 final_framerate = np.around(sum(framerates) / len(framerates), decimals=3)
                 final_se_framerate = np.around(sum(se_framerates) / len(se_framerates), decimals=3)
 
-                writer.writerow({'Avg_Success': final_avg_succ,
-                                 'Avg_Precision': final_avg_precc,
-                                 'Framerate': final_framerate,
-                                 'SE_Framerate': final_se_framerate,
+                writer.writerow({csv_avg_success: final_avg_succ,
+                                 csv_avg_precision: final_avg_precc,
+                                 csv_avg_fps: final_framerate,
+                                 csv_avg_se_fps: final_se_framerate,
                                  changing_parameter: value[0]["value"]})
 
     elif approach == "DSST dynamic" or approach == "DSST static":
@@ -626,10 +632,10 @@ def create_opt_csv(experiment_folder, eval_folder):
             "parameter"]
 
         with open(csv_name, "w", newline='') as outcsv:
-            fieldnames = ["Avg_Success",
-                          "Avg_Precision",
-                          "Framerate",
-                          "SE_Framerate",
+            fieldnames = [csv_avg_success,
+                          csv_avg_precision,
+                          csv_avg_fps,
+                          "Avg. SE_Frame-rate",
                           changing_parameter]
 
             writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
@@ -662,10 +668,10 @@ def create_opt_csv(experiment_folder, eval_folder):
                 final_framerate = np.around(sum(framerates) / len(framerates), decimals=3)
                 final_se_framerate = np.around(sum(se_framerates) / len(se_framerates), decimals=3)
 
-                writer.writerow({'Avg_Success': final_avg_succ,
-                                 'Avg_Precision': final_avg_precc,
-                                 'Framerate': final_framerate,
-                                 'SE_Framerate': final_se_framerate,
+                writer.writerow({csv_avg_success: final_avg_succ,
+                                 csv_avg_precision: final_avg_precc,
+                                 csv_avg_fps: final_framerate,
+                                 csv_avg_se_fps: final_se_framerate,
                                  changing_parameter: value[0]["value"]})
 
     # sort created csv by parameter and override old
@@ -769,8 +775,8 @@ def create_graphs_from_opt_csv(obt_folder):
         sorted_df = df.sort_values(parameter_name)
 
         # ================ PARAMETER vs METRIC ================
-        success = sorted_df["Avg_Success"]
-        precision = sorted_df["Avg_Precision"]
+        success = sorted_df[csv_avg_success]
+        precision = sorted_df[csv_avg_precision]
 
 
         ind = np.arange(len(success))  # the x locations for the groups
@@ -808,8 +814,8 @@ def create_graphs_from_opt_csv(obt_folder):
         plt.savefig(figure_file3)
 
         # ================ PARAMETER vs FRAMERATE ================
-        framerate = sorted_df["Framerate"]
-        se_framerate = sorted_df["SE_Framerate"]
+        framerate = sorted_df[csv_avg_fps]
+        se_framerate = sorted_df[csv_avg_se_fps]
 
         ind = np.arange(len(framerate))  # the x locations for the groups
         width = 0.35  # the width of the bars
