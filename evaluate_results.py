@@ -675,10 +675,10 @@ def create_opt_csv(experiment_folder, eval_folder):
                             elif key_val[0] == "se_frame_rate":
                                 se_framerates.append(float(key_val[1]))
 
-                final_avg_succ = sum(avg_succs) / len(avg_succs)  # sidn strings dirn, braucht ints...^^^^^^^^^
-                final_avg_precc = sum(avg_precs) / len(avg_precs)
-                final_framerate = sum(framerates) / len(framerates)
-                final_se_framerate = sum(se_framerates) / len(se_framerates)
+                final_avg_succ = np.around(sum(avg_succs) / len(avg_succs), decimals=3)
+                final_avg_precc = np.around(sum(avg_precs) / len(avg_precs), decimals=3)
+                final_framerate = np.around(sum(framerates) / len(framerates), decimals=3)
+                final_se_framerate = np.around(sum(se_framerates) / len(se_framerates), decimals=3)
 
                 writer.writerow({'Avg_Success': final_avg_succ,
                                  'Avg_Precision': final_avg_precc,
@@ -833,7 +833,7 @@ def create_graphs_from_opt_csv(obt_folder):
 
         # add some text for labels, title and axes ticks
         ax.set_ylabel('Frame-rate')
-        ax.set_title('Avg. Frame-rate complete Tracker and Frame-rate of SE module over parameter values')
+        ax.set_title('Avg. FPS hiob and avg. FPS  of SE module over parameter values')
         ax.set_xticks(ind + width / 2)
         ax.set_xticklabels(sorted_df[parameter_name])
 
@@ -1101,16 +1101,19 @@ def get_same_parameter_values(trackings):
         # all_parameter_values[str(parameter)] = {"tracking": tracking, "parameter": parameter}
         all_parameter_values[str(parameter)] = []
         for curr_dict in tracker_configs:
-            all_parameter_values[str(parameter)].append(
-                {"tracking": curr_dict["tracking"], "parameter": parameter, "value": curr_dict["conf"][parameter]})
+            try:
+                all_parameter_values[str(parameter)].append(
+                    {"tracking": curr_dict["tracking"], "parameter": parameter, "value": curr_dict["conf"][parameter]})
             # all_parameter_values[str(parameter)]["value"] = curr_dict["conf"][parameter]
+            except KeyError:
+                if parameter == "hog_cell_size" or parameter == "hog_block_norm_size":
+                    pass
 
     print("finding tracker configuration which have the same value for the optimization parameter...")
     # if the parameter has different values, it is a parameter changed in opt (hog opt changes multiple parameters)
     for parameter in all_parameter_values:
         # for special case adjust_max_scale_diff_after, which has different values but no impact
         if parameter == 'adjust_max_scale_diff':
-            adjust_scale_diff_values = all_parameter_values[parameter]
             adjust_scale_diff_values = [curr_dict["value"] for curr_dict in all_parameter_values[parameter]]
         parameter_values = [curr_dict["value"] for curr_dict in all_parameter_values[parameter]]
         if not only_item_in_list(all_parameter_values[parameter][0]["value"], parameter_values):
@@ -1119,6 +1122,14 @@ def get_same_parameter_values(trackings):
     if 'adjust_max_scale_diff_after' in changing_parameter_values and only_item_in_list(False,
                                                                                         adjust_scale_diff_values):
         del changing_parameter_values["adjust_max_scale_diff_after"]
+
+    if "hog_cell_size" in changing_parameter_values:
+        hog_cell_vals = []
+        for tracking in changing_parameter_values["hog_cell_size"]:
+            if tracking["value"] not in hog_cell_vals:
+                hog_cell_vals.append(tracking["value"])
+        if len(hog_cell_vals) == 2:
+            del changing_parameter_values["hog_cell_size"]
 
     if 'hog_block_norm_size' in changing_parameter_values:
         del changing_parameter_values["hog_block_norm_size"]
@@ -1170,7 +1181,9 @@ if __name__ == "__main__":
 
     # experiment folder containing multiple hiob executions, h_opt for example
     elif folder_type == "multiple_hiob_executions":
-        if mode == "opt":
+        if mode == "" or None:
+            print("EITHER --mode opr or --mode exp")
+        elif mode == "opt":
             print("detected multiple hiob executions, mode = opt")
             print("creating opt csv")
             create_opt_csv(results_path, "opt")
