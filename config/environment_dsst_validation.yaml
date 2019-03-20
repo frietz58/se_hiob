@@ -8,7 +8,7 @@
 environment_name: dsst
 
 # directory to which execution logs are written:
-log_dir: ../dsst_opt/hog_conf
+log_dir: ../dsst_validation
 
 # directory in which data samples are kept:
 data_dir: ./data
