@@ -120,8 +120,6 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
 
         # val_change = start + (step ** i) - 1
         val_change = change_function(start, step, i, "bigger")
-        if val_change is None:
-            continue
         print(val_change)
 
         val_changes_bigger = additional_parameters
@@ -159,30 +157,31 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
     gc.collect()
 
     # make val smaller
-    if not only_one_dir:
-        print("Decreasing Parameter Value: ")
-        for i in range(1, times + 1):
+    print("Decreasing Parameter Value: ")
+    for i in range(1, times + 1):
 
-            # val_change = start  (step ** i) - 1
-            val_change = change_function(start, step, i, "smaller")
-            if val_change is None:
-                continue
-            print(val_change)
+        if only_one_dir:
+            break
 
-            val_changes_smaller = additional_parameters
-            val_changes_smaller.append([str(parameter_name), val_change])
+        # val_change = start  (step ** i) - 1
+        val_change = change_function(start, step, i, "smaller")
 
-            set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
-                       save_to=args.tracker)
+        print(val_change)
 
-            environment_change = [["environment_name", "candidates"],
-                                  ["log_dir", "../candidates_opt/" + str(parameter_name)]]
-            set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+        val_changes_smaller = additional_parameters
+        val_changes_smaller.append([str(parameter_name), val_change])
 
-            if not test:
-                subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
-            gc.collect()
-        print()
+        set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
+                   save_to=args.tracker)
+
+        environment_change = [["environment_name", "candidates"],
+                              ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+
+        if not test:
+            subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
+        gc.collect()
+    print()
 
 
 def change_c_number_scales(start, step, i, direction):
@@ -194,17 +193,9 @@ def change_c_number_scales(start, step, i, direction):
 
 def change_inner_punish_threshold(start, step, i, direction):
     if direction == "bigger":
-        val = float(np.around(start + (step ** i) - 1, decimals=2))
-        if val > 0.78:
-            return val
-        else:
-            return None
+        return float(np.around(start + (step ** i) - 1, decimals=2))
     elif direction == "smaller":
-        val = float(np.around(start - (step ** i) + 1, decimals=2))
-        if val < 0.22:
-            return float(np.around(start - (step ** i) + 1, decimals=2))
-        else:
-            return None
+        return float(np.around(start - (step ** i) + 1, decimals=2))
 
 
 def change_c_scale_factor(start, step, i, direction):
@@ -224,30 +215,63 @@ def change_scale_window_step_size(start, step, i, direction):
 
 def change_adjust_max_scale_diff_after(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
-    # return int(np.around(start + (step * i), decimals=0))
-    return 10
-
+    return int(np.around(start + (step * i), decimals=0))
 
 def change_adjust_max_scale_diff(start, step, i, direction):
-    # only switch bool once
-    return False
+    # special case, we want it to only grow, smaller case is never used
+    return True
 
 
 if __name__ == '__main__':
 
     if args.gpu is None:
-        args.gpu = 2
+        args.gpu = 0
 
-    test = True
+    test = False
 
-    print("==== new parameter ==== \n")
-    change_parameter(parameter_name='adjust_max_scale_diff', additional_parameters=[
+    change_parameter(parameter_name='c_number_scales', additional_parameters=[
         ["use_scale_estimation", True],
         ["update_strategy", "cont"],
         ["approach", "candidates"],
-        ["c_change_aspect_ratio", False,
-         "adjust_max_scale_diff_after", 10]
-    ], start=True, step=1, times=1, change_function=change_adjust_max_scale_diff, test=test, only_one_dir=True)
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=33, step=2, times=5, change_function=change_c_number_scales, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='inner_punish_threshold', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='outer_punish_threshold', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='c_scale_factor', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=1.01, step=1.01, times=10, change_function=change_c_scale_factor, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='max_scale_difference', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.01, step=1.02, times=10, change_function=change_max_scale_difference, test=test, only_one_dir=True)
 
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='scale_window_step_size', additional_parameters=[
@@ -257,4 +281,22 @@ if __name__ == '__main__':
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", False]
     ], start=0.005, step=1.02, times=10, change_function=change_scale_window_step_size, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='adjust_max_scale_diff_after', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", True]
+    ], start=1, step=1, times=10, change_function=change_adjust_max_scale_diff_after, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='adjust_max_scale_diff', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff_after", 10]
+    ], start=False, step=1, times=1, change_function=change_adjust_max_scale_diff, test=test, only_one_dir=True)
 

@@ -217,6 +217,10 @@ def change_adjust_max_scale_diff_after(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
     return int(np.around(start + (step * i), decimals=0))
 
+def change_adjust_max_scale_diff(start, step, i, direction):
+    # special case, we want it to only grow, smaller case is never used
+    return True
+
 
 if __name__ == '__main__':
 
@@ -286,4 +290,13 @@ if __name__ == '__main__':
         ["c_change_aspect_ratio", False],
         ["adjust_max_scale_diff", True]
     ], start=1, step=1, times=10, change_function=change_adjust_max_scale_diff_after, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='adjust_max_scale_diff', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff_after", 10]
+    ], start=False, step=1, times=1, change_function=change_adjust_max_scale_diff, test=test, only_one_dir=True)
 

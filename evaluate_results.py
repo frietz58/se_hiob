@@ -570,71 +570,53 @@ def create_opt_csv(experiment_folder, eval_folder):
 
     # create head with parameters
     if approach == "Candidates dynamic" or approach == "Candidates static":
-        # TODO wie bei dsst
-        with open(csv_name, mode='w') as outcsv:
-            c_fieldnames = ["Avg_Success",
-                            "Avg_Precision",
-                            "Framerate",
-                            "SE_Framerate",
-                            "adjust_max_scale_diff",
-                            "adjust_max_scale_diff_after",
-                            "inner_punish_threshold",
-                            "outer_punish_threshold",
-                            "c_number_scales",
-                            "max_scale_difference",
-                            "scale_window_step_size",
-                            "c_scale_factor"]
+        # find dirs with same parameter value
+        same_parameter_value_collection = get_same_parameter_values(trackings)
+        changing_parameter = same_parameter_value_collection[list(same_parameter_value_collection.keys())[0]][0][
+            "parameter"]
 
-            writer = csv.DictWriter(outcsv, fieldnames=c_fieldnames)
+        with open(csv_name, "w", newline='') as outcsv:
+            fieldnames = ["Avg_Success",
+                          "Avg_Precision",
+                          "Framerate",
+                          "SE_Framerate",
+                          changing_parameter]
+
+            writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
             writer.writeheader()
 
-            # find dirs with same parameter value
-            same_parameter_collection = get_same_parameter_values(trackings)
+            # get the average values for the same parameter value for a row in the opt csv
+            avg_succs = []
+            avg_precs = []
+            se_framerates = []
+            framerates = []
+            for value in same_parameter_value_collection.values():
+                # get value for one row
+                for single_tracking in value:
+                    with open(single_tracking["tracking"] + "/evaluation.txt", "r") as evaltxt:
+                        lines = evaltxt.readlines()
+                        for line in lines:
+                            line = line.replace("\n", "")
+                            key_val = line.split("=")
+                            if key_val[0] == "average_precision_rating":
+                                avg_precs.append(float(key_val[1]))
+                            elif key_val[0] == "average_success_rating":
+                                avg_succs.append(float(key_val[1]))
+                            elif key_val[0] == "frame_rate":
+                                framerates.append(float(key_val[1]))
+                            elif key_val[0] == "se_frame_rate":
+                                se_framerates.append(float(key_val[1]))
 
-            for tracking_dir in trackings:
-                with open(tracking_dir + "/evaluation.txt", "r") as evaltxt:
-                    lines = evaltxt.readlines()
-                    for line in lines:
-                        line = line.replace("\n", "")
-                        key_val = line.split("=")
-                        if key_val[0] == "average_precision_rating":
-                            avg_prec = key_val[1]
-                        elif key_val[0] == "average_success_rating":
-                            avg_succ = key_val[1]
-                        elif key_val[0] == "frame_rate":
-                            frame_rate = key_val[1]
-                        elif key_val[0] == "se_frame_rate":
-                            se_framerate = key_val[1]
+                final_avg_succ = np.around(sum(avg_succs) / len(avg_succs), decimals=3)
+                final_avg_precc = np.around(sum(avg_precs) / len(avg_precs), decimals=3)
+                final_framerate = np.around(sum(framerates) / len(framerates), decimals=3)
+                final_se_framerate = np.around(sum(se_framerates) / len(se_framerates), decimals=3)
 
-                if "tracker.yaml" in os.listdir(tracking_dir):
-                    with open(tracking_dir + "/tracker.yaml", "r") as stream:
-                        try:
-                            configuration = yaml.safe_load(stream)
-                            scale_estimator_conf = configuration["scale_estimator"]
-                            adj_max_dif = scale_estimator_conf["adjust_max_scale_diff"]
-                            adj_max_dif_after = scale_estimator_conf["adjust_max_scale_diff_after"]
-                            inner_thresh = scale_estimator_conf["inner_punish_threshold"]
-                            outer_thresh = scale_estimator_conf["outer_punish_threshold"]
-                            number_c = scale_estimator_conf["c_number_scales"]
-                            max_diff = scale_estimator_conf["max_scale_difference"]
-                            window_step_size = scale_estimator_conf["scale_window_step_size"]
-                            c_scale_factor = scale_estimator_conf["c_scale_factor"]
-
-                        except yaml.YAMLError as exc:
-                            print(exc)
-
-                        writer.writerow({'Avg_Success': avg_succ,
-                                         'Avg_Precision': avg_prec,
-                                         'Framerate': frame_rate,
-                                         'SE_Framerate': se_framerate,
-                                         'adjust_max_scale_diff': adj_max_dif,
-                                         'adjust_max_scale_diff_after': adj_max_dif_after,
-                                         'inner_punish_threshold': inner_thresh,
-                                         'outer_punish_threshold': outer_thresh,
-                                         'c_number_scales': number_c,
-                                         'max_scale_difference': max_diff,
-                                         'scale_window_step_size': window_step_size,
-                                         'c_scale_factor': c_scale_factor})
+                writer.writerow({'Avg_Success': final_avg_succ,
+                                 'Avg_Precision': final_avg_precc,
+                                 'Framerate': final_framerate,
+                                 'SE_Framerate': final_se_framerate,
+                                 changing_parameter: value[0]["value"]})
 
     elif approach == "DSST dynamic" or approach == "DSST static":
 
@@ -685,6 +667,12 @@ def create_opt_csv(experiment_folder, eval_folder):
                                  'Framerate': final_framerate,
                                  'SE_Framerate': final_se_framerate,
                                  changing_parameter: value[0]["value"]})
+
+    # sort created csv by parameter and override old
+    df = pd.read_csv(csv_name)
+    cols = list(df)
+    sorted = df.sort_values(cols[-1])
+    sorted.to_csv(csv_name, index=False)
 
     return None
 

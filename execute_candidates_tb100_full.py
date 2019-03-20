@@ -22,4 +22,4 @@ if __name__ == '__main__':
         print("execution  " + str(i))
 
         if not test:
-            subprocess.call(['python', 'hiob_cli.py', '-e', 'config/environment_experiments_candidates.yaml', '-t', 'config/tracker_candidates.yaml', '-g', str(args.gpu)])
+            subprocess.call(['python', 'hiob_cli.py', '-e', 'config/environment_candidates.yaml', '-t', 'config/tracker_candidates.yaml', '-g', str(args.gpu)])

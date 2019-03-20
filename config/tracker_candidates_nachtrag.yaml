@@ -106,7 +106,7 @@ scale_estimator:
   approach: candidates
 
   #dsst params:
-  #values form avg opt
+  # values form avg opt
   scale_factor: 1.01  # scale factor between scale lvls
   scale_sigma_factor: 0.75 # changes the deviation/sharpness of the output gaussian
   learning_rate: 0.09
@@ -128,8 +128,7 @@ scale_estimator:
   max_scale_difference: 0.02 # max value the scale may change between two frames
   scale_window_step_size: 0.005 # the deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
   adjust_max_scale_diff: false # adjust the max_scale_difference value if the factor has been limited n time sin a row, necessary for extreme scale changes that exceed the max_scale_difference between frames
-  adjust_max_scale_diff_after: 10 # the number after how many times of the scale factor being limited the max scale_difference gets adjusted
-
+  adjust_max_scale_diff_after: 3 # the number after how many times of the scale factor being limited the max scale_difference gets adjusted
 
 
 
