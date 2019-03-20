@@ -106,16 +106,17 @@ scale_estimator:
   approach: custom_dsst
 
   #dsst params:
-  scale_factor: 1.02  # scale factor between scale lvls
-  scale_sigma_factor: 0.25 # changes the deviation/sharpness of the output gaussian
-  learning_rate: 0.025
+  # values form avg opt
+  scale_factor: 1.01  # scale factor between scale lvls
+  scale_sigma_factor: 0.75 # changes the deviation/sharpness of the output gaussian
+  learning_rate: 0.09
   reg: 0.01
   scale_model_max: 512 # max area of the scale model on the image
   scale_model_size: 16
   padding: 1.0
-  dsst_number_scales: 33 # number of scaled candidates to generate
+  dsst_number_scales: 17 # number of scaled candidates to generate
   d_change_aspect_ratio: false
-  hog_cell_size: 1
+  hog_cell_size: 2
   hog_block_norm_size: 4
 
 # candidate params:
