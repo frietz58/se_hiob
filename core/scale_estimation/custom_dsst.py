@@ -458,7 +458,8 @@ class CustomDsst:
 
                 # punish each candidate based on its divergence to 1
                 out['x'][:, i] = np.multiply(x_hog.flatten(), self.scale_window[i])
-                out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])(self.hog_cell_size[0], self.hog_cell_size[1])
+                #out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])(self.hog_cell_size[0], self.hog_cell_size[1])
+                out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])
 
         return out
 

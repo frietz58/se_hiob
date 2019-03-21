@@ -192,12 +192,12 @@ class CandidateApproach:
             evaluated_candidates = [[], []]
 
             # get pixel value of candidates at scaled lvl 1
-            base_candidate_rect = scaled_candidates[0][16]
-            base_candidate_val = np.sum([feature_mask[
-                                         round(base_candidate_rect.top / mask_scale_factor[1]):
-                                         round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
-                                         round(base_candidate_rect.left / mask_scale_factor[0]):
-                                         round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
+            # base_candidate_rect = scaled_candidates[0][16]
+            # base_candidate_val = np.sum([feature_mask[
+            #                              round(base_candidate_rect.top / mask_scale_factor[1]):
+            #                              round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
+            #                              round(base_candidate_rect.left / mask_scale_factor[0]):
+            #                              round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
 
             for width_candidate in scaled_candidates[0]:
                 # TODO dont have this code block three times...
@@ -234,12 +234,12 @@ class CandidateApproach:
 
         # if keep aspect ration the same
         else:
-            base_candidate_rect = scaled_candidates[16]
-            base_candidate_val = np.sum([feature_mask[
-                                  round(base_candidate_rect.top / mask_scale_factor[1]):
-                                  round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
-                                  round(base_candidate_rect.left / mask_scale_factor[0]):
-                                  round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
+            # base_candidate_rect = scaled_candidates[16]
+            # base_candidate_val = np.sum([feature_mask[
+            #                       round(base_candidate_rect.top / mask_scale_factor[1]):
+            #                       round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
+            #                       round(base_candidate_rect.left / mask_scale_factor[0]):
+            #                       round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
 
             # Evaluate each candidate based on its size
             evaluated_candidates = []
