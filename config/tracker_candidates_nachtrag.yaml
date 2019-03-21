@@ -106,7 +106,6 @@ scale_estimator:
   approach: candidates
 
   #dsst params:
-  # values form avg opt
   scale_factor: 1.01  # scale factor between scale lvls
   scale_sigma_factor: 0.75 # changes the deviation/sharpness of the output gaussian
   learning_rate: 0.09
