@@ -217,6 +217,7 @@ def change_adjust_max_scale_diff_after(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
     return int(np.around(start + (step * i), decimals=0))
 
+
 def change_adjust_max_scale_diff(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
     return True
@@ -227,7 +228,7 @@ if __name__ == '__main__':
     if args.gpu is None:
         args.gpu = 0
 
-    test = True
+    test = False
 
     change_parameter(parameter_name='c_number_scales', additional_parameters=[
         ["use_scale_estimation", True],
@@ -237,66 +238,66 @@ if __name__ == '__main__':
         ["adjust_max_scale_diff", False]
     ], start=33, step=2, times=5, change_function=change_c_number_scales, test=test, only_one_dir=False)
 
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='inner_punish_threshold', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "candidates"],
-    #     ["c_change_aspect_ratio", False],
-    #     ["adjust_max_scale_diff", False]
-    # ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='outer_punish_threshold', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "candidates"],
-    #     ["c_change_aspect_ratio", False],
-    #     ["adjust_max_scale_diff", False]
-    # ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='c_scale_factor', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "candidates"],
-    #     ["c_change_aspect_ratio", False],
-    #     ["adjust_max_scale_diff", False]
-    # ], start=1.01, step=1.01, times=10, change_function=change_c_scale_factor, test=test, only_one_dir=True)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='max_scale_difference', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "candidates"],
-    #     ["c_change_aspect_ratio", False],
-    #     ["adjust_max_scale_diff", False]
-    # ], start=0.01, step=1.02, times=10, change_function=change_max_scale_difference, test=test, only_one_dir=True)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='scale_window_step_size', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "candidates"],
-    #     ["c_change_aspect_ratio", False],
-    #     ["adjust_max_scale_diff", False]
-    # ], start=0.005, step=1.02, times=10, change_function=change_scale_window_step_size, test=test, only_one_dir=True)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='adjust_max_scale_diff_after', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "candidates"],
-    #     ["c_change_aspect_ratio", False],
-    #     ["adjust_max_scale_diff", True]
-    # ], start=1, step=1, times=10, change_function=change_adjust_max_scale_diff_after, test=test, only_one_dir=True)
-    #
-    # print("==== new parameter ==== \n")
-    # change_parameter(parameter_name='adjust_max_scale_diff', additional_parameters=[
-    #     ["use_scale_estimation", True],
-    #     ["update_strategy", "cont"],
-    #     ["approach", "candidates"],
-    #     ["c_change_aspect_ratio", False],
-    #     ["adjust_max_scale_diff_after", 10]
-    # ], start=False, step=1, times=1, change_function=change_adjust_max_scale_diff, test=test, only_one_dir=True)
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='inner_punish_threshold', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='outer_punish_threshold', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.5, step=1.05, times=5, change_function=change_inner_punish_threshold, test=test, only_one_dir=False)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='c_scale_factor', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=1.01, step=1.01, times=10, change_function=change_c_scale_factor, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='max_scale_difference', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.01, step=1.02, times=10, change_function=change_max_scale_difference, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='scale_window_step_size', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", False]
+    ], start=0.005, step=1.02, times=10, change_function=change_scale_window_step_size, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='adjust_max_scale_diff_after', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff", True]
+    ], start=1, step=1, times=10, change_function=change_adjust_max_scale_diff_after, test=test, only_one_dir=True)
+
+    print("==== new parameter ==== \n")
+    change_parameter(parameter_name='adjust_max_scale_diff', additional_parameters=[
+        ["use_scale_estimation", True],
+        ["update_strategy", "cont"],
+        ["approach", "candidates"],
+        ["c_change_aspect_ratio", False],
+        ["adjust_max_scale_diff_after", 10]
+    ], start=False, step=1, times=1, change_function=change_adjust_max_scale_diff, test=test, only_one_dir=True)
 
