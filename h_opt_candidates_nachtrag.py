@@ -217,6 +217,7 @@ def change_adjust_max_scale_diff_after(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
     return int(np.around(start + (step * i), decimals=0))
 
+
 def change_adjust_max_scale_diff(start, step, i, direction):
     # special case, we want it to only grow, smaller case is never used
     return True
