@@ -2,13 +2,14 @@ import os
 from core.Rect import Rect
 import argparse
 import scipy.io
+import matplotlib
+matplotlib.use('Agg')  # for plot when display is undefined
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
 import zipfile36
 import yaml
 import pandas as pd
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -44,6 +45,9 @@ csv_avg_success = "Avg. Success"
 csv_avg_precision = "Avg. Precision"
 csv_avg_fps = "Avg. Frame rate"
 csv_avg_se_fps = "Avg. SE Frame rate"
+csv_avg_ss = "Avg. Size Score"
+csv_total_precision = "Total Precision"
+csv_total_success = "Total Success"
 
 
 # ================================= GET FUNCTIONS =================================
@@ -522,7 +526,7 @@ def create_attribute_score_csv(result_folder, eval_folder):
     if not os.path.isdir(full_eval_path):
         os.mkdir(full_eval_path)
 
-    csv_fields = ["Attribute", "Samples", "Frames", csv_avg_precision, csv_avg_success, "Avg. Size Score"]
+    csv_fields = ["Attribute", "Samples", "Frames", csv_total_precision, csv_total_success, csv_avg_ss]
 
     out_csv = os.path.join(full_eval_path, eval_folder + ".csv")
     with open(out_csv, 'w', newline='') as outcsv:
@@ -559,9 +563,9 @@ def create_attribute_score_csv(result_folder, eval_folder):
                     "Attribute": attribute,
                     "Samples": len(attribute_sequences),
                     "Frames": score_dict["Frames"],
-                    csv_avg_precision: np.around(score_dict["Total Precision"], decimals=3),
-                    csv_avg_success: np.around(score_dict["Total Success"], decimals=3),
-                    "Avg. Size Score": score_dict["Size Score"]
+                    csv_total_precision: np.around(score_dict["Total Precision"], decimals=3),
+                    csv_total_success: np.around(score_dict["Total Success"], decimals=3),
+                    csv_avg_ss: score_dict["Size Score"]
                 })
 
 
