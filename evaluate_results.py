@@ -327,7 +327,7 @@ def get_avg_results_from_experiment(experiment_folder):
     # create csv with the average values for each attribute
     print("creating average over attributes csv")
     out_csv = os.path.join(eval_path, "attribute_averages.csv")
-    csv_fields = ["Attribute", "Samples", "Frames", "Precision", "Success", "Size Score"]
+    csv_fields = ["Attribute", "Samples", "Frames", csv_avg_precision, csv_avg_success, csv_avg_ss]
     with open(out_csv, 'w', newline='') as outcsv:
         writer = csv.DictWriter(outcsv, fieldnames=csv_fields)
         writer.writeheader()
@@ -340,11 +340,21 @@ def get_avg_results_from_experiment(experiment_folder):
             if attribute_sequences != []:
                 all_preds = []
                 all_gts = []
+
+            prec_sum = 0
+            succ_sum = 0
+            size_score_sum = 0
+
             for sequence in specific_attribute_sequences:
                 if sequence.split("/")[-1].split("-")[-1] not in unique_samples:
                     unique_samples.append(sequence.split("/")[-1].split("-")[-1])
 
                 sequence_preds, sequence_gts = get_all_rects(sequence)
+                sequence_results = get_metrics_from_rects("attribute", all_preds=sequence_preds, all_gts=sequence_gts)
+                prec_sum += sequence_results["Total Precision"]
+                succ_sum += sequence_results["Total Success"]
+                size_score_sum += sequence_results["Size Score"]
+
                 all_preds.append(sequence_preds)
                 all_gts.append(sequence_gts)
 
@@ -361,15 +371,23 @@ def get_avg_results_from_experiment(experiment_folder):
 
             score_dict = get_metrics_from_rects("attribute", all_preds=flat_preds, all_gts=flat_gts)
 
-
             writer.writerow({
                 "Attribute": attribute,
                 "Samples": len(attribute_sequences[attribute]),
                 "Frames": score_dict["Frames"],
-                "Precision": score_dict["Total Precision"],
-                "Success": score_dict["Total Success"],
-                "Size Score": score_dict["Size Score"]
+                csv_avg_precision: np.around(score_dict["Total Precision"], decimals=3),
+                csv_avg_success: np.around(score_dict["Total Success"], decimals=3),
+                csv_avg_ss: score_dict["Size Score"]
             })
+
+            # writer.writerow({
+            #     "Attribute": attribute,
+            #     "Samples": len(specific_attribute_sequences),
+            #     "Frames": score_dict["Frames"],
+            #     csv_avg_precision: np.around(prec_sum / len(specific_attribute_sequences), decimals=3),
+            #     csv_avg_success: np.around(succ_sum / len(specific_attribute_sequences), decimals=3),
+            #     csv_avg_ss: np.around(size_score_sum / len(specific_attribute_sequences), decimals=3)
+            # })
 
 
 
@@ -410,7 +428,7 @@ def get_avg_results_from_experiment(experiment_folder):
 
 
 # get metric from rects
-def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None):
+def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None, sequences=None):
     print("getting metrics for {0}".format(result_folder))
 
     if all_preds is None and all_gts is None:
