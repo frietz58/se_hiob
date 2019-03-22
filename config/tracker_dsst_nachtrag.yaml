@@ -113,7 +113,7 @@ scale_estimator:
   scale_model_max: 512 # max area of the scale model on the image
   scale_model_size: 16
   padding: 1.0
-  dsst_number_scales: 17 # number of scaled candidates to generate
+  dsst_number_scales: 25 # number of scaled candidates to generate
   d_change_aspect_ratio: false
   hog_cell_size: 1
   hog_block_norm_size: 4

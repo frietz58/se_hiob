@@ -223,12 +223,16 @@ def change_dsst_number_scales(start, step, i, direction):
         return int(np.around(start - step ** i, decimals=2))
 
 
+def hard_code_numbers(start, step, i, direction):
+    return 17
+
+
 if __name__ == '__main__':
 
     if args.gpu is None:
         args.gpu = 0
 
-    test = True
+    test = False
 
     # print("==== execution 0 ==== \n")
     # change_hog_conf(change_dict={"hog_cell_size":       [1, 2, 4, 8],
@@ -255,7 +259,7 @@ if __name__ == '__main__':
     #     ["update_strategy", "cont"],
     #     ["approach", "custom_dsst"],
     #     ["d_change_aspect_ratio", False]
-    # ], start=0.25, step=1.02, times_per_dir=5, change_function=change_scale_sigma_factor, test=test, only_one_dir=False)
+    # ], start=0.25, step=1.02, times_per_dir=5, change_function=change_scale_sigma_facto- %(name)sr, test=test, only_one_dir=False)
     #
     # print("==== new parameter ==== \n")
     # change_parameter(parameter_name='learning_rate', additional_parameters=[
@@ -280,12 +284,22 @@ if __name__ == '__main__':
     #     ["approach", "custom_dsst"],
     #     ["d_change_aspect_ratio", False]
     # ], start=16, step=2, times_per_dir=5, change_function=change_scale_model_size, test=test, only_one_dir=False)
+    #
+    # print("==== new parameter ==== \n")
+    # change_parameter(parameter_name='dsst_number_scales', additional_parameters=[
+    #     ["use_scale_estimation", True],
+    #     ["update_strategy", "cont"],
+    #     ["approach", "custom_dsst"],
+    #     ["d_change_aspect_ratio", False]
+    # ], start=33, step=2, times_per_dir=5, change_function=change_dsst_number_scales, test=test, only_one_dir=False)
 
+
+    # last 2 opt
     print("==== new parameter ==== \n")
     change_parameter(parameter_name='dsst_number_scales', additional_parameters=[
         ["use_scale_estimation", True],
         ["update_strategy", "cont"],
         ["approach", "custom_dsst"],
         ["d_change_aspect_ratio", False]
-    ], start=33, step=2, times_per_dir=5, change_function=change_dsst_number_scales, test=test, only_one_dir=False)
+    ], start=25, step=2, times_per_dir=1, change_function=hard_code_numbers, test=test, only_one_dir=True)
 
