@@ -23,7 +23,7 @@ logger.addHandler(ch)
 # to star a complete new run (aka do every experiment a second time, empty the log file or rename the )
 parser = argparse.ArgumentParser(description='Execute hiob experiments')
 parser.add_argument('-g', '--gpu')
-parser.add_argument('-exp', '--experiments', nargs='+', help='<Required> Set flag', required=True)
+parser.add_argument('-exp', '--experiments', nargs='+', required=True)
 
 args = parser.parse_args()
 
@@ -66,14 +66,14 @@ def main():
         "candidates_stat_cont_tb100full",
         "candidates_stat_limited_tb100full",
 
-        # "candidates_dyn_cont_tb100full",
-        # "candidates_dyn_limited_tb100full",
+        "candidates_dyn_cont_tb100full",
+        "candidates_dyn_limited_tb100full",
 
         "dsst_stat_cont_tb100full",
         "dsst_stat_limited_tb100full",
 
-        # "dsst_dyn_cont_tb100full",
-        # "dsst_dyn_limited_tb100full"
+        "dsst_dyn_cont_tb100full",
+        "dsst_dyn_limited_tb100full"
     ]
 
     log_progress = True
