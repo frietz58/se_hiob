@@ -1106,6 +1106,13 @@ def get_same_parameter_values(trackings):
         with open(tracking + "/tracker.yaml", "r") as stream:
             try:
                 configuration = yaml.safe_load(stream)
+
+                # if hog cell size not in configuration insert baseline values,
+                # which have been used but where in hog ocode instead of config file
+                if "hog_cell_size" not in configuration["scale_estimator"]:
+                    configuration["scale_estimator"]["hog_cell_size"] = 1
+                    configuration["scale_estimator"]["hog_block_norm_size"] = 4
+
                 scale_estimator_conf = configuration["scale_estimator"]
                 tracker_configs.append({"tracking": tracking, "conf": scale_estimator_conf})
             except yaml.YAMLError as exc:
