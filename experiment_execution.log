@@ -1,110 +1,181 @@
-specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
-
-starting experiment candidates_stat_cont_tb100full
-finished experiment candidates_stat_cont_tb100full
-
-starting experiment candidates_stat_limited_tb100full
-finished experiment candidates_stat_limited_tb100full
-
-starting experiment candidates_dyn_cont_tb100full
-finished experiment candidates_dyn_cont_tb100full
-
-starting experiment candidates_dyn_limited_tb100full
-finished experiment candidates_dyn_limited_tb100full
-
-starting experiment dsst_stat_cont_tb100full
-finished experiment dsst_stat_cont_tb100full
-
-starting experiment dsst_stat_limited_tb100full
-finished experiment dsst_stat_limited_tb100full
-
-starting experiment dsst_dyn_cont_tb100full
-finished experiment dsst_dyn_cont_tb100full
-
-starting experiment dsst_dyn_limited_tb100full
-EXPERIMENT dsst_dyn_limited_tb100full FAILED!
-Log:
-CREATING NEW TRACKER
-[2019-03-22 08:37:40,469|INFO|core.Tracker|Tracker.py:164] - log_dir is '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:37:40,469|INFO|core.Tracker|Tracker.py:169] - log_dir exists
-[2019-03-22 08:37:40,469|INFO|core.Tracker|Tracker.py:183] - execution: 0c2dcf5f-cb8d-4d49-8c58-12484d8702e7 - hiob-execution-finn-ubuntu-2019-03-22-08.37.40.420580
-[2019-03-22 08:37:40,469|INFO|core.Tracker|Tracker.py:187] - creating execution_dir at '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.37.40.420580'
-[2019-03-22 08:37:40,470|INFO|core.Tracker|Tracker.py:192] - Creating file handler for logging into '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.37.40.420580/execution.log'
-[2019-03-22 08:37:40,470|INFO|core.Tracker|Tracker.py:196] - Attached log to file '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.37.40.420580/execution.log'
-[2019-03-22 08:37:40,470|INFO|core.Tracker|Tracker.py:198] - Execution is: 0c2dcf5f-cb8d-4d49-8c58-12484d8702e7 - 'hiob-execution-finn-ubuntu-2019-03-22-08.37.40.420580'
-[2019-03-22 08:37:40,470|INFO|core.Tracker|Tracker.py:199] - log_dir: '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:37:40,470|INFO|core.Tracker|Tracker.py:200] - execution_dir: '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.37.40.420580'
-[2019-03-22 08:37:40,470|INFO|core.Tracker|Tracker.py:203] - Copying environment file from 'config/env_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:37:40,470|INFO|core.Tracker|Tracker.py:207] - Copying tracker file from 'config/tracker_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:37:40,470|INFO|__main__|hiob_cli.py:49] - Initiate tracking process
-[2019-03-22 08:37:40,470|INFO|core.sample_provider.Sample|Sample.py:62] - Start loading sample Deer
-[2019-03-22 08:37:40,910|INFO|core.sample_provider.Sample|Sample.py:146] - Sample '<Sample tb100/Deer,71fs,GT>' loaded
-[2019-03-22 08:37:40,910|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:65] - build model started
-[2019-03-22 08:37:40,919|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:111] - build model finished 0s
-[2019-03-22 08:37:40,919|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:45] - creating pretrained vgg16 net as feature extractor
-[2019-03-22 08:37:40,919|INFO|core.Vgg16|Vgg16.py:28] - VGG16 file: './net/vgg16.npy'
-[2019-03-22 08:37:41,239|INFO|core.Vgg16|Vgg16.py:55] - npy file loaded
-[2019-03-22 08:37:41,239|INFO|core.Vgg16|Vgg16.py:67] - build model started
-[2019-03-22 08:37:41,327|INFO|core.Vgg16|Vgg16.py:135] - build model finished: 0s
-[2019-03-22 08:37:41,329|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:67] - swarm setup
-[2019-03-22 08:37:41,329|INFO|core.Tracker|Tracker.py:245] - Setup done
-2019-03-22 08:37:41.329485: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-2019-03-22 08:37:41.388537: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:964] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
-2019-03-22 08:37:41.388973: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1432] Found device 0 with properties: 
-name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.228
-pciBusID: 0000:01:00.0
-totalMemory: 3.95GiB freeMemory: 3.53GiB
-2019-03-22 08:37:41.388987: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1511] Adding visible gpu devices: 0
-2019-03-22 08:37:41.584898: I tensorflow/core/common_runtime/gpu/gpu_device.cc:982] Device interconnect StreamExecutor with strength 1 edge matrix:
-2019-03-22 08:37:41.584927: I tensorflow/core/common_runtime/gpu/gpu_device.cc:988]      0 
-2019-03-22 08:37:41.584933: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1001] 0:   N 
-2019-03-22 08:37:41.585083: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 3254 MB memory) -> physical GPU (device: 0, name: GeForce GTX 970, pci bus id: 0000:01:00.0, compute capability: 5.2)
-[2019-03-22 08:37:41,585|INFO|root|Tracker.py:262] - start tracking sample Deer
-[2019-03-22 08:37:41,585|INFO|core.Tracking|Tracking.py:99] - Creating new Tracking#1
-[2019-03-22 08:37:41,587|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv4_3
-[2019-03-22 08:37:41,591|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:37:41,596|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:37:41,596|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:37:41,596|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:37:41,596|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:37:41,604|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:37:41,695|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv5_3
-[2019-03-22 08:37:41,700|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:37:41,705|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:37:41,705|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:37:41,705|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:37:41,706|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:37:41,713|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:37:41,808|INFO|core.Consolidator|Consolidator.py:83] - Input shape for ConsolidatorNet: (None, 25, 25, 768)
-[2019-03-22 08:37:41,808|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:37:41,809|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (9, 9, 768, 32)
-[2019-03-22 08:37:41,809|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:37:41,818|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([None, 25, 25, 32])
-[2019-03-22 08:37:41,818|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:37:41,820|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([None, 25, 25, 64])
-[2019-03-22 08:37:41,820|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 3
-[2019-03-22 08:37:41,820|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (5, 5, 64, 1)
-[2019-03-22 08:37:41,820|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:37:41,828|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 3 shape: ([None, 25, 25, 1])
-[2019-03-22 08:37:42,081|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:37:42,082|INFO|core.Tracking|Tracking.py:217] - calculate roi...
-[2019-03-22 08:37:42,083|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#0/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:37:42,083|INFO|core.Tracking|Tracking.py:219] - generate sroi and extract features
-[2019-03-22 08:37:42,093|INFO|core.Tracking|Tracking.py:221] - generate target mask
-[2019-03-22 08:37:42,093|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#0/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:37:43,346|INFO|core.Tracking|Tracking.py:225] - train selector
-[2019-03-22 08:37:43,346|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv4_3
-[2019-03-22 08:37:43,368|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv5_3
-[2019-03-22 08:37:43,599|INFO|core.selection.NetSelector|NetSelector.py:121] - Evaluating feature impact
-[2019-03-22 08:37:43,694|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv4_3: 30, 8, 92, 117, 121, 217, 223, 489, 184, 369, 396, 349, 237, 306, 463, 57, 284, 282, 10, 106, 271, 68, 401, 174, 372, 477, 380, 210, 393, 336, 261, 214, 241, 179, 510, 273, 226, 111, 59, 73, 62, 454, 438, 403, 251, 506, 157, 112, 291, 44, 231, 435, 443, 447, 35, 315, 198, 424, 94, 87, 371, 299, 116, 236, 266, 263, 5, 459, 277, 107, 378, 185, 423, 65, 247, 101, 376, 374, 352, 122, 474, 211, 248, 495, 154, 286, 375, 351, 268, 509, 216, 142, 15, 473, 204, 189, 219, 363, 212, 108, 88, 318, 297, 485, 391, 354, 195, 302, 98, 227, 321, 457, 7, 3, 205, 43, 55, 78, 508, 430, 334, 475, 95, 145, 408, 63, 12, 281, 316, 451, 344, 138, 69, 483, 83, 292, 182, 309, 496, 181, 120, 132, 206, 66, 300, 97, 314, 4, 239, 81, 338, 169, 414, 293, 410, 327, 433, 147, 37, 191, 275, 151, 76, 229, 202, 20, 96, 319, 270, 105, 353, 303, 422, 461, 152, 77, 416, 453, 395, 61, 104, 246, 499, 452, 163, 165, 200, 250, 51, 394, 355, 133, 164, 136, 294, 255, 14, 99, 40, 27, 228, 67, 242, 238, 278, 493, 155, 264, 428, 377, 357, 419, 356, 2, 168, 265, 308, 50, 478, 64, 449, 432, 209, 389, 72, 234, 135, 140, 256, 175, 224, 262, 431, 288, 75, 409, 100, 458, 267, 448, 388, 390, 46, 358, 193, 1, 398, 301, 331, 60, 359, 384, 328, 148, 488, 335, 337, 365, 494, 161, 259, 196, 253, 441, 13, 487, 310, 74, 126, 341, 176, 491, 178, 492, 240, 399, 361, 405, 115, 82, 215, 56, 197, 417, 123, 400, 127, 425, 128, 295, 0, 220, 208, 366, 501, 47, 201, 326, 134, 146, 118, 348, 137, 85, 129, 415, 404, 465, 252, 149, 235, 479, 31, 383, 434, 70, 340, 427, 444, 230, 16, 296, 21, 260, 171, 19, 141, 183, 232, 280, 119, 285, 290, 407, 387, 18, 411, 258, 186, 305, 497, 24, 440, 190, 442, 269, 421, 22, 187, 471, 360, 6, 464, 194, 307, 283, 397, 188, 446, 49, 39, 455, 342, 362, 500, 131, 276, 199, 180, 462, 103, 79, 109, 124, 25, 32, 243, 502, 158, 110, 153, 143, 382, 17, 373, 436, 392, 386, 311, 486, 28, 368, 482, 102, 466, 312, 150, 467, 272, 130, 257, 156, 439, 381, 472, 222, 177, 379, 218, 34, 144, 125, 36, 42, 346, 192, 167, 481, 45, 412, 470, 254, 402, 325, 71, 437, 203, 279, 323, 370, 139, 249, 345, 11, 406, 26, 170, 274, 511, 84, 324, 426, 313, 332, 505, 41, 29, 245, 469, 476, 289, 244, 48, 320, 90, 484, 420, 287, 339, 298, 172, 385, 166, 159, 367, 468, 53, 418, 38, 350, 413, 322, 54, 58, 207, 429, 330, 450, 33, 445, 317, 507, 23, 93, 480, 9, 490, 114, 113, 225, 343, 89, 80, 162, 221, 364, 91, 456, 329, 213, 173, 347, 86, 233, 333, 503, 52, 460, 498, 304, 504, 160
-[2019-03-22 08:37:43,694|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv5_3: 145, 143, 446, 139, 2, 31, 315, 314, 202, 29, 155, 313, 254, 426, 90, 134, 4, 260, 182, 490, 159, 71, 360, 316, 309, 189, 423, 330, 274, 102, 500, 370, 498, 279, 380, 93, 141, 70, 58, 216, 298, 117, 148, 304, 284, 282, 37, 172, 263, 136, 485, 390, 242, 325, 132, 321, 214, 255, 348, 305, 318, 392, 338, 113, 203, 39, 308, 80, 7, 363, 473, 30, 430, 268, 146, 54, 437, 427, 349, 259, 421, 150, 138, 100, 371, 501, 405, 510, 303, 403, 387, 504, 208, 184, 499, 432, 116, 231, 49, 74, 509, 271, 112, 210, 468, 369, 366, 310, 341, 449, 433, 188, 409, 220, 98, 383, 397, 123, 110, 168, 320, 395, 471, 286, 232, 408, 258, 211, 183, 353, 225, 476, 312, 442, 280, 67, 120, 262, 9, 52, 281, 222, 355, 478, 265, 332, 328, 10, 234, 195, 77, 257, 128, 252, 376, 368, 32, 236, 209, 166, 163, 17, 64, 505, 137, 23, 444, 34, 235, 278, 460, 218, 154, 475, 317, 91, 253, 15, 401, 56, 68, 21, 191, 92, 503, 229, 489, 389, 479, 375, 14, 374, 13, 294, 283, 8, 329, 167, 425, 46, 288, 97, 495, 196, 481, 340, 379, 492, 273, 333, 319, 41, 108, 486, 297, 213, 407, 160, 327, 420, 223, 352, 448, 245, 465, 44, 264, 1, 440, 270, 311, 57, 275, 144, 357, 152, 429, 438, 276, 207, 422, 299, 83, 467, 301, 290, 464, 277, 82, 459, 482, 78, 488, 66, 122, 287, 452, 162, 418, 26, 174, 25, 411, 507, 406, 240, 230, 342, 227, 361, 205, 224, 343, 201, 393, 187, 496, 176, 331, 373, 324, 181, 186, 388, 24, 96, 180, 243, 453, 447, 94, 302, 491, 221, 244, 51, 335, 219, 416, 456, 118, 197, 382, 256, 11, 249, 53, 45, 291, 233, 384, 354, 40, 292, 200, 381, 73, 35, 107, 483, 322, 185, 497, 147, 346, 417, 272, 50, 239, 295, 18, 59, 16, 396, 206, 228, 101, 436, 28, 358, 190, 508, 114, 47, 344, 42, 494, 412, 377, 153, 339, 480, 266, 359, 88, 204, 364, 455, 55, 161, 0, 461, 502, 394, 269, 142, 133, 135, 470, 414, 419, 33, 248, 156, 296, 95, 386, 130, 362, 192, 404, 474, 347, 81, 451, 493, 246, 177, 104, 454, 466, 398, 121, 443, 170, 307, 62, 350, 217, 178, 85, 399, 323, 385, 129, 306, 450, 19, 226, 179, 285, 484, 84, 111, 22, 457, 215, 413, 27, 76, 334, 89, 126, 199, 72, 60, 193, 86, 65, 79, 119, 164, 36, 365, 212, 293, 87, 3, 400, 445, 63, 124, 105, 75, 48, 237, 99, 345, 157, 372, 247, 38, 194, 158, 289, 424, 267, 336, 472, 351, 115, 337, 431, 5, 131, 171, 391, 477, 251, 356, 367, 511, 402, 410, 169, 300, 20, 140, 127, 487, 151, 378, 250, 173, 469, 241, 165, 415, 238, 435, 175, 463, 12, 149, 506, 462, 439, 458, 106, 61, 43, 441, 103, 6, 109, 125, 428, 326, 434, 198, 69, 261
-[2019-03-22 08:37:43,697|INFO|core.Consolidator|Consolidator.py:163] - Storing frame 'initial_frame' for consolidator update with weight 1.000.
-[2019-03-22 08:37:44,296|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:37:44,298|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#1/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:37:44,301|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#1/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:37:44,327|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:178] - Predicting position for frame <Frame#1/71 of Tracking#1 on tb100/Deer>, Lost: 0
-[2019-03-22 08:37:44,333|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:210] - previous position: <rect(306, 5, 95, 65)>
-[2019-03-22 08:37:44,358|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:285] - Prediction: <rect(320, 32, 95, 65)>, quality: 0.537232
+2019-03-22 17:13:33,445 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 17:13:33,447 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 17:13:33,448 | INFO | completed experiments so far: []
+2019-03-22 17:13:33,448 | INFO | completed experiments so far: []
+2019-03-22 17:13:33,448 | INFO | starting experiment dsst_validation0
+2019-03-22 17:14:10,135 | INFO | finished experiment dsst_validation0
+2019-03-22 17:14:10,135 | INFO | 
+2019-03-22 17:14:10,135 | INFO | completed experiments so far: ['dsst_validation0']
+2019-03-22 17:14:10,136 | INFO | starting experiment dsst_validation1
+2019-03-22 17:14:46,955 | INFO | finished experiment dsst_validation1
+2019-03-22 17:14:46,955 | INFO | 
+2019-03-22 17:14:46,955 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1']
+2019-03-22 17:14:46,955 | INFO | starting experiment dsst_validation2
+2019-03-22 17:15:36,703 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 17:15:36,704 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 17:15:36,704 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1']
+2019-03-22 17:15:36,704 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1']
+2019-03-22 17:15:36,704 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1']
+2019-03-22 17:15:36,704 | INFO | starting experiment dsst_validation2
+2019-03-22 17:16:12,902 | INFO | finished experiment dsst_validation2
+2019-03-22 17:16:12,902 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2']
+2019-03-22 17:16:12,902 | INFO | starting experiment dsst_validation3
+2019-03-22 17:16:48,784 | INFO | finished experiment dsst_validation3
+2019-03-22 17:16:48,784 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3']
+2019-03-22 17:16:48,785 | INFO | starting experiment dsst_validation4
+2019-03-22 17:17:24,966 | INFO | finished experiment dsst_validation4
+2019-03-22 17:17:24,967 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4']
+2019-03-22 17:17:24,967 | INFO | starting experiment dsst_validation5
+2019-03-22 17:18:00,623 | INFO | finished experiment dsst_validation5
+2019-03-22 17:18:00,623 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5']
+2019-03-22 17:18:00,623 | INFO | starting experiment dsst_validation6
+2019-03-22 17:18:37,040 | INFO | finished experiment dsst_validation6
+2019-03-22 17:18:37,041 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6']
+2019-03-22 17:18:37,041 | INFO | starting experiment dsst_validation7
+2019-03-22 17:19:12,903 | INFO | finished experiment dsst_validation7
+2019-03-22 17:19:12,903 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7']
+2019-03-22 17:19:12,903 | INFO | starting experiment dsst_validation8
+2019-03-22 17:19:49,078 | INFO | finished experiment dsst_validation8
+2019-03-22 17:19:49,079 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8']
+2019-03-22 17:19:49,079 | INFO | starting experiment dsst_validation9
+2019-03-22 17:20:25,087 | INFO | finished experiment dsst_validation9
+2019-03-22 17:20:25,088 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9']
+2019-03-22 17:20:25,088 | INFO | starting experiment candidates_stat_cont_tb100full
+2019-03-22 17:21:03,441 | INFO | finished experiment candidates_stat_cont_tb100full
+2019-03-22 17:21:03,442 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full']
+2019-03-22 17:21:03,442 | INFO | starting experiment candidates_stat_limited_tb100full
+2019-03-22 17:21:40,501 | INFO | finished experiment candidates_stat_limited_tb100full
+2019-03-22 17:21:40,502 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:21:40,502 | INFO | starting experiment candidates_dyn_cont_tb100full
+2019-03-22 17:22:11,243 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 17:22:11,243 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 17:22:11,243 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,244 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,244 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,244 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,244 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,244 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,245 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,245 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,245 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,245 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,245 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-22 17:22:11,246 | INFO | starting experiment candidates_stat_cont_tb100full
+2019-03-22 17:22:52,838 | INFO | finished experiment candidates_stat_cont_tb100full
+2019-03-22 17:22:52,839 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full']
+2019-03-22 17:22:52,839 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full']
+2019-03-22 17:22:52,839 | INFO | starting experiment candidates_dyn_cont_tb100full
+2019-03-22 17:23:35,930 | INFO | finished experiment candidates_dyn_cont_tb100full
+2019-03-22 17:23:35,931 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full']
+2019-03-22 17:23:35,931 | INFO | starting experiment candidates_dyn_limited_tb100full
+2019-03-22 17:24:17,706 | INFO | finished experiment candidates_dyn_limited_tb100full
+2019-03-22 17:24:17,707 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full']
+2019-03-22 17:24:17,707 | INFO | starting experiment dsst_stat_cont_tb100full
+2019-03-22 17:24:57,538 | INFO | finished experiment dsst_stat_cont_tb100full
+2019-03-22 17:24:57,539 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full']
+2019-03-22 17:24:57,539 | INFO | starting experiment dsst_stat_limited_tb100full
+2019-03-22 17:25:35,844 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 17:25:35,845 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 17:25:35,845 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full']
+2019-03-22 17:25:35,845 | INFO | starting experiment candidates_stat_cont_tb100full
+2019-03-22 17:26:16,634 | INFO | finished experiment candidates_stat_cont_tb100full
+2019-03-22 17:26:16,635 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full']
+2019-03-22 17:26:16,635 | INFO | starting experiment dsst_stat_limited_tb100full
+2019-03-22 17:26:58,397 | INFO | finished experiment dsst_stat_limited_tb100full
+2019-03-22 17:26:58,398 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full', 'dsst_stat_limited_tb100full']
+2019-03-22 17:26:58,398 | INFO | starting experiment dsst_dyn_cont_tb100full
+2019-03-22 17:27:32,771 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 17:27:32,771 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 17:27:51,500 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full', 'dsst_stat_limited_tb100full']
+2019-03-22 17:29:58,697 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 17:29:58,698 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 17:30:01,136 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full', 'dsst_stat_limited_tb100full']
+2019-03-22 17:30:23,070 | INFO | starting experiment dsst_dyn_cont_tb100full
+2019-03-22 17:31:14,925 | INFO | finished experiment dsst_dyn_cont_tb100full
+2019-03-22 17:31:14,925 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full']
+2019-03-22 17:31:14,925 | INFO | starting experiment dsst_dyn_limited_tb100full
+2019-03-22 17:31:23,472 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 17:31:23,472 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 17:31:27,771 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full']
+2019-03-22 17:31:27,772 | INFO | starting experiment dsst_dyn_limited_tb100full
+2019-03-22 17:31:36,526 | ERROR | EXPERIMENT dsst_dyn_limited_tb100full FAILED!
+2019-03-22 17:31:36,527 | ERROR | Log:
+2019-03-22 17:31:36,527 | ERROR | CREATING NEW TRACKER
+[2019-03-22 17:31:29,046|INFO|core.Tracker|Tracker.py:164] - log_dir is '../dsst_dyn_limited_tb100full/'
+[2019-03-22 17:31:29,046|INFO|core.Tracker|Tracker.py:169] - log_dir exists
+[2019-03-22 17:31:29,046|INFO|core.Tracker|Tracker.py:183] - execution: cceaef27-d370-4500-aa42-9cafc702fcc6 - hiob-execution-finn-ubuntu-2019-03-22-17.31.28.997656
+[2019-03-22 17:31:29,046|INFO|core.Tracker|Tracker.py:187] - creating execution_dir at '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-17.31.28.997656'
+[2019-03-22 17:31:29,046|INFO|core.Tracker|Tracker.py:192] - Creating file handler for logging into '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-17.31.28.997656/execution.log'
+[2019-03-22 17:31:29,047|INFO|core.Tracker|Tracker.py:196] - Attached log to file '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-17.31.28.997656/execution.log'
+[2019-03-22 17:31:29,047|INFO|core.Tracker|Tracker.py:198] - Execution is: cceaef27-d370-4500-aa42-9cafc702fcc6 - 'hiob-execution-finn-ubuntu-2019-03-22-17.31.28.997656'
+[2019-03-22 17:31:29,047|INFO|core.Tracker|Tracker.py:199] - log_dir: '../dsst_dyn_limited_tb100full/'
+[2019-03-22 17:31:29,047|INFO|core.Tracker|Tracker.py:200] - execution_dir: '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-17.31.28.997656'
+[2019-03-22 17:31:29,047|INFO|core.Tracker|Tracker.py:203] - Copying environment file from 'config/env_dsst_dyn_limited_tb100full.yaml'
+[2019-03-22 17:31:29,047|INFO|core.Tracker|Tracker.py:207] - Copying tracker file from 'config/tracker_dsst_dyn_limited_tb100full.yaml'
+[2019-03-22 17:31:29,047|INFO|__main__|hiob_cli.py:49] - Initiate tracking process
+[2019-03-22 17:31:29,047|INFO|core.sample_provider.Sample|Sample.py:62] - Start loading sample Deer
+[2019-03-22 17:31:29,506|INFO|core.sample_provider.Sample|Sample.py:146] - Sample '<Sample tb100/Deer,71fs,GT>' loaded
+[2019-03-22 17:31:29,506|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:65] - build model started
+[2019-03-22 17:31:29,515|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:111] - build model finished 0s
+[2019-03-22 17:31:29,515|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:45] - creating pretrained vgg16 net as feature extractor
+[2019-03-22 17:31:29,515|INFO|core.Vgg16|Vgg16.py:28] - VGG16 file: './net/vgg16.npy'
+[2019-03-22 17:31:29,844|INFO|core.Vgg16|Vgg16.py:55] - npy file loaded
+[2019-03-22 17:31:29,844|INFO|core.Vgg16|Vgg16.py:67] - build model started
+[2019-03-22 17:31:29,946|INFO|core.Vgg16|Vgg16.py:135] - build model finished: 0s
+[2019-03-22 17:31:29,947|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:67] - swarm setup
+[2019-03-22 17:31:29,947|INFO|core.Tracker|Tracker.py:245] - Setup done
+2019-03-22 17:31:29.947797: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+[2019-03-22 17:31:29,948|INFO|root|Tracker.py:262] - start tracking sample Deer
+[2019-03-22 17:31:29,948|INFO|core.Tracking|Tracking.py:99] - Creating new Tracking#1
+[2019-03-22 17:31:29,950|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv4_3
+[2019-03-22 17:31:29,954|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
+[2019-03-22 17:31:29,959|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
+[2019-03-22 17:31:29,959|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
+[2019-03-22 17:31:29,959|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
+[2019-03-22 17:31:29,960|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
+[2019-03-22 17:31:29,968|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
+[2019-03-22 17:31:30,053|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv5_3
+[2019-03-22 17:31:30,057|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
+[2019-03-22 17:31:30,062|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
+[2019-03-22 17:31:30,063|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
+[2019-03-22 17:31:30,063|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
+[2019-03-22 17:31:30,063|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
+[2019-03-22 17:31:30,070|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
+[2019-03-22 17:31:30,155|INFO|core.Consolidator|Consolidator.py:83] - Input shape for ConsolidatorNet: (None, 25, 25, 768)
+[2019-03-22 17:31:30,156|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
+[2019-03-22 17:31:30,156|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (9, 9, 768, 32)
+[2019-03-22 17:31:30,156|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
+[2019-03-22 17:31:30,164|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([None, 25, 25, 32])
+[2019-03-22 17:31:30,164|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
+[2019-03-22 17:31:30,166|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([None, 25, 25, 64])
+[2019-03-22 17:31:30,166|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 3
+[2019-03-22 17:31:30,166|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (5, 5, 64, 1)
+[2019-03-22 17:31:30,166|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
+[2019-03-22 17:31:30,174|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 3 shape: ([None, 25, 25, 1])
+[2019-03-22 17:31:30,425|INFO|core.Frame|Frame.py:57] - Creating new Frame
+[2019-03-22 17:31:30,426|INFO|core.Tracking|Tracking.py:217] - calculate roi...
+[2019-03-22 17:31:30,427|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#0/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
+[2019-03-22 17:31:30,427|INFO|core.Tracking|Tracking.py:219] - generate sroi and extract features
+[2019-03-22 17:31:30,435|INFO|core.Tracking|Tracking.py:221] - generate target mask
+[2019-03-22 17:31:30,435|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#0/71 of Tracking#1 on tb100/Deer>
+[2019-03-22 17:31:31,067|INFO|core.Tracking|Tracking.py:225] - train selector
+[2019-03-22 17:31:31,067|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv4_3
+[2019-03-22 17:31:31,080|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv5_3
+[2019-03-22 17:31:32,556|INFO|core.selection.NetSelector|NetSelector.py:121] - Evaluating feature impact
+[2019-03-22 17:31:32,673|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv4_3: 30, 8, 92, 117, 121, 217, 223, 489, 184, 369, 396, 349, 237, 306, 463, 57, 284, 282, 10, 106, 271, 68, 401, 174, 372, 477, 380, 210, 393, 336, 261, 214, 241, 179, 510, 273, 226, 111, 59, 73, 62, 454, 438, 403, 251, 506, 157, 112, 291, 44, 231, 435, 443, 447, 35, 315, 198, 424, 94, 87, 371, 299, 116, 236, 266, 263, 5, 459, 277, 107, 378, 185, 423, 65, 247, 101, 376, 374, 352, 122, 474, 211, 248, 495, 154, 286, 375, 351, 268, 509, 216, 142, 15, 473, 204, 189, 219, 363, 212, 108, 88, 318, 297, 485, 391, 354, 195, 302, 98, 227, 321, 457, 7, 3, 205, 43, 55, 78, 508, 430, 334, 475, 95, 145, 408, 63, 12, 281, 316, 451, 344, 138, 69, 483, 83, 292, 182, 309, 496, 181, 120, 132, 206, 66, 300, 97, 314, 4, 239, 81, 338, 169, 414, 293, 410, 327, 433, 147, 37, 191, 275, 151, 76, 229, 202, 20, 96, 319, 270, 105, 353, 303, 422, 461, 152, 77, 416, 453, 395, 61, 104, 246, 499, 452, 163, 165, 200, 250, 51, 394, 355, 133, 164, 136, 294, 255, 14, 99, 40, 27, 228, 67, 242, 238, 278, 493, 155, 264, 428, 377, 357, 419, 356, 2, 168, 265, 308, 50, 478, 64, 449, 432, 209, 389, 72, 234, 135, 140, 256, 175, 224, 262, 431, 288, 75, 409, 100, 458, 267, 448, 388, 390, 46, 358, 193, 1, 398, 301, 331, 60, 359, 384, 328, 148, 488, 335, 337, 365, 494, 161, 259, 196, 253, 441, 13, 487, 310, 74, 126, 341, 176, 491, 178, 492, 240, 399, 361, 405, 115, 82, 215, 56, 197, 417, 123, 400, 127, 425, 128, 295, 0, 220, 208, 366, 501, 47, 201, 326, 134, 146, 118, 348, 137, 85, 129, 415, 404, 465, 252, 149, 235, 479, 31, 383, 434, 70, 340, 427, 444, 230, 16, 296, 21, 260, 171, 19, 141, 183, 232, 280, 119, 285, 290, 407, 387, 18, 411, 258, 186, 305, 497, 24, 440, 190, 442, 269, 421, 22, 187, 471, 360, 6, 464, 194, 307, 283, 397, 188, 446, 49, 39, 455, 342, 362, 500, 131, 276, 199, 180, 462, 103, 79, 109, 124, 25, 32, 243, 502, 158, 110, 153, 143, 382, 17, 373, 436, 392, 386, 311, 486, 28, 368, 482, 102, 466, 312, 150, 467, 272, 130, 257, 156, 439, 381, 472, 222, 177, 379, 218, 34, 144, 125, 36, 42, 346, 192, 167, 481, 45, 412, 470, 254, 402, 325, 71, 437, 203, 279, 323, 370, 139, 249, 345, 11, 406, 26, 170, 274, 511, 84, 324, 426, 313, 332, 505, 41, 29, 245, 469, 476, 289, 244, 48, 320, 90, 484, 420, 287, 339, 298, 172, 385, 166, 159, 367, 468, 53, 418, 38, 350, 413, 322, 54, 58, 207, 429, 330, 450, 33, 445, 317, 507, 23, 93, 480, 9, 490, 114, 113, 225, 343, 89, 80, 162, 221, 364, 91, 456, 329, 213, 173, 347, 86, 233, 333, 503, 52, 460, 498, 304, 504, 160
+[2019-03-22 17:31:32,674|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv5_3: 145, 143, 446, 139, 2, 31, 315, 314, 202, 29, 155, 313, 254, 426, 90, 134, 4, 260, 182, 490, 159, 71, 360, 316, 309, 189, 423, 330, 274, 102, 500, 370, 498, 279, 380, 93, 141, 70, 58, 216, 298, 117, 148, 304, 284, 282, 37, 172, 263, 136, 485, 390, 242, 325, 132, 321, 214, 255, 348, 305, 318, 392, 338, 113, 203, 39, 308, 80, 7, 363, 473, 30, 430, 268, 146, 54, 437, 427, 349, 259, 421, 150, 138, 100, 371, 501, 405, 510, 303, 403, 387, 504, 208, 184, 499, 432, 116, 231, 49, 74, 509, 271, 112, 210, 468, 369, 366, 310, 341, 449, 433, 188, 409, 220, 98, 383, 397, 123, 110, 168, 320, 395, 471, 286, 232, 408, 258, 211, 183, 353, 225, 476, 312, 442, 280, 67, 120, 262, 9, 52, 281, 222, 355, 478, 265, 332, 328, 10, 234, 195, 77, 257, 128, 252, 376, 368, 32, 236, 209, 166, 163, 17, 64, 505, 137, 23, 444, 34, 235, 278, 460, 218, 154, 475, 317, 91, 253, 15, 401, 56, 68, 21, 191, 92, 503, 229, 489, 389, 479, 375, 14, 374, 13, 294, 283, 8, 329, 167, 425, 46, 288, 97, 495, 196, 481, 340, 379, 492, 273, 333, 319, 41, 108, 486, 297, 213, 407, 160, 327, 420, 223, 352, 448, 245, 465, 44, 264, 1, 440, 270, 311, 57, 275, 144, 357, 152, 429, 438, 276, 207, 422, 299, 83, 467, 301, 290, 464, 277, 82, 459, 482, 78, 488, 66, 122, 287, 452, 162, 418, 26, 174, 25, 411, 507, 406, 240, 230, 342, 227, 361, 205, 224, 343, 201, 393, 187, 496, 176, 331, 373, 324, 181, 186, 388, 24, 96, 180, 243, 453, 447, 94, 302, 491, 221, 244, 51, 335, 219, 416, 456, 118, 197, 382, 256, 11, 249, 53, 45, 291, 233, 384, 354, 40, 292, 200, 381, 73, 35, 107, 483, 322, 185, 497, 147, 346, 417, 272, 50, 239, 295, 18, 59, 16, 396, 206, 228, 101, 436, 28, 358, 190, 508, 114, 47, 344, 42, 494, 412, 377, 153, 339, 480, 266, 359, 88, 204, 364, 455, 55, 161, 0, 461, 502, 394, 269, 142, 133, 135, 470, 414, 419, 33, 248, 156, 296, 95, 386, 130, 362, 192, 404, 474, 347, 81, 451, 493, 246, 177, 104, 454, 466, 398, 121, 443, 170, 307, 62, 350, 217, 178, 85, 399, 323, 385, 129, 306, 450, 19, 226, 179, 285, 484, 84, 111, 22, 457, 215, 413, 27, 76, 334, 89, 126, 199, 72, 60, 193, 86, 65, 79, 119, 164, 36, 365, 212, 293, 87, 3, 400, 445, 63, 124, 105, 75, 48, 237, 99, 345, 157, 372, 247, 38, 194, 158, 289, 424, 267, 336, 472, 351, 115, 337, 431, 5, 131, 171, 391, 477, 251, 356, 367, 511, 402, 410, 169, 300, 20, 140, 127, 487, 151, 378, 250, 173, 469, 241, 165, 415, 238, 435, 175, 463, 12, 149, 506, 462, 439, 458, 106, 61, 43, 441, 103, 6, 109, 125, 428, 326, 434, 198, 69, 261
+[2019-03-22 17:31:32,677|INFO|core.Consolidator|Consolidator.py:163] - Storing frame 'initial_frame' for consolidator update with weight 1.000.
+2019-03-22 17:31:32.793816: W tensorflow/core/framework/allocator.cc:108] Allocation of 155520000 exceeds 10% of system memory.
+2019-03-22 17:31:32.960068: W tensorflow/core/framework/allocator.cc:108] Allocation of 155520000 exceeds 10% of system memory.
+2019-03-22 17:31:33.123861: W tensorflow/core/framework/allocator.cc:108] Allocation of 155520000 exceeds 10% of system memory.
+2019-03-22 17:31:33.283349: W tensorflow/core/framework/allocator.cc:108] Allocation of 155520000 exceeds 10% of system memory.
+2019-03-22 17:31:33.445332: W tensorflow/core/framework/allocator.cc:108] Allocation of 155520000 exceeds 10% of system memory.
+[2019-03-22 17:31:36,040|INFO|core.Frame|Frame.py:57] - Creating new Frame
+[2019-03-22 17:31:36,041|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#1/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
+[2019-03-22 17:31:36,044|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#1/71 of Tracking#1 on tb100/Deer>
+[2019-03-22 17:31:36,263|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:178] - Predicting position for frame <Frame#1/71 of Tracking#1 on tb100/Deer>, Lost: 0
+[2019-03-22 17:31:36,267|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:210] - previous position: <rect(306, 5, 95, 65)>
+[2019-03-22 17:31:36,285|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:285] - Prediction: <rect(320, 32, 95, 65)>, quality: 0.537232
 Traceback (most recent call last):
   File "hiob_cli.py", line 87, in <module>
     main()
@@ -136,452 +207,12 @@ Traceback (most recent call last):
     x2, y2, w2, h2 = other
 TypeError: 'NoneType' object is not iterable
 
-starting continuous experiment execution
-specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
-
-starting experiment candidates_stat_cont_tb100full
-finished experiment candidates_stat_cont_tb100full
-
-starting experiment candidates_stat_limited_tb100full
-finished experiment candidates_stat_limited_tb100full
-
-starting experiment candidates_dyn_cont_tb100full
-finished experiment candidates_dyn_cont_tb100full
-
-starting experiment candidates_dyn_limited_tb100full
-finished experiment candidates_dyn_limited_tb100full
-
-starting experiment dsst_stat_cont_tb100full
-finished experiment dsst_stat_cont_tb100full
-
-starting experiment dsst_stat_limited_tb100full
-finished experiment dsst_stat_limited_tb100full
-
-starting experiment dsst_dyn_cont_tb100full
-finished experiment dsst_dyn_cont_tb100full
-
-starting experiment dsst_dyn_limited_tb100full
-starting continuous experiment execution
-specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
-
-starting experiment candidates_stat_cont_tb100full
-finished experiment candidates_stat_cont_tb100full
-
-starting experiment candidates_stat_limited_tb100full
-finished experiment candidates_stat_limited_tb100full
-
-starting experiment candidates_dyn_cont_tb100full
-finished experiment candidates_dyn_cont_tb100full
-
-starting experiment candidates_dyn_limited_tb100full
-finished experiment candidates_dyn_limited_tb100full
-
-starting experiment dsst_stat_cont_tb100full
-finished experiment dsst_stat_cont_tb100full
-
-starting experiment dsst_stat_limited_tb100full
-finished experiment dsst_stat_limited_tb100full
-
-starting experiment dsst_dyn_cont_tb100full
-finished experiment dsst_dyn_cont_tb100full
-
-starting experiment dsst_dyn_limited_tb100full
-EXPERIMENT dsst_dyn_limited_tb100full FAILED!
-Log:
-CREATING NEW TRACKER
-[2019-03-22 08:47:43,502|INFO|core.Tracker|Tracker.py:164] - log_dir is '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:47:43,502|INFO|core.Tracker|Tracker.py:169] - log_dir exists
-[2019-03-22 08:47:43,502|INFO|core.Tracker|Tracker.py:183] - execution: 1ede7f53-79e8-4f90-af15-0bac1b2fd0b6 - hiob-execution-finn-ubuntu-2019-03-22-08.47.43.448988
-[2019-03-22 08:47:43,502|INFO|core.Tracker|Tracker.py:187] - creating execution_dir at '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.47.43.448988'
-[2019-03-22 08:47:43,502|INFO|core.Tracker|Tracker.py:192] - Creating file handler for logging into '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.47.43.448988/execution.log'
-[2019-03-22 08:47:43,503|INFO|core.Tracker|Tracker.py:196] - Attached log to file '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.47.43.448988/execution.log'
-[2019-03-22 08:47:43,503|INFO|core.Tracker|Tracker.py:198] - Execution is: 1ede7f53-79e8-4f90-af15-0bac1b2fd0b6 - 'hiob-execution-finn-ubuntu-2019-03-22-08.47.43.448988'
-[2019-03-22 08:47:43,503|INFO|core.Tracker|Tracker.py:199] - log_dir: '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:47:43,503|INFO|core.Tracker|Tracker.py:200] - execution_dir: '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.47.43.448988'
-[2019-03-22 08:47:43,503|INFO|core.Tracker|Tracker.py:203] - Copying environment file from 'config/env_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:47:43,503|INFO|core.Tracker|Tracker.py:207] - Copying tracker file from 'config/tracker_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:47:43,503|INFO|__main__|hiob_cli.py:49] - Initiate tracking process
-[2019-03-22 08:47:43,503|INFO|core.sample_provider.Sample|Sample.py:62] - Start loading sample Deer
-[2019-03-22 08:47:43,990|INFO|core.sample_provider.Sample|Sample.py:146] - Sample '<Sample tb100/Deer,71fs,GT>' loaded
-[2019-03-22 08:47:43,990|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:65] - build model started
-[2019-03-22 08:47:44,000|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:111] - build model finished 0s
-[2019-03-22 08:47:44,000|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:45] - creating pretrained vgg16 net as feature extractor
-[2019-03-22 08:47:44,000|INFO|core.Vgg16|Vgg16.py:28] - VGG16 file: './net/vgg16.npy'
-[2019-03-22 08:47:44,334|INFO|core.Vgg16|Vgg16.py:55] - npy file loaded
-[2019-03-22 08:47:44,335|INFO|core.Vgg16|Vgg16.py:67] - build model started
-[2019-03-22 08:47:44,428|INFO|core.Vgg16|Vgg16.py:135] - build model finished: 0s
-[2019-03-22 08:47:44,431|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:67] - swarm setup
-[2019-03-22 08:47:44,431|INFO|core.Tracker|Tracker.py:245] - Setup done
-2019-03-22 08:47:44.431690: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-2019-03-22 08:47:44.505192: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:964] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
-2019-03-22 08:47:44.505635: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1432] Found device 0 with properties: 
-name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.228
-pciBusID: 0000:01:00.0
-totalMemory: 3.95GiB freeMemory: 3.52GiB
-2019-03-22 08:47:44.505660: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1511] Adding visible gpu devices: 0
-2019-03-22 08:47:44.740744: I tensorflow/core/common_runtime/gpu/gpu_device.cc:982] Device interconnect StreamExecutor with strength 1 edge matrix:
-2019-03-22 08:47:44.740776: I tensorflow/core/common_runtime/gpu/gpu_device.cc:988]      0 
-2019-03-22 08:47:44.740784: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1001] 0:   N 
-2019-03-22 08:47:44.740957: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 3240 MB memory) -> physical GPU (device: 0, name: GeForce GTX 970, pci bus id: 0000:01:00.0, compute capability: 5.2)
-[2019-03-22 08:47:44,742|INFO|root|Tracker.py:262] - start tracking sample Deer
-[2019-03-22 08:47:44,742|INFO|core.Tracking|Tracking.py:99] - Creating new Tracking#1
-[2019-03-22 08:47:44,744|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv4_3
-[2019-03-22 08:47:44,750|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:47:44,757|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:47:44,757|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:47:44,757|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:47:44,757|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:47:44,767|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:47:44,876|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv5_3
-[2019-03-22 08:47:44,881|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:47:44,887|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:47:44,887|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:47:44,887|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:47:44,887|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:47:44,896|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:47:44,991|INFO|core.Consolidator|Consolidator.py:83] - Input shape for ConsolidatorNet: (None, 25, 25, 768)
-[2019-03-22 08:47:44,992|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:47:44,992|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (9, 9, 768, 32)
-[2019-03-22 08:47:44,992|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:47:45,002|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([None, 25, 25, 32])
-[2019-03-22 08:47:45,002|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:47:45,004|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([None, 25, 25, 64])
-[2019-03-22 08:47:45,004|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 3
-[2019-03-22 08:47:45,004|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (5, 5, 64, 1)
-[2019-03-22 08:47:45,004|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:47:45,013|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 3 shape: ([None, 25, 25, 1])
-[2019-03-22 08:47:45,287|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:47:45,289|INFO|core.Tracking|Tracking.py:217] - calculate roi...
-[2019-03-22 08:47:45,289|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#0/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:47:45,289|INFO|core.Tracking|Tracking.py:219] - generate sroi and extract features
-[2019-03-22 08:47:45,301|INFO|core.Tracking|Tracking.py:221] - generate target mask
-[2019-03-22 08:47:45,301|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#0/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:47:46,596|INFO|core.Tracking|Tracking.py:225] - train selector
-[2019-03-22 08:47:46,596|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv4_3
-[2019-03-22 08:47:46,615|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv5_3
-[2019-03-22 08:47:46,838|INFO|core.selection.NetSelector|NetSelector.py:121] - Evaluating feature impact
-[2019-03-22 08:47:46,929|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv4_3: 30, 8, 92, 117, 121, 217, 223, 489, 184, 369, 396, 349, 237, 306, 463, 57, 284, 282, 10, 106, 271, 68, 401, 174, 372, 477, 380, 210, 393, 336, 261, 214, 241, 179, 510, 273, 226, 111, 59, 73, 62, 454, 438, 403, 251, 506, 157, 112, 291, 44, 231, 435, 443, 447, 35, 315, 198, 424, 94, 87, 371, 299, 116, 236, 266, 263, 5, 459, 277, 107, 378, 185, 423, 65, 247, 101, 376, 374, 352, 122, 474, 211, 248, 495, 154, 286, 375, 351, 268, 509, 216, 142, 15, 473, 204, 189, 219, 363, 212, 108, 88, 318, 297, 485, 391, 354, 195, 302, 98, 227, 321, 457, 7, 3, 205, 43, 55, 78, 508, 430, 334, 475, 95, 145, 408, 63, 12, 281, 316, 451, 344, 138, 69, 483, 83, 292, 182, 309, 496, 181, 120, 132, 206, 66, 300, 97, 314, 4, 239, 81, 338, 169, 414, 293, 410, 327, 433, 147, 37, 191, 275, 151, 76, 229, 202, 20, 96, 319, 270, 105, 353, 303, 422, 461, 152, 77, 416, 453, 395, 61, 104, 246, 499, 452, 163, 165, 200, 250, 51, 394, 355, 133, 164, 136, 294, 255, 14, 99, 40, 27, 228, 67, 242, 238, 278, 493, 155, 264, 428, 377, 357, 419, 356, 2, 168, 265, 308, 50, 478, 64, 449, 432, 209, 389, 72, 234, 135, 140, 256, 175, 224, 262, 431, 288, 75, 409, 100, 458, 267, 448, 388, 390, 46, 358, 193, 1, 398, 301, 331, 60, 359, 384, 328, 148, 488, 335, 337, 365, 494, 161, 259, 196, 253, 441, 13, 487, 310, 74, 126, 341, 176, 491, 178, 492, 240, 399, 361, 405, 115, 82, 215, 56, 197, 417, 123, 400, 127, 425, 128, 295, 0, 220, 208, 366, 501, 47, 201, 326, 134, 146, 118, 348, 137, 85, 129, 415, 404, 465, 252, 149, 235, 479, 31, 383, 434, 70, 340, 427, 444, 230, 16, 296, 21, 260, 171, 19, 141, 183, 232, 280, 119, 285, 290, 407, 387, 18, 411, 258, 186, 305, 497, 24, 440, 190, 442, 269, 421, 22, 187, 471, 360, 6, 464, 194, 307, 283, 397, 188, 446, 49, 39, 455, 342, 362, 500, 131, 276, 199, 180, 462, 103, 79, 109, 124, 25, 32, 243, 502, 158, 110, 153, 143, 382, 17, 373, 436, 392, 386, 311, 486, 28, 368, 482, 102, 466, 312, 150, 467, 272, 130, 257, 156, 439, 381, 472, 222, 177, 379, 218, 34, 144, 125, 36, 42, 346, 192, 167, 481, 45, 412, 470, 254, 402, 325, 71, 437, 203, 279, 323, 370, 139, 249, 345, 11, 406, 26, 170, 274, 511, 84, 324, 426, 313, 332, 505, 41, 29, 245, 469, 476, 289, 244, 48, 320, 90, 484, 420, 287, 339, 298, 172, 385, 166, 159, 367, 468, 53, 418, 38, 350, 413, 322, 54, 58, 207, 429, 330, 450, 33, 445, 317, 507, 23, 93, 480, 9, 490, 114, 113, 225, 343, 89, 80, 162, 221, 364, 91, 456, 329, 213, 173, 347, 86, 233, 333, 503, 52, 460, 498, 304, 504, 160
-[2019-03-22 08:47:46,930|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv5_3: 145, 143, 446, 139, 2, 31, 315, 314, 202, 29, 155, 313, 254, 426, 90, 134, 4, 260, 182, 490, 159, 71, 360, 316, 309, 189, 423, 330, 274, 102, 500, 370, 498, 279, 380, 93, 141, 70, 58, 216, 298, 117, 148, 304, 284, 282, 37, 172, 263, 136, 485, 390, 242, 325, 132, 321, 214, 255, 348, 305, 318, 392, 338, 113, 203, 39, 308, 80, 7, 363, 473, 30, 430, 268, 146, 54, 437, 427, 349, 259, 421, 150, 138, 100, 371, 501, 405, 510, 303, 403, 387, 504, 208, 184, 499, 432, 116, 231, 49, 74, 509, 271, 112, 210, 468, 369, 366, 310, 341, 449, 433, 188, 409, 220, 98, 383, 397, 123, 110, 168, 320, 395, 471, 286, 232, 408, 258, 211, 183, 353, 225, 476, 312, 442, 280, 67, 120, 262, 9, 52, 281, 222, 355, 478, 265, 332, 328, 10, 234, 195, 77, 257, 128, 252, 376, 368, 32, 236, 209, 166, 163, 17, 64, 505, 137, 23, 444, 34, 235, 278, 460, 218, 154, 475, 317, 91, 253, 15, 401, 56, 68, 21, 191, 92, 503, 229, 489, 389, 479, 375, 14, 374, 13, 294, 283, 8, 329, 167, 425, 46, 288, 97, 495, 196, 481, 340, 379, 492, 273, 333, 319, 41, 108, 486, 297, 213, 407, 160, 327, 420, 223, 352, 448, 245, 465, 44, 264, 1, 440, 270, 311, 57, 275, 144, 357, 152, 429, 438, 276, 207, 422, 299, 83, 467, 301, 290, 464, 277, 82, 459, 482, 78, 488, 66, 122, 287, 452, 162, 418, 26, 174, 25, 411, 507, 406, 240, 230, 342, 227, 361, 205, 224, 343, 201, 393, 187, 496, 176, 331, 373, 324, 181, 186, 388, 24, 96, 180, 243, 453, 447, 94, 302, 491, 221, 244, 51, 335, 219, 416, 456, 118, 197, 382, 256, 11, 249, 53, 45, 291, 233, 384, 354, 40, 292, 200, 381, 73, 35, 107, 483, 322, 185, 497, 147, 346, 417, 272, 50, 239, 295, 18, 59, 16, 396, 206, 228, 101, 436, 28, 358, 190, 508, 114, 47, 344, 42, 494, 412, 377, 153, 339, 480, 266, 359, 88, 204, 364, 455, 55, 161, 0, 461, 502, 394, 269, 142, 133, 135, 470, 414, 419, 33, 248, 156, 296, 95, 386, 130, 362, 192, 404, 474, 347, 81, 451, 493, 246, 177, 104, 454, 466, 398, 121, 443, 170, 307, 62, 350, 217, 178, 85, 399, 323, 385, 129, 306, 450, 19, 226, 179, 285, 484, 84, 111, 22, 457, 215, 413, 27, 76, 334, 89, 126, 199, 72, 60, 193, 86, 65, 79, 119, 164, 36, 365, 212, 293, 87, 3, 400, 445, 63, 124, 105, 75, 48, 237, 99, 345, 157, 372, 247, 38, 194, 158, 289, 424, 267, 336, 472, 351, 115, 337, 431, 5, 131, 171, 391, 477, 251, 356, 367, 511, 402, 410, 169, 300, 20, 140, 127, 487, 151, 378, 250, 173, 469, 241, 165, 415, 238, 435, 175, 463, 12, 149, 506, 462, 439, 458, 106, 61, 43, 441, 103, 6, 109, 125, 428, 326, 434, 198, 69, 261
-[2019-03-22 08:47:46,933|INFO|core.Consolidator|Consolidator.py:163] - Storing frame 'initial_frame' for consolidator update with weight 1.000.
-[2019-03-22 08:47:47,529|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:47:47,531|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#1/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:47:47,535|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#1/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:47:47,559|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:178] - Predicting position for frame <Frame#1/71 of Tracking#1 on tb100/Deer>, Lost: 0
-[2019-03-22 08:47:47,565|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:210] - previous position: <rect(306, 5, 95, 65)>
-[2019-03-22 08:47:47,585|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:285] - Prediction: <rect(320, 32, 95, 65)>, quality: 0.537232
-Traceback (most recent call last):
-  File "hiob_cli.py", line 87, in <module>
-    main()
-  File "hiob_cli.py", line 74, in main
-    silent=args.silent)
-  File "hiob_cli.py", line 51, in track
-    loop.run_until_complete(tracker.execute_everything())
-  File "/usr/lib/python3.6/asyncio/base_events.py", line 473, in run_until_complete
-    return future.result()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 322, in execute_everything
-    await self.execute_tracking_on_all_samples()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 319, in execute_tracking_on_all_samples
-    await self.execute_tracking_on_sample(sample)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 312, in execute_tracking_on_sample
-    await tracking.execute_everything()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 531, in execute_everything
-    await self.execute_tracking()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 467, in execute_tracking
-    await self.tracking_step()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 449, in tracking_step
-    self.tracking_evaluate_frame()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 418, in tracking_evaluate_frame
-    self.evaluate_frame(frame)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 634, in evaluate_frame
-    result['overlap_score'] = gt.overlap_score(p)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Rect.py", line 210, in overlap_score
-    intersect = self.intersect(other)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Rect.py", line 195, in intersect
-    x2, y2, w2, h2 = other
-TypeError: 'NoneType' object is not iterable
-
-2019-03-22 08:50:06,210 - experiment_execution - INFO - starting continuous experiment execution
-2019-03-22 08:50:06,210 - experiment_execution - INFO - specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
-2019-03-22 08:50:06,210 - experiment_execution - INFO - 
-2019-03-22 08:50:06,210 - experiment_execution - INFO - starting experiment candidates_stat_cont_tb100full
-2019-03-22 08:50:18,615 - experiment_execution - INFO - finished experiment candidates_stat_cont_tb100full
-2019-03-22 08:50:18,615 - experiment_execution - INFO - 
-2019-03-22 08:50:18,615 - experiment_execution - INFO - starting experiment candidates_stat_limited_tb100full
-2019-03-22 08:50:30,969 - experiment_execution - INFO - finished experiment candidates_stat_limited_tb100full
-2019-03-22 08:50:30,969 - experiment_execution - INFO - 
-2019-03-22 08:50:30,970 - experiment_execution - INFO - starting experiment candidates_dyn_cont_tb100full
-2019-03-22 08:50:43,528 - experiment_execution - INFO - finished experiment candidates_dyn_cont_tb100full
-2019-03-22 08:50:43,528 - experiment_execution - INFO - 
-2019-03-22 08:50:43,529 - experiment_execution - INFO - starting experiment candidates_dyn_limited_tb100full
-2019-03-22 08:50:56,404 - experiment_execution - INFO - finished experiment candidates_dyn_limited_tb100full
-2019-03-22 08:50:56,404 - experiment_execution - INFO - 
-2019-03-22 08:50:56,404 - experiment_execution - INFO - starting experiment dsst_stat_cont_tb100full
-2019-03-22 08:51:12,062 - experiment_execution - INFO - finished experiment dsst_stat_cont_tb100full
-2019-03-22 08:51:12,062 - experiment_execution - INFO - 
-2019-03-22 08:51:12,062 - experiment_execution - INFO - starting experiment dsst_stat_limited_tb100full
-2019-03-22 08:51:24,815 - experiment_execution - INFO - finished experiment dsst_stat_limited_tb100full
-2019-03-22 08:51:24,815 - experiment_execution - INFO - 
-2019-03-22 08:51:24,815 - experiment_execution - INFO - starting experiment dsst_dyn_cont_tb100full
-2019-03-22 08:51:44,223 - experiment_execution - INFO - finished experiment dsst_dyn_cont_tb100full
-2019-03-22 08:51:44,223 - experiment_execution - INFO - 
-2019-03-22 08:51:44,223 - experiment_execution - INFO - starting experiment dsst_dyn_limited_tb100full
-2019-03-22 08:51:49,738 - experiment_execution - ERROR - EXPERIMENT dsst_dyn_limited_tb100full FAILED!
-2019-03-22 08:51:49,739 - experiment_execution - ERROR - Log:
-2019-03-22 08:51:49,739 - experiment_execution - ERROR - CREATING NEW TRACKER
-[2019-03-22 08:51:45,504|INFO|core.Tracker|Tracker.py:164] - log_dir is '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:51:45,504|INFO|core.Tracker|Tracker.py:169] - log_dir exists
-[2019-03-22 08:51:45,504|INFO|core.Tracker|Tracker.py:183] - execution: e0ce5106-46fc-4c4d-841b-308bcb849c67 - hiob-execution-finn-ubuntu-2019-03-22-08.51.45.456692
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:187] - creating execution_dir at '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.51.45.456692'
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:192] - Creating file handler for logging into '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.51.45.456692/execution.log'
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:196] - Attached log to file '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.51.45.456692/execution.log'
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:198] - Execution is: e0ce5106-46fc-4c4d-841b-308bcb849c67 - 'hiob-execution-finn-ubuntu-2019-03-22-08.51.45.456692'
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:199] - log_dir: '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:200] - execution_dir: '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.51.45.456692'
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:203] - Copying environment file from 'config/env_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:51:45,505|INFO|core.Tracker|Tracker.py:207] - Copying tracker file from 'config/tracker_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:51:45,505|INFO|__main__|hiob_cli.py:49] - Initiate tracking process
-[2019-03-22 08:51:45,505|INFO|core.sample_provider.Sample|Sample.py:62] - Start loading sample Deer
-[2019-03-22 08:51:45,944|INFO|core.sample_provider.Sample|Sample.py:146] - Sample '<Sample tb100/Deer,71fs,GT>' loaded
-[2019-03-22 08:51:45,944|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:65] - build model started
-[2019-03-22 08:51:45,952|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:111] - build model finished 0s
-[2019-03-22 08:51:45,952|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:45] - creating pretrained vgg16 net as feature extractor
-[2019-03-22 08:51:45,953|INFO|core.Vgg16|Vgg16.py:28] - VGG16 file: './net/vgg16.npy'
-[2019-03-22 08:51:46,270|INFO|core.Vgg16|Vgg16.py:55] - npy file loaded
-[2019-03-22 08:51:46,270|INFO|core.Vgg16|Vgg16.py:67] - build model started
-[2019-03-22 08:51:46,357|INFO|core.Vgg16|Vgg16.py:135] - build model finished: 0s
-[2019-03-22 08:51:46,359|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:67] - swarm setup
-[2019-03-22 08:51:46,359|INFO|core.Tracker|Tracker.py:245] - Setup done
-2019-03-22 08:51:46.359609: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-2019-03-22 08:51:46.418986: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:964] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
-2019-03-22 08:51:46.419400: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1432] Found device 0 with properties: 
-name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.228
-pciBusID: 0000:01:00.0
-totalMemory: 3.95GiB freeMemory: 3.53GiB
-2019-03-22 08:51:46.419414: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1511] Adding visible gpu devices: 0
-2019-03-22 08:51:46.612689: I tensorflow/core/common_runtime/gpu/gpu_device.cc:982] Device interconnect StreamExecutor with strength 1 edge matrix:
-2019-03-22 08:51:46.612720: I tensorflow/core/common_runtime/gpu/gpu_device.cc:988]      0 
-2019-03-22 08:51:46.612726: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1001] 0:   N 
-2019-03-22 08:51:46.612864: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 3250 MB memory) -> physical GPU (device: 0, name: GeForce GTX 970, pci bus id: 0000:01:00.0, compute capability: 5.2)
-[2019-03-22 08:51:46,613|INFO|root|Tracker.py:262] - start tracking sample Deer
-[2019-03-22 08:51:46,613|INFO|core.Tracking|Tracking.py:99] - Creating new Tracking#1
-[2019-03-22 08:51:46,614|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv4_3
-[2019-03-22 08:51:46,619|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:51:46,624|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:51:46,624|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:51:46,624|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:51:46,624|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:51:46,631|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:51:46,715|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv5_3
-[2019-03-22 08:51:46,719|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:51:46,724|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:51:46,724|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:51:46,724|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:51:46,724|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:51:46,731|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:51:46,815|INFO|core.Consolidator|Consolidator.py:83] - Input shape for ConsolidatorNet: (None, 25, 25, 768)
-[2019-03-22 08:51:46,815|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:51:46,816|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (9, 9, 768, 32)
-[2019-03-22 08:51:46,816|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:51:46,823|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([None, 25, 25, 32])
-[2019-03-22 08:51:46,823|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:51:46,825|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([None, 25, 25, 64])
-[2019-03-22 08:51:46,825|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 3
-[2019-03-22 08:51:46,825|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (5, 5, 64, 1)
-[2019-03-22 08:51:46,825|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:51:46,833|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 3 shape: ([None, 25, 25, 1])
-[2019-03-22 08:51:47,063|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:51:47,064|INFO|core.Tracking|Tracking.py:217] - calculate roi...
-[2019-03-22 08:51:47,064|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#0/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:51:47,064|INFO|core.Tracking|Tracking.py:219] - generate sroi and extract features
-[2019-03-22 08:51:47,076|INFO|core.Tracking|Tracking.py:221] - generate target mask
-[2019-03-22 08:51:47,076|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#0/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:51:48,239|INFO|core.Tracking|Tracking.py:225] - train selector
-[2019-03-22 08:51:48,239|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv4_3
-[2019-03-22 08:51:48,256|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv5_3
-[2019-03-22 08:51:48,491|INFO|core.selection.NetSelector|NetSelector.py:121] - Evaluating feature impact
-[2019-03-22 08:51:48,583|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv4_3: 30, 8, 92, 117, 121, 217, 223, 489, 184, 369, 396, 349, 237, 306, 463, 57, 284, 282, 10, 106, 271, 68, 401, 174, 372, 477, 380, 210, 393, 336, 261, 214, 241, 179, 510, 273, 226, 111, 59, 73, 62, 454, 438, 403, 251, 506, 157, 112, 291, 44, 231, 435, 443, 447, 35, 315, 198, 424, 94, 87, 371, 299, 116, 236, 266, 263, 5, 459, 277, 107, 378, 185, 423, 65, 247, 101, 376, 374, 352, 122, 474, 211, 248, 495, 154, 286, 375, 351, 268, 509, 216, 142, 15, 473, 204, 189, 219, 363, 212, 108, 88, 318, 297, 485, 391, 354, 195, 302, 98, 227, 321, 457, 7, 3, 205, 43, 55, 78, 508, 430, 334, 475, 95, 145, 408, 63, 12, 281, 316, 451, 344, 138, 69, 483, 83, 292, 182, 309, 496, 181, 120, 132, 206, 66, 300, 97, 314, 4, 239, 81, 338, 169, 414, 293, 410, 327, 433, 147, 37, 191, 275, 151, 76, 229, 202, 20, 96, 319, 270, 105, 353, 303, 422, 461, 152, 77, 416, 453, 395, 61, 104, 246, 499, 452, 163, 165, 200, 250, 51, 394, 355, 133, 164, 136, 294, 255, 14, 99, 40, 27, 228, 67, 242, 238, 278, 493, 155, 264, 428, 377, 357, 419, 356, 2, 168, 265, 308, 50, 478, 64, 449, 432, 209, 389, 72, 234, 135, 140, 256, 175, 224, 262, 431, 288, 75, 409, 100, 458, 267, 448, 388, 390, 46, 358, 193, 1, 398, 301, 331, 60, 359, 384, 328, 148, 488, 335, 337, 365, 494, 161, 259, 196, 253, 441, 13, 487, 310, 74, 126, 341, 176, 491, 178, 492, 240, 399, 361, 405, 115, 82, 215, 56, 197, 417, 123, 400, 127, 425, 128, 295, 0, 220, 208, 366, 501, 47, 201, 326, 134, 146, 118, 348, 137, 85, 129, 415, 404, 465, 252, 149, 235, 479, 31, 383, 434, 70, 340, 427, 444, 230, 16, 296, 21, 260, 171, 19, 141, 183, 232, 280, 119, 285, 290, 407, 387, 18, 411, 258, 186, 305, 497, 24, 440, 190, 442, 269, 421, 22, 187, 471, 360, 6, 464, 194, 307, 283, 397, 188, 446, 49, 39, 455, 342, 362, 500, 131, 276, 199, 180, 462, 103, 79, 109, 124, 25, 32, 243, 502, 158, 110, 153, 143, 382, 17, 373, 436, 392, 386, 311, 486, 28, 368, 482, 102, 466, 312, 150, 467, 272, 130, 257, 156, 439, 381, 472, 222, 177, 379, 218, 34, 144, 125, 36, 42, 346, 192, 167, 481, 45, 412, 470, 254, 402, 325, 71, 437, 203, 279, 323, 370, 139, 249, 345, 11, 406, 26, 170, 274, 511, 84, 324, 426, 313, 332, 505, 41, 29, 245, 469, 476, 289, 244, 48, 320, 90, 484, 420, 287, 339, 298, 172, 385, 166, 159, 367, 468, 53, 418, 38, 350, 413, 322, 54, 58, 207, 429, 330, 450, 33, 445, 317, 507, 23, 93, 480, 9, 490, 114, 113, 225, 343, 89, 80, 162, 221, 364, 91, 456, 329, 213, 173, 347, 86, 233, 333, 503, 52, 460, 498, 304, 504, 160
-[2019-03-22 08:51:48,584|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv5_3: 145, 143, 446, 139, 2, 31, 315, 314, 202, 29, 155, 313, 254, 426, 90, 134, 4, 260, 182, 490, 159, 71, 360, 316, 309, 189, 423, 330, 274, 102, 500, 370, 498, 279, 380, 93, 141, 70, 58, 216, 298, 117, 148, 304, 284, 282, 37, 172, 263, 136, 485, 390, 242, 325, 132, 321, 214, 255, 348, 305, 318, 392, 338, 113, 203, 39, 308, 80, 7, 363, 473, 30, 430, 268, 146, 54, 437, 427, 349, 259, 421, 150, 138, 100, 371, 501, 405, 510, 303, 403, 387, 504, 208, 184, 499, 432, 116, 231, 49, 74, 509, 271, 112, 210, 468, 369, 366, 310, 341, 449, 433, 188, 409, 220, 98, 383, 397, 123, 110, 168, 320, 395, 471, 286, 232, 408, 258, 211, 183, 353, 225, 476, 312, 442, 280, 67, 120, 262, 9, 52, 281, 222, 355, 478, 265, 332, 328, 10, 234, 195, 77, 257, 128, 252, 376, 368, 32, 236, 209, 166, 163, 17, 64, 505, 137, 23, 444, 34, 235, 278, 460, 218, 154, 475, 317, 91, 253, 15, 401, 56, 68, 21, 191, 92, 503, 229, 489, 389, 479, 375, 14, 374, 13, 294, 283, 8, 329, 167, 425, 46, 288, 97, 495, 196, 481, 340, 379, 492, 273, 333, 319, 41, 108, 486, 297, 213, 407, 160, 327, 420, 223, 352, 448, 245, 465, 44, 264, 1, 440, 270, 311, 57, 275, 144, 357, 152, 429, 438, 276, 207, 422, 299, 83, 467, 301, 290, 464, 277, 82, 459, 482, 78, 488, 66, 122, 287, 452, 162, 418, 26, 174, 25, 411, 507, 406, 240, 230, 342, 227, 361, 205, 224, 343, 201, 393, 187, 496, 176, 331, 373, 324, 181, 186, 388, 24, 96, 180, 243, 453, 447, 94, 302, 491, 221, 244, 51, 335, 219, 416, 456, 118, 197, 382, 256, 11, 249, 53, 45, 291, 233, 384, 354, 40, 292, 200, 381, 73, 35, 107, 483, 322, 185, 497, 147, 346, 417, 272, 50, 239, 295, 18, 59, 16, 396, 206, 228, 101, 436, 28, 358, 190, 508, 114, 47, 344, 42, 494, 412, 377, 153, 339, 480, 266, 359, 88, 204, 364, 455, 55, 161, 0, 461, 502, 394, 269, 142, 133, 135, 470, 414, 419, 33, 248, 156, 296, 95, 386, 130, 362, 192, 404, 474, 347, 81, 451, 493, 246, 177, 104, 454, 466, 398, 121, 443, 170, 307, 62, 350, 217, 178, 85, 399, 323, 385, 129, 306, 450, 19, 226, 179, 285, 484, 84, 111, 22, 457, 215, 413, 27, 76, 334, 89, 126, 199, 72, 60, 193, 86, 65, 79, 119, 164, 36, 365, 212, 293, 87, 3, 400, 445, 63, 124, 105, 75, 48, 237, 99, 345, 157, 372, 247, 38, 194, 158, 289, 424, 267, 336, 472, 351, 115, 337, 431, 5, 131, 171, 391, 477, 251, 356, 367, 511, 402, 410, 169, 300, 20, 140, 127, 487, 151, 378, 250, 173, 469, 241, 165, 415, 238, 435, 175, 463, 12, 149, 506, 462, 439, 458, 106, 61, 43, 441, 103, 6, 109, 125, 428, 326, 434, 198, 69, 261
-[2019-03-22 08:51:48,587|INFO|core.Consolidator|Consolidator.py:163] - Storing frame 'initial_frame' for consolidator update with weight 1.000.
-[2019-03-22 08:51:49,185|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:51:49,187|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#1/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:51:49,190|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#1/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:51:49,215|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:178] - Predicting position for frame <Frame#1/71 of Tracking#1 on tb100/Deer>, Lost: 0
-[2019-03-22 08:51:49,220|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:210] - previous position: <rect(306, 5, 95, 65)>
-[2019-03-22 08:51:49,244|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:285] - Prediction: <rect(320, 32, 95, 65)>, quality: 0.537232
-Traceback (most recent call last):
-  File "hiob_cli.py", line 87, in <module>
-    main()
-  File "hiob_cli.py", line 74, in main
-    silent=args.silent)
-  File "hiob_cli.py", line 51, in track
-    loop.run_until_complete(tracker.execute_everything())
-  File "/usr/lib/python3.6/asyncio/base_events.py", line 473, in run_until_complete
-    return future.result()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 322, in execute_everything
-    await self.execute_tracking_on_all_samples()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 319, in execute_tracking_on_all_samples
-    await self.execute_tracking_on_sample(sample)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 312, in execute_tracking_on_sample
-    await tracking.execute_everything()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 531, in execute_everything
-    await self.execute_tracking()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 467, in execute_tracking
-    await self.tracking_step()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 449, in tracking_step
-    self.tracking_evaluate_frame()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 418, in tracking_evaluate_frame
-    self.evaluate_frame(frame)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 634, in evaluate_frame
-    result['overlap_score'] = gt.overlap_score(p)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Rect.py", line 210, in overlap_score
-    intersect = self.intersect(other)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Rect.py", line 195, in intersect
-    x2, y2, w2, h2 = other
-TypeError: 'NoneType' object is not iterable
-
-2019-03-22 08:55:44,840 - INFO - starting continuous experiment execution
-2019-03-22 08:55:44,840 - INFO - specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
-2019-03-22 08:55:44,840 - INFO - 
-2019-03-22 08:55:44,840 - INFO - starting experiment candidates_stat_cont_tb100full
-2019-03-22 08:55:57,170 - INFO - finished experiment candidates_stat_cont_tb100full
-2019-03-22 08:55:57,170 - INFO - 
-2019-03-22 08:55:57,170 - INFO - starting experiment candidates_stat_limited_tb100full
-2019-03-22 08:56:14,292 | INFO | starting continuous experiment execution
-2019-03-22 08:56:14,292 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
-2019-03-22 08:56:14,292 | INFO | 
-2019-03-22 08:56:14,292 | INFO | starting experiment candidates_stat_cont_tb100full
-2019-03-22 08:56:26,651 | INFO | finished experiment candidates_stat_cont_tb100full
-2019-03-22 08:56:26,651 | INFO | 
-2019-03-22 08:56:26,651 | INFO | starting experiment candidates_stat_limited_tb100full
-2019-03-22 08:56:38,946 | INFO | finished experiment candidates_stat_limited_tb100full
-2019-03-22 08:56:38,946 | INFO | 
-2019-03-22 08:56:38,946 | INFO | starting experiment candidates_dyn_cont_tb100full
-2019-03-22 08:56:51,385 | INFO | finished experiment candidates_dyn_cont_tb100full
-2019-03-22 08:56:51,386 | INFO | 
-2019-03-22 08:56:51,386 | INFO | starting experiment candidates_dyn_limited_tb100full
-2019-03-22 08:57:03,589 | INFO | finished experiment candidates_dyn_limited_tb100full
-2019-03-22 08:57:03,589 | INFO | 
-2019-03-22 08:57:03,589 | INFO | starting experiment dsst_stat_cont_tb100full
-2019-03-22 08:57:18,951 | INFO | finished experiment dsst_stat_cont_tb100full
-2019-03-22 08:57:18,951 | INFO | 
-2019-03-22 08:57:18,951 | INFO | starting experiment dsst_stat_limited_tb100full
-2019-03-22 08:57:31,652 | INFO | finished experiment dsst_stat_limited_tb100full
-2019-03-22 08:57:31,652 | INFO | 
-2019-03-22 08:57:31,652 | INFO | starting experiment dsst_dyn_cont_tb100full
-2019-03-22 08:57:51,078 | INFO | finished experiment dsst_dyn_cont_tb100full
-2019-03-22 08:57:51,078 | INFO | 
-2019-03-22 08:57:51,079 | INFO | starting experiment dsst_dyn_limited_tb100full
-2019-03-22 08:57:56,617 | ERROR | EXPERIMENT dsst_dyn_limited_tb100full FAILED!
-2019-03-22 08:57:56,617 | ERROR | Log:
-2019-03-22 08:57:56,617 | ERROR | CREATING NEW TRACKER
-[2019-03-22 08:57:52,358|INFO|core.Tracker|Tracker.py:164] - log_dir is '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:57:52,358|INFO|core.Tracker|Tracker.py:169] - log_dir exists
-[2019-03-22 08:57:52,358|INFO|core.Tracker|Tracker.py:183] - execution: 0fe653ea-f5b6-4855-9bbe-7b14502cc34f - hiob-execution-finn-ubuntu-2019-03-22-08.57.52.310199
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:187] - creating execution_dir at '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.57.52.310199'
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:192] - Creating file handler for logging into '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.57.52.310199/execution.log'
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:196] - Attached log to file '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.57.52.310199/execution.log'
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:198] - Execution is: 0fe653ea-f5b6-4855-9bbe-7b14502cc34f - 'hiob-execution-finn-ubuntu-2019-03-22-08.57.52.310199'
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:199] - log_dir: '../dsst_dyn_limited_tb100full/'
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:200] - execution_dir: '../dsst_dyn_limited_tb100full/hiob-execution-finn-ubuntu-2019-03-22-08.57.52.310199'
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:203] - Copying environment file from 'config/env_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:57:52,359|INFO|core.Tracker|Tracker.py:207] - Copying tracker file from 'config/tracker_dsst_dyn_limited_tb100full.yaml'
-[2019-03-22 08:57:52,359|INFO|__main__|hiob_cli.py:49] - Initiate tracking process
-[2019-03-22 08:57:52,359|INFO|core.sample_provider.Sample|Sample.py:62] - Start loading sample Deer
-[2019-03-22 08:57:52,797|INFO|core.sample_provider.Sample|Sample.py:146] - Sample '<Sample tb100/Deer,71fs,GT>' loaded
-[2019-03-22 08:57:52,797|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:65] - build model started
-[2019-03-22 08:57:52,806|INFO|core.roi.SimpleSroiGenerator|SimpleSroiGenerator.py:111] - build model finished 0s
-[2019-03-22 08:57:52,806|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:45] - creating pretrained vgg16 net as feature extractor
-[2019-03-22 08:57:52,806|INFO|core.Vgg16|Vgg16.py:28] - VGG16 file: './net/vgg16.npy'
-[2019-03-22 08:57:53,126|INFO|core.Vgg16|Vgg16.py:55] - npy file loaded
-[2019-03-22 08:57:53,126|INFO|core.Vgg16|Vgg16.py:67] - build model started
-[2019-03-22 08:57:53,214|INFO|core.Vgg16|Vgg16.py:135] - build model finished: 0s
-[2019-03-22 08:57:53,216|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:67] - swarm setup
-[2019-03-22 08:57:53,216|INFO|core.Tracker|Tracker.py:245] - Setup done
-2019-03-22 08:57:53.216630: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-2019-03-22 08:57:53.276014: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:964] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
-2019-03-22 08:57:53.276563: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1432] Found device 0 with properties: 
-name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.228
-pciBusID: 0000:01:00.0
-totalMemory: 3.95GiB freeMemory: 3.53GiB
-2019-03-22 08:57:53.276578: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1511] Adding visible gpu devices: 0
-2019-03-22 08:57:53.470687: I tensorflow/core/common_runtime/gpu/gpu_device.cc:982] Device interconnect StreamExecutor with strength 1 edge matrix:
-2019-03-22 08:57:53.470718: I tensorflow/core/common_runtime/gpu/gpu_device.cc:988]      0 
-2019-03-22 08:57:53.470723: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1001] 0:   N 
-2019-03-22 08:57:53.470909: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 3250 MB memory) -> physical GPU (device: 0, name: GeForce GTX 970, pci bus id: 0000:01:00.0, compute capability: 5.2)
-[2019-03-22 08:57:53,471|INFO|root|Tracker.py:262] - start tracking sample Deer
-[2019-03-22 08:57:53,471|INFO|core.Tracking|Tracking.py:99] - Creating new Tracking#1
-[2019-03-22 08:57:53,472|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv4_3
-[2019-03-22 08:57:53,477|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:57:53,482|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:57:53,482|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:57:53,482|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:57:53,482|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:57:53,489|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:57:53,574|INFO|core.selection.NetSelector|NetSelector.py:40] - Building SelNet for feature conv5_3
-[2019-03-22 08:57:53,578|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:57:53,583|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([1, 25, 25, 512])
-[2019-03-22 08:57:53,583|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:57:53,583|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (3, 3, 512, 1)
-[2019-03-22 08:57:53,583|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:57:53,591|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([1, 25, 25, 1])
-[2019-03-22 08:57:53,675|INFO|core.Consolidator|Consolidator.py:83] - Input shape for ConsolidatorNet: (None, 25, 25, 768)
-[2019-03-22 08:57:53,675|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 1
-[2019-03-22 08:57:53,675|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (9, 9, 768, 32)
-[2019-03-22 08:57:53,676|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:57:53,683|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 1 shape: ([None, 25, 25, 32])
-[2019-03-22 08:57:53,683|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 2
-[2019-03-22 08:57:53,685|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 2 shape: ([None, 25, 25, 64])
-[2019-03-22 08:57:53,685|INFO|core.BuiltNet|BuiltNet.py:137] - Layer 3
-[2019-03-22 08:57:53,685|INFO|core.BuiltNet|BuiltNet.py:273] - Shape (5, 5, 64, 1)
-[2019-03-22 08:57:53,685|INFO|core.BuiltNet|BuiltNet.py:274] - Parms {'stddev': 1e-07, 'name': 'truncated_normal'}
-[2019-03-22 08:57:53,693|INFO|core.BuiltNet|BuiltNet.py:148] - Layer 3 shape: ([None, 25, 25, 1])
-[2019-03-22 08:57:53,927|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:57:53,929|INFO|core.Tracking|Tracking.py:217] - calculate roi...
-[2019-03-22 08:57:53,929|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#0/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:57:53,929|INFO|core.Tracking|Tracking.py:219] - generate sroi and extract features
-[2019-03-22 08:57:53,941|INFO|core.Tracking|Tracking.py:221] - generate target mask
-[2019-03-22 08:57:53,941|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#0/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:57:55,131|INFO|core.Tracking|Tracking.py:225] - train selector
-[2019-03-22 08:57:55,132|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv4_3
-[2019-03-22 08:57:55,151|INFO|core.selection.NetSelector|NetSelector.py:56] - Loading data for selection for conv5_3
-[2019-03-22 08:57:55,381|INFO|core.selection.NetSelector|NetSelector.py:121] - Evaluating feature impact
-[2019-03-22 08:57:55,473|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv4_3: 30, 8, 92, 117, 121, 217, 223, 489, 184, 369, 396, 349, 237, 306, 463, 57, 284, 282, 10, 106, 271, 68, 401, 174, 372, 477, 380, 210, 393, 336, 261, 214, 241, 179, 510, 273, 226, 111, 59, 73, 62, 454, 438, 403, 251, 506, 157, 112, 291, 44, 231, 435, 443, 447, 35, 315, 198, 424, 94, 87, 371, 299, 116, 236, 266, 263, 5, 459, 277, 107, 378, 185, 423, 65, 247, 101, 376, 374, 352, 122, 474, 211, 248, 495, 154, 286, 375, 351, 268, 509, 216, 142, 15, 473, 204, 189, 219, 363, 212, 108, 88, 318, 297, 485, 391, 354, 195, 302, 98, 227, 321, 457, 7, 3, 205, 43, 55, 78, 508, 430, 334, 475, 95, 145, 408, 63, 12, 281, 316, 451, 344, 138, 69, 483, 83, 292, 182, 309, 496, 181, 120, 132, 206, 66, 300, 97, 314, 4, 239, 81, 338, 169, 414, 293, 410, 327, 433, 147, 37, 191, 275, 151, 76, 229, 202, 20, 96, 319, 270, 105, 353, 303, 422, 461, 152, 77, 416, 453, 395, 61, 104, 246, 499, 452, 163, 165, 200, 250, 51, 394, 355, 133, 164, 136, 294, 255, 14, 99, 40, 27, 228, 67, 242, 238, 278, 493, 155, 264, 428, 377, 357, 419, 356, 2, 168, 265, 308, 50, 478, 64, 449, 432, 209, 389, 72, 234, 135, 140, 256, 175, 224, 262, 431, 288, 75, 409, 100, 458, 267, 448, 388, 390, 46, 358, 193, 1, 398, 301, 331, 60, 359, 384, 328, 148, 488, 335, 337, 365, 494, 161, 259, 196, 253, 441, 13, 487, 310, 74, 126, 341, 176, 491, 178, 492, 240, 399, 361, 405, 115, 82, 215, 56, 197, 417, 123, 400, 127, 425, 128, 295, 0, 220, 208, 366, 501, 47, 201, 326, 134, 146, 118, 348, 137, 85, 129, 415, 404, 465, 252, 149, 235, 479, 31, 383, 434, 70, 340, 427, 444, 230, 16, 296, 21, 260, 171, 19, 141, 183, 232, 280, 119, 285, 290, 407, 387, 18, 411, 258, 186, 305, 497, 24, 440, 190, 442, 269, 421, 22, 187, 471, 360, 6, 464, 194, 307, 283, 397, 188, 446, 49, 39, 455, 342, 362, 500, 131, 276, 199, 180, 462, 103, 79, 109, 124, 25, 32, 243, 502, 158, 110, 153, 143, 382, 17, 373, 436, 392, 386, 311, 486, 28, 368, 482, 102, 466, 312, 150, 467, 272, 130, 257, 156, 439, 381, 472, 222, 177, 379, 218, 34, 144, 125, 36, 42, 346, 192, 167, 481, 45, 412, 470, 254, 402, 325, 71, 437, 203, 279, 323, 370, 139, 249, 345, 11, 406, 26, 170, 274, 511, 84, 324, 426, 313, 332, 505, 41, 29, 245, 469, 476, 289, 244, 48, 320, 90, 484, 420, 287, 339, 298, 172, 385, 166, 159, 367, 468, 53, 418, 38, 350, 413, 322, 54, 58, 207, 429, 330, 450, 33, 445, 317, 507, 23, 93, 480, 9, 490, 114, 113, 225, 343, 89, 80, 162, 221, 364, 91, 456, 329, 213, 173, 347, 86, 233, 333, 503, 52, 460, 498, 304, 504, 160
-[2019-03-22 08:57:55,473|INFO|core.Tracking|Tracking.py:267] - Feature orders for conv5_3: 145, 143, 446, 139, 2, 31, 315, 314, 202, 29, 155, 313, 254, 426, 90, 134, 4, 260, 182, 490, 159, 71, 360, 316, 309, 189, 423, 330, 274, 102, 500, 370, 498, 279, 380, 93, 141, 70, 58, 216, 298, 117, 148, 304, 284, 282, 37, 172, 263, 136, 485, 390, 242, 325, 132, 321, 214, 255, 348, 305, 318, 392, 338, 113, 203, 39, 308, 80, 7, 363, 473, 30, 430, 268, 146, 54, 437, 427, 349, 259, 421, 150, 138, 100, 371, 501, 405, 510, 303, 403, 387, 504, 208, 184, 499, 432, 116, 231, 49, 74, 509, 271, 112, 210, 468, 369, 366, 310, 341, 449, 433, 188, 409, 220, 98, 383, 397, 123, 110, 168, 320, 395, 471, 286, 232, 408, 258, 211, 183, 353, 225, 476, 312, 442, 280, 67, 120, 262, 9, 52, 281, 222, 355, 478, 265, 332, 328, 10, 234, 195, 77, 257, 128, 252, 376, 368, 32, 236, 209, 166, 163, 17, 64, 505, 137, 23, 444, 34, 235, 278, 460, 218, 154, 475, 317, 91, 253, 15, 401, 56, 68, 21, 191, 92, 503, 229, 489, 389, 479, 375, 14, 374, 13, 294, 283, 8, 329, 167, 425, 46, 288, 97, 495, 196, 481, 340, 379, 492, 273, 333, 319, 41, 108, 486, 297, 213, 407, 160, 327, 420, 223, 352, 448, 245, 465, 44, 264, 1, 440, 270, 311, 57, 275, 144, 357, 152, 429, 438, 276, 207, 422, 299, 83, 467, 301, 290, 464, 277, 82, 459, 482, 78, 488, 66, 122, 287, 452, 162, 418, 26, 174, 25, 411, 507, 406, 240, 230, 342, 227, 361, 205, 224, 343, 201, 393, 187, 496, 176, 331, 373, 324, 181, 186, 388, 24, 96, 180, 243, 453, 447, 94, 302, 491, 221, 244, 51, 335, 219, 416, 456, 118, 197, 382, 256, 11, 249, 53, 45, 291, 233, 384, 354, 40, 292, 200, 381, 73, 35, 107, 483, 322, 185, 497, 147, 346, 417, 272, 50, 239, 295, 18, 59, 16, 396, 206, 228, 101, 436, 28, 358, 190, 508, 114, 47, 344, 42, 494, 412, 377, 153, 339, 480, 266, 359, 88, 204, 364, 455, 55, 161, 0, 461, 502, 394, 269, 142, 133, 135, 470, 414, 419, 33, 248, 156, 296, 95, 386, 130, 362, 192, 404, 474, 347, 81, 451, 493, 246, 177, 104, 454, 466, 398, 121, 443, 170, 307, 62, 350, 217, 178, 85, 399, 323, 385, 129, 306, 450, 19, 226, 179, 285, 484, 84, 111, 22, 457, 215, 413, 27, 76, 334, 89, 126, 199, 72, 60, 193, 86, 65, 79, 119, 164, 36, 365, 212, 293, 87, 3, 400, 445, 63, 124, 105, 75, 48, 237, 99, 345, 157, 372, 247, 38, 194, 158, 289, 424, 267, 336, 472, 351, 115, 337, 431, 5, 131, 171, 391, 477, 251, 356, 367, 511, 402, 410, 169, 300, 20, 140, 127, 487, 151, 378, 250, 173, 469, 241, 165, 415, 238, 435, 175, 463, 12, 149, 506, 462, 439, 458, 106, 61, 43, 441, 103, 6, 109, 125, 428, 326, 434, 198, 69, 261
-[2019-03-22 08:57:55,476|INFO|core.Consolidator|Consolidator.py:163] - Storing frame 'initial_frame' for consolidator update with weight 1.000.
-[2019-03-22 08:57:56,060|INFO|core.Frame|Frame.py:57] - Creating new Frame
-[2019-03-22 08:57:56,062|INFO|core.Tracking|Tracking.py:540] - ROI on <Frame#1/71 of Tracking#1 on tb100/Deer> is <rect(233, 0, 241, 241)>
-[2019-03-22 08:57:56,066|INFO|core.extraction.CNNFeatureExtractor|CNNFeatureExtractor.py:89] - Extracting features for <Frame#1/71 of Tracking#1 on tb100/Deer>
-[2019-03-22 08:57:56,090|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:178] - Predicting position for frame <Frame#1/71 of Tracking#1 on tb100/Deer>, Lost: 0
-[2019-03-22 08:57:56,095|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:210] - previous position: <rect(306, 5, 95, 65)>
-[2019-03-22 08:57:56,112|INFO|core.pursuing.SwarmPursuer|SwarmPursuer.py:285] - Prediction: <rect(320, 32, 95, 65)>, quality: 0.537232
-Traceback (most recent call last):
-  File "hiob_cli.py", line 87, in <module>
-    main()
-  File "hiob_cli.py", line 74, in main
-    silent=args.silent)
-  File "hiob_cli.py", line 51, in track
-    loop.run_until_complete(tracker.execute_everything())
-  File "/usr/lib/python3.6/asyncio/base_events.py", line 473, in run_until_complete
-    return future.result()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 322, in execute_everything
-    await self.execute_tracking_on_all_samples()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 319, in execute_tracking_on_all_samples
-    await self.execute_tracking_on_sample(sample)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracker.py", line 312, in execute_tracking_on_sample
-    await tracking.execute_everything()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 531, in execute_everything
-    await self.execute_tracking()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 467, in execute_tracking
-    await self.tracking_step()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 449, in tracking_step
-    self.tracking_evaluate_frame()
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 418, in tracking_evaluate_frame
-    self.evaluate_frame(frame)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Tracking.py", line 634, in evaluate_frame
-    result['overlap_score'] = gt.overlap_score(p)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Rect.py", line 210, in overlap_score
-    intersect = self.intersect(other)
-  File "/home/finn/PycharmProjects/code-git/HIOB/core/Rect.py", line 195, in intersect
-    x2, y2, w2, h2 = other
-TypeError: 'NoneType' object is not iterable
-
+2019-03-22 18:05:01,539 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 18:05:01,540 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 18:05:01,540 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full']
+2019-03-22 18:05:01,540 | INFO | starting experiment dsst_dyn_limited_tb100full
+2019-03-22 18:05:38,631 | INFO | finished experiment dsst_dyn_limited_tb100full
+2019-03-22 18:17:12,360 | INFO | =========== NEW EXECUTION ===========
+2019-03-22 18:17:12,360 | INFO | specified GPU: 0, experiments: ['candidates_stat_cont_tb100full', 'all']
+2019-03-22 18:17:12,360 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_stat_cont_tb100full', 'candidates_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full']
+2019-03-22 18:17:12,360 | WARNING | EXECUTED EACH EXPERIMENT ONCE

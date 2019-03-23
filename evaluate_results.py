@@ -657,7 +657,7 @@ def create_opt_csv(experiment_folder, eval_folder):
             fieldnames = [csv_avg_success,
                           csv_avg_precision,
                           csv_avg_fps,
-                          "Avg. SE_Frame-rate",
+                          csv_avg_se_fps,
                           changing_parameter]
 
             writer = csv.DictWriter(outcsv, fieldnames=fieldnames)

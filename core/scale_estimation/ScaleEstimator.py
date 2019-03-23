@@ -139,7 +139,7 @@ class ScaleEstimator:
             final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
 
         # high_gain / limited combined
-        elif self.update_strategy == "high_gain":
+        elif self.update_strategy == "limited":
             if self.passed_since_last_se == 20:
                 logger.info("20 frames passed without updating the scale, enforcing execution of SE")
                 final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)

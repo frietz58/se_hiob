@@ -97,7 +97,7 @@ tracking_conf:
 
 scale_estimator:
   use_scale_estimation: true   # Enable or disable scale estimation
-  update_strategy: high_gain
+  update_strategy: limited
   dyn_min_se_treshold: 0.2
   dyn_max_se_treshold: 0.4
   static_update_val: 20

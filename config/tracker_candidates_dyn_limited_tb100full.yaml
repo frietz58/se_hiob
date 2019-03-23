@@ -97,7 +97,7 @@ tracking_conf:
 
 scale_estimator:
   use_scale_estimation: true   # Enable or disable scale estimation
-  update_strategy: high_gain
+  update_strategy: limited
   dyn_min_se_treshold: 0.2
   dyn_max_se_treshold: 0.4
   static_update_val: 20
@@ -137,7 +137,7 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
 # = Short Test Set = #
-- tb100/Deer
+#- tb100/Deer
 #- tb100/DragonBaby
 #- tb100/CarScale
 #- tb100/Walking
