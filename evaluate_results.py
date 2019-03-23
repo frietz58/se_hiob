@@ -1158,7 +1158,13 @@ def get_same_parameter_values(trackings):
         del changing_parameter_values["hog_block_norm_size"]
 
     if len(changing_parameter_values) != 1:
-        raise ValueError("More than one changing parameter, aborting: " + str(changing_parameter_values.keys()))
+        if "c_number_scales" in changing_parameter_values.keys():
+            print("Multiple changing paramters: " + str(changing_parameter_values.keys()))
+            print("Removing c_number_scales")
+            del changing_parameter_values["c_number_scales"]
+
+            if len(changing_parameter_values) != 1:
+                raise ValueError("Still multiple changing parameters, aborting: " + str(changing_parameter_values.keys()))
 
     # get trackings where value is the same to average over those
     parameter_value_trackings = {}
