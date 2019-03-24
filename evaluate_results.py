@@ -1008,11 +1008,11 @@ def create_graphs_from_opt_csv(obt_folder):
         figure_file2 = os.path.join(obt_folder, 'parameter_vs_framerate.pdf')
         plt.savefig(figure_file2)
 
-        create_tex_include(dataframe=sorted_df,
-                           tex_name="include_figure.tex",
-                           obt_folder=obt_folder,
-                           path_in_src="opt_results",
-                           parameter_name=str(parameter_name))
+    create_tex_include(dataframe=sorted_df,
+                       tex_name="include_figure.tex",
+                       obt_folder=obt_folder,
+                       path_in_src="opt_results",  # for the include command in the tex file
+                       parameter_name=str(parameter_name))
 
 
 # create a tex file with a subfigure containing the two graphs for the parameter

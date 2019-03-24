@@ -4,7 +4,7 @@ import os
 
 # Use like:
 # evaluate all parameters in an "opt folder" containing the folders with the trackings with the different param values
-# python eval_executor -t /informatik2/students/home/5rietz/BA/gws5_opt/candidates_opt
+# python run_opt_eval -t /informatik2/students/home/5rietz/BA/gws5_opt/candidates_opt
 # -c all // -c c_number_scales inner_punish_threshold
 
 parser = argparse.ArgumentParser(description='Execute hiob experiments')

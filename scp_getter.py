@@ -23,7 +23,7 @@ def main():
 
     all_candidates_params = [
         "adjust_max_scale_diff", "adjust_max_scale_diff_after", "c_number_scales",
-        "c_scales_factor", "inner_punish_threshold", "max_scale_difference", "outer_punish_Factor",
+        "c_scale_factor", "inner_punish_threshold", "max_scale_difference", "outer_punish_threshold",
         "scale_window_step_size"]
 
     if "dsst" in args.source:
@@ -51,7 +51,7 @@ def main():
                     print(err)
 
                 call = "scp 5rietz@rzssh1.informatik.uni-hamburg.de:\'" + os.path.join(args.source, str(param),
-                        "*.pdf") + "\' " + str(local_save_path)
+                        "*.tex") + "\' " + str(local_save_path)
                 p = Popen(call, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
                 output, err = p.communicate()
                 if err != b"":
@@ -84,7 +84,7 @@ def main():
                     print(err)
 
                 call = "scp 5rietz@rzssh1.informatik.uni-hamburg.de:\'" + os.path.join(args.source, str(param),
-                        "*.pdf") + "\' " + str(local_save_path)
+                        "*.tex") + "\' " + str(local_save_path)
                 p = Popen(call, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
                 output, err = p.communicate()
                 if err != b"":
