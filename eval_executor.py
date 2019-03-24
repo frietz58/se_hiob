@@ -3,6 +3,7 @@ from subprocess import Popen, PIPE
 import os
 
 # Use like:
+# evaluate all parameters in an "opt folder" containing the folders with the trackings with the different param values
 # python eval_executor -t /informatik2/students/home/5rietz/BA/gws5_opt/candidates_opt
 # -c all // -c c_number_scales inner_punish_threshold
 
@@ -56,8 +57,6 @@ def main():
                 else:
                     print("successfully finished evaluating " + param)
                     print("")
-
-
 
 
 if __name__ == "__main__":

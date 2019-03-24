@@ -53,8 +53,9 @@ sd_csv_name = "standard_deviations.csv"
 
 
 # ======= plot font =======
-font = {'family': 'normal',
-        'size': 15}
+# font = {'family': 'normal',
+#         'size': 15}
+font = {'size': 15}
 matplotlib.rc('font', **font)
 
 
