@@ -52,6 +52,12 @@ csv_total_success = "Total Success"
 sd_csv_name = "standard_deviations.csv"
 
 
+# ======= plot font =======
+font = {'family': 'normal',
+        'size': 15}
+matplotlib.rc('font', **font)
+
+
 # ================================= GET FUNCTIONS =================================
 # get all workplace files
 def get_saved_workplaces(result_dir):
@@ -589,7 +595,10 @@ def create_attribute_score_csv(result_folder, eval_folder):
 
 # create a csv comparing the trackings in one csv folder (opt)
 def create_opt_csv(experiment_folder, eval_folder):
-    filename = os.path.basename(experiment_folder)
+    if experiment_folder.split("/")[-1] == "":
+        filename = experiment_folder.split("/")[-2]
+    else:
+        filename = experiment_folder.split("/")[-1]
     csv_name = os.path.join(experiment_folder, filename + "_opt.csv")
 
     trackings = get_tracking_folders(experiment_folder)
@@ -874,7 +883,10 @@ def create_graphs_metrics_for_set(set_of_results, set_name):
 # create the graphs for the opt plotting parameter value vs x
 def create_graphs_from_opt_csv(obt_folder):
     # obt folder are named like the parameter that is obtimized, this:
-    parameter_name = obt_folder.split("/")[-1]
+    if obt_folder.split("/")[-1] == "":
+        parameter_name = obt_folder.split("/")[-2]
+    else:
+        parameter_name = obt_folder.split("/")[-1]
 
     if os.path.isdir(obt_folder):
         files_in_dir = os.listdir(obt_folder)
@@ -904,11 +916,13 @@ def create_graphs_from_opt_csv(obt_folder):
         # add some text for labels, title and axes ticks
         ax.set_ylabel('Scores')
         ax.set_xlabel(str(parameter_name))
-        ax.set_title('Avg. Precision and Success over parameter values')
+        ax.set_title(str(parameter_name))
         ax.set_xticks(ind)
         ax.set_xticklabels(sorted_df[parameter_name])
+        if len(ind) > 5:
+            plt.xticks(rotation=45)
 
-        ax.legend((success_graph[0], precision_graph[0]), ('Avg. Success', 'Avg. Precision'))
+        ax.legend((success_graph[0], precision_graph[0]), (csv_avg_success, csv_avg_precision))
         ax.set_ylim(0, 1)
 
         def autolabel(rects):
@@ -925,71 +939,103 @@ def create_graphs_from_opt_csv(obt_folder):
         # autolabel(rects2)
 
         # plt.show()
-        figure_file3 = os.path.join(obt_folder, 'parameter_vs_metrics.pdf')
-        plt.savefig(figure_file3)
+        figure_file1 = os.path.join(obt_folder, 'parameter_vs_metrics.pdf')
+        plt.savefig(figure_file1)
 
         # ================ PARAMETER vs FRAMERATE ================
         framerate = sorted_df[csv_avg_fps]
         framerate_sd = sorted_sd["avg_fps_sd"]
-        log_framerate = [np.log(x) for x in framerate]
-        log_framerate_sd = [np.log(x) for x in framerate_sd]
 
         se_framerate = sorted_df[csv_avg_se_fps]
         se_framerate_sd = sorted_sd["avg_se_fps_sd"]
-        log_se_framerate = [np.log(x) for x in se_framerate]
-        log_se_framerate_sd = [np.log(x) for x in se_framerate_sd]
 
         ind = np.arange(len(framerate))  # the x locations for the groups
-        width = 0.35  # the width of the bars
 
+        if max(se_framerate) < 70:
+            fig, ax = plt.subplots()
 
+            se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
+            framerate_graph = ax.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
 
-        fig, (ax, ax2) = plt.subplots(2, 1, sharex=True)
+            #ax.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(se_framerate) + max(se_framerate_sd) * 5))
+            ax.set_ylim(0, 60)
+            ax.set_ylabel('Frame-rate')
+            ax.set_title(str(parameter_name))
+            ax.set_xticks(ind)
+            ax.set_xticklabels(sorted_df[parameter_name])
+            if len(ind) > 5:
+                plt.xticks(rotation=45)
 
-        # ax2 = ax.twinx()
-        # ax2.set_ylim([min(se_framerate) - 10, max(se_framerate) + 10])
+        else:
+            fig, (ax, ax2) = plt.subplots(2, 1, sharex=True)
 
-        # framerate_bar = ax.bar(ind, log_framerate, width, color='#785ef0')
-        # se_framerate_bar = ax.bar(ind + width, log_se_framerate, width, color='#fe6100')
+            se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
+            ax.set_ylim((min(se_framerate) - max(se_framerate_sd) * 5), (max(se_framerate) + max(se_framerate_sd) * 5))
+            ax.set_ylabel('SE Frame-rate')
+            ax.set_title(str(parameter_name))
+            ax.set_xticks(ind)
+            ax.set_xticklabels(sorted_df[parameter_name])
+            if len(ind) > 5 :
+                plt.xticks(rotation=45)
 
-        se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
-        ax.set_ylim((min(se_framerate) - max(se_framerate_sd) * 10), (max(se_framerate) + max(se_framerate_sd) * 10))
-        ax.set_ylabel('SE Frame-rate')
-        ax.set_title('Avg. FPS hiob and avg. FPS of SE module over parameter values')
-        ax.set_xticks(ind)
-        ax.set_xticklabels(sorted_df[parameter_name])
-        # ax.set_xlabel(str(parameter_name))
+            framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
+            ax2.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(framerate) + max(framerate_sd) * 5))
+            ax2.set_ylabel('Frame-rate')
+            ax2.set_xticks(ind)
+            ax2.set_xticklabels(sorted_df[parameter_name])
+            ax2.set_xlabel(str(parameter_name))
 
-        framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
-        ax2.set_ylim((min(framerate) - max(framerate_sd) * 10), (max(framerate) + max(framerate_sd) * 10))
-        ax2.set_ylabel('Frame-rate')
-        # ax2.set_title('Avg. FPS hiob and avg. FPS of SE module over parameter values')
-        ax2.set_xticks(ind)
-        ax2.set_xticklabels(sorted_df[parameter_name])
-        ax2.set_xlabel(str(parameter_name))
+            ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
 
-        ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
+            # hide the spines between ax and ax2
+            ax.spines['bottom'].set_visible(False)
+            ax2.spines['top'].set_visible(False)
+            ax.xaxis.tick_top()
+            ax.tick_params(labeltop='off')  # don't put tick labels at the top
+            ax2.xaxis.tick_bottom()
 
-        # hide the spines between ax and ax2
-        ax.spines['bottom'].set_visible(False)
-        ax2.spines['top'].set_visible(False)
-        ax.xaxis.tick_top()
-        ax.tick_params(labeltop='off')  # don't put tick labels at the top
-        ax2.xaxis.tick_bottom()
+            d = .015  # how big to make the diagonal lines in axes coordinates
+            kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+            ax.plot((-d, +d), (-d, +d), **kwargs)  # top-left diagonal
+            ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
 
-        d = .015  # how big to make the diagonal lines in axes coordinates
-        # arguments to pass to plot, just so we don't keep repeating them
-        kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
-        ax.plot((-d, +d), (-d, +d), **kwargs)  # top-left diagonal
-        ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
-
-        kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
-        ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
-        ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+            kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
+            ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+            ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
 
         # plt.show()
-        figure_file3 = os.path.join(obt_folder, 'parameter_vs_framerate.pdf')
-        plt.savefig(figure_file3)
+        figure_file2 = os.path.join(obt_folder, 'parameter_vs_framerate.pdf')
+        plt.savefig(figure_file2)
+
+        create_tex_include(dataframe=sorted_df,
+                           tex_name="include_figure.tex",
+                           obt_folder=obt_folder,
+                           path_in_src="opt_results",
+                           parameter_name=str(parameter_name))
+
+
+# create a tex file with a subfigure containing the two graphs for the parameter
+def create_tex_include(dataframe, obt_folder, tex_name, path_in_src, parameter_name):
+    tex_path = os.path.join(obt_folder, tex_name)
+    approach = get_approach_to_parameter(parameter_name)
+    with open(tex_path, "w") as tex_file:
+        tex_file.writelines(
+                [
+                    "\\begin{subfigure}[t]{0.5\\textwidth}\n",
+                    "\\centering\\captionsetup{width=.9\\linewidth}\n",
+                    "\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, approach, parameter_name, "parameter_vs_framerate") + "}\n",
+                    "\\end{subfigure}\n",
+                    "\\begin{subfigure}[t]{0.5\\textwidth}\n",
+                    "\\centering\\captionsetup{width=.9\\linewidth}\n",
+                    "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, approach, parameter_name, "parameter_vs_framerate") + "}\n",
+                    "\\end{subfigure}\n",
+                    "\\subcaption[]{The average metric scores and the average impact on the computational load of the "
+                        "values of the \\textit{" + str(parameter_name.replace("_", "\\_")) + "} parameter. The best performing value is " +
+                        str(dataframe.loc[dataframe[csv_avg_success].idxmax()][parameter_name]) + ", with an average success"
+                        " rating of " + str(dataframe.loc[dataframe[csv_avg_success].idxmax()][csv_avg_success]) + " and "
+                        "an overall tracking frame-rate of " + str(dataframe.loc[dataframe[csv_avg_success].idxmax()][csv_avg_fps]) + ". }"
+                 ]
+            )
 
 
 # ================================= HELPER FUNCTIONS =================================
@@ -1116,6 +1162,19 @@ def pos_int_form_string(string_number):
         return int(string_number)
 
 
+# return the approach to which a parameter belongs
+def get_approach_to_parameter(parameter):
+    if parameter in ["dsst_number_scales", "hog_cell_size", "learning_rate", "scale_factor", "scale_model_max",
+                     "scale_sigma_factor"]:
+        return "dsst"
+    elif parameter in ["adjust_max_scale_diff", "adjust_max_scale_diff_after", "c_number_scales", "c_scales_factor",
+                       "inner_punish_threshold", "max_scale_difference", "outer_punish_Factor",
+                       "scale_window_step_size"]:
+        return "candidates"
+    else:
+        raise ValueError("Parameter not found")
+
+
 # read the information from the tracker.yaml file to reconstruct which tracking algorithm has been used
 def get_approach_from_yaml(tracking_dir):
     with open(tracking_dir + "/tracker.yaml", "r") as stream:
@@ -1221,7 +1280,8 @@ def get_same_parameter_values(trackings):
     print("loading all tracker configurations...")
     for tracking in trackings:
         with open(tracking + "/tracker.yaml", "r") as stream:
-            try:
+            try:# to star a complete new run (aka do every experiment a second time, empty the log file or rename the )
+
                 configuration = yaml.safe_load(stream)
 
                 # if hog cell size not in configuration insert baseline values,
