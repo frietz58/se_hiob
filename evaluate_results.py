@@ -1023,7 +1023,7 @@ def create_tex_include(dataframe, obt_folder, tex_name, path_in_src, parameter_n
                 [
                     "\\begin{subfigure}[t]{0.5\\textwidth}\n",
                     "\\centering\\captionsetup{width=.9\\linewidth}\n",
-                    "\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, approach, parameter_name, "parameter_vs_framerate") + "}\n",
+                    "\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, approach, parameter_name, "parameter_vs_metrics") + "}\n",
                     "\\end{subfigure}\n",
                     "\\begin{subfigure}[t]{0.5\\textwidth}\n",
                     "\\centering\\captionsetup{width=.9\\linewidth}\n",
