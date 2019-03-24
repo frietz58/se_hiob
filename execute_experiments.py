@@ -24,6 +24,7 @@ logger.addHandler(ch)
 parser = argparse.ArgumentParser(description='Execute hiob experiments')
 parser.add_argument('-g', '--gpu')
 parser.add_argument('-exp', '--experiments', nargs='+', required=True)
+parser.add_argument('-skip', '--skipping', nargs='+')
 
 args = parser.parse_args()
 
@@ -52,6 +53,9 @@ def main():
     logger.info("specified GPU: " + args.gpu + ", experiments: " + str(args.experiments))
 
     experiment_names = [
+        "candidates_stat_cont_tb100full",
+        "candidates_stat_limited_tb100full",
+
         "dsst_validation0",
         "dsst_validation1",
         "dsst_validation2",
@@ -62,9 +66,6 @@ def main():
         "dsst_validation7",
         "dsst_validation8",
         "dsst_validation9",
-
-        "candidates_stat_cont_tb100full",
-        "candidates_stat_limited_tb100full",
 
         "candidates_dyn_cont_tb100full",
         "candidates_dyn_limited_tb100full",
@@ -79,6 +80,10 @@ def main():
     log_progress = True
 
     for experiment in experiment_names:
+
+        if experiment in args.skipping:
+            print("as specified, skipping: " + str(experiment))
+            continue
 
         if log_progress:
             progress = get_progress_from_log()
