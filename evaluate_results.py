@@ -713,11 +713,13 @@ def create_opt_csv(experiment_folder, eval_folder):
             ])
 
             # get the average values for the same parameter value for a row in the opt csv
-            avg_succs = []
-            avg_precs = []
-            se_framerates = []
-            framerates = []
-            for value in same_parameter_value_collection.values():
+
+            for i, value in enumerate(same_parameter_value_collection.values()):
+                avg_succs = []
+                avg_precs = []
+                se_framerates = []
+                framerates = []
+
                 # get value for one row
                 for single_tracking in value:
                     with open(single_tracking["tracking"] + "/evaluation.txt", "r") as evaltxt:
@@ -738,6 +740,10 @@ def create_opt_csv(experiment_folder, eval_folder):
                 final_avg_precc = np.around(sum(avg_precs) / len(avg_precs), decimals=3)
                 final_framerate = np.around(sum(framerates) / len(framerates), decimals=3)
                 final_se_framerate = np.around(sum(se_framerates) / len(se_framerates), decimals=3)
+                print("succs: " + str(avg_succs))
+                print("precs: " + str(avg_precs))
+                print("framerates: " + str(framerates))
+                print("se_framerates: " + str(se_framerates))
 
                 writer.writerow({csv_avg_success: final_avg_succ,
                                  csv_avg_precision: final_avg_precc,
@@ -758,7 +764,7 @@ def create_opt_csv(experiment_folder, eval_folder):
                 avg_se_fps_helper = [x - final_se_framerate for x in se_framerates]
                 avg_se_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_se_fps_helper]), len(se_framerates) - 1))
 
-                sd_df.append([
+                sd_df.loc[i] = [
                     value[0]["value"],
                     final_avg_succ,
                     final_avg_precc,
@@ -768,7 +774,7 @@ def create_opt_csv(experiment_folder, eval_folder):
                     prec_sd,
                     avg_fps_sd,
                     avg_se_fps_sd
-                ])
+                ]
 
     # sort created csv by parameter and override old
     df = pd.read_csv(csv_name)
@@ -930,39 +936,50 @@ def create_graphs_from_opt_csv(obt_folder):
         ind = np.arange(len(framerate))  # the x locations for the groups
         width = 0.35  # the width of the bars
 
-        fig, ax = plt.subplots()
+
+
+        fig, (ax, ax2) = plt.subplots(2, 1, sharex=True)
 
         # ax2 = ax.twinx()
         # ax2.set_ylim([min(se_framerate) - 10, max(se_framerate) + 10])
 
-        framerate_bar = ax.bar(ind, log_framerate, width, color='#785ef0')
-        se_framerate_bar = ax.bar(ind + width, log_se_framerate, width, color='#fe6100')
+        # framerate_bar = ax.bar(ind, log_framerate, width, color='#785ef0')
+        # se_framerate_bar = ax.bar(ind + width, log_se_framerate, width, color='#fe6100')
 
-        success_graph = ax.errorbar(ind, framerate, yerr=framerate_sd, color='#785ef0', capsize=3)
-        precision_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#fe6100', capsize=3)
-
-        # add some text for labels, title and axes ticks
-        ax.set_ylabel('Frame-rate')
-        ax.set_title('Avg. FPS hiob and avg. FPS  of SE module over parameter values')
-        ax.set_xticks(ind + width / 2)
+        se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
+        ax.set_ylim((min(se_framerate) - max(se_framerate_sd) * 10), (max(se_framerate) + max(se_framerate_sd) * 10))
+        ax.set_ylabel('SE Frame-rate')
+        ax.set_title('Avg. FPS hiob and avg. FPS of SE module over parameter values')
+        ax.set_xticks(ind)
         ax.set_xticklabels(sorted_df[parameter_name])
-        ax.set_xlabel(str(parameter_name))
+        # ax.set_xlabel(str(parameter_name))
 
-        ax.legend((success_graph[0], precision_graph[0]), ('Avg. Frame-rate', 'Avg. SE Frame-rate'))
-        ax.set_ylim(0, max(log_se_framerate) + min(log_framerate))
+        framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
+        ax2.set_ylim((min(framerate) - max(framerate_sd) * 10), (max(framerate) + max(framerate_sd) * 10))
+        ax2.set_ylabel('Frame-rate')
+        # ax2.set_title('Avg. FPS hiob and avg. FPS of SE module over parameter values')
+        ax2.set_xticks(ind)
+        ax2.set_xticklabels(sorted_df[parameter_name])
+        ax2.set_xlabel(str(parameter_name))
 
-        def autolabel(rects):
-            """
-            Attach a text label above each bar displaying its height
-            """
-            for rect in rects:
-                height = rect.get_height()
-                ax.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
-                        '%d' % int(height),
-                        ha='center', va='bottom')
+        ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
 
-        # autolabel(rects1)
-        # autolabel(rects2)
+        # hide the spines between ax and ax2
+        ax.spines['bottom'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+        ax.xaxis.tick_top()
+        ax.tick_params(labeltop='off')  # don't put tick labels at the top
+        ax2.xaxis.tick_bottom()
+
+        d = .015  # how big to make the diagonal lines in axes coordinates
+        # arguments to pass to plot, just so we don't keep repeating them
+        kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+        ax.plot((-d, +d), (-d, +d), **kwargs)  # top-left diagonal
+        ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
+
+        kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
+        ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+        ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
 
         # plt.show()
         figure_file3 = os.path.join(obt_folder, 'parameter_vs_framerate.pdf')
