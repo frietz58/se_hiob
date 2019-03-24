@@ -1168,8 +1168,8 @@ def get_approach_to_parameter(parameter):
     if parameter in ["dsst_number_scales", "hog_cell_size", "learning_rate", "scale_factor", "scale_model_max",
                      "scale_sigma_factor"]:
         return "dsst"
-    elif parameter in ["adjust_max_scale_diff", "adjust_max_scale_diff_after", "c_number_scales", "c_scales_factor",
-                       "inner_punish_threshold", "max_scale_difference", "outer_punish_Factor",
+    elif parameter in ["adjust_max_scale_diff", "adjust_max_scale_diff_after", "c_number_scales", "c_scale_factor",
+                       "inner_punish_threshold", "max_scale_difference", "outer_punish_threshold",
                        "scale_window_step_size"]:
         return "candidates"
     else:
