@@ -3,6 +3,7 @@ from core.Rect import Rect
 import argparse
 import scipy.io
 import matplotlib
+
 matplotlib.use('Agg')  # for plot when display is undefined
 import matplotlib.pyplot as plt
 import numpy as np
@@ -48,6 +49,7 @@ csv_avg_se_fps = "Avg. SE Frame rate"
 csv_avg_ss = "Avg. Size Score"
 csv_total_precision = "Total Precision"
 csv_total_success = "Total Success"
+sd_csv_name = "standard_deviations.csv"
 
 
 # ================================= GET FUNCTIONS =================================
@@ -389,8 +391,6 @@ def get_avg_results_from_experiment(experiment_folder):
             #     csv_avg_ss: np.around(size_score_sum / len(specific_attribute_sequences), decimals=3)
             # })
 
-
-
         # get the average values of the rows:
         # final_precs = []
         # final_succs = []
@@ -613,12 +613,24 @@ def create_opt_csv(experiment_folder, eval_folder):
             writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
             writer.writeheader()
 
+            sd_df = pd.DataFrame(columns=[
+                changing_parameter,
+                "avg_succ",
+                "avg_prec",
+                "avg_fps",
+                "avg_se_fps",
+                "succ_sd",
+                "prec_sd",
+                "avg_fps_sd",
+                "avg_se_fps_sd"
+            ])
+
             # get the average values for the same parameter value for a row in the opt csv
             avg_succs = []
             avg_precs = []
             se_framerates = []
             framerates = []
-            for value in same_parameter_value_collection.values():
+            for i, value in enumerate(same_parameter_value_collection.values()):
                 # get value for one row
                 for single_tracking in value:
                     with open(single_tracking["tracking"] + "/evaluation.txt", "r") as evaltxt:
@@ -645,6 +657,31 @@ def create_opt_csv(experiment_folder, eval_folder):
                                  csv_avg_fps: final_framerate,
                                  csv_avg_se_fps: final_se_framerate,
                                  changing_parameter: value[0]["value"]})
+
+                # calc sds
+                succ_sd_helper = [x - final_avg_succ for x in avg_succs]
+                succ_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in succ_sd_helper]), len(avg_succs) - 1))
+
+                prec_sd_helper = [x - final_avg_precc for x in avg_precs]
+                prec_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in prec_sd_helper]), len(avg_precs) - 1))
+
+                avg_fps_helper = [x - final_framerate for x in framerates]
+                avg_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_fps_helper]), len(framerates) - 1))
+
+                avg_se_fps_helper = [x - final_se_framerate for x in se_framerates]
+                avg_se_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_se_fps_helper]), len(se_framerates) - 1))
+
+                sd_df.loc[i] = [
+                    value[0]["value"],
+                    final_avg_succ,
+                    final_avg_precc,
+                    final_framerate,
+                    final_se_framerate,
+                    succ_sd,
+                    prec_sd,
+                    avg_fps_sd,
+                    avg_se_fps_sd
+                ]
 
     elif approach == "DSST dynamic" or approach == "DSST static":
 
@@ -663,6 +700,18 @@ def create_opt_csv(experiment_folder, eval_folder):
             writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
             writer.writeheader()
 
+            sd_df = pd.DataFrame(columns=[
+                changing_parameter,
+                "avg_succ",
+                "avg_prec",
+                "avg_fps",
+                "avg_se_fps",
+                "succ_sd",
+                "prec_sd",
+                "avg_fps_sd",
+                "avg_se_fps_sd"
+            ])
+
             # get the average values for the same parameter value for a row in the opt csv
             avg_succs = []
             avg_precs = []
@@ -696,11 +745,39 @@ def create_opt_csv(experiment_folder, eval_folder):
                                  csv_avg_se_fps: final_se_framerate,
                                  changing_parameter: value[0]["value"]})
 
+                # calc sds
+                succ_sd_helper = [x - final_avg_succ for x in avg_succs]
+                succ_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in succ_sd_helper]), len(avg_succs) - 1))
+
+                prec_sd_helper = [x - final_avg_precc for x in avg_precs]
+                prec_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in prec_sd_helper]), len(avg_precs) - 1))
+
+                avg_fps_helper = [x - final_framerate for x in framerates]
+                avg_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_fps_helper]), len(framerates) - 1))
+
+                avg_se_fps_helper = [x - final_se_framerate for x in se_framerates]
+                avg_se_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_se_fps_helper]), len(se_framerates) - 1))
+
+                sd_df.append([
+                    value[0]["value"],
+                    final_avg_succ,
+                    final_avg_precc,
+                    final_framerate,
+                    final_se_framerate,
+                    succ_sd,
+                    prec_sd,
+                    avg_fps_sd,
+                    avg_se_fps_sd
+                ])
+
     # sort created csv by parameter and override old
     df = pd.read_csv(csv_name)
     cols = list(df)
     sorted = df.sort_values(cols[-1])
-    sorted.to_csv(csv_name, index=False)
+    sorted.to_csv(csv_name, )
+
+    # save the helper csv with the standard deviation
+    sd_df.to_csv(os.path.join(experiment_folder, sd_csv_name), index=False)
 
     return None
 
@@ -796,26 +873,30 @@ def create_graphs_from_opt_csv(obt_folder):
         df = pd.read_csv(os.path.join(obt_folder, csv_name))
         sorted_df = df.sort_values(parameter_name)
 
+        sd_df = pd.read_csv(os.path.join(obt_folder, sd_csv_name))
+        sorted_sd = sd_df.sort_values(parameter_name)
+
         # ================ PARAMETER vs METRIC ================
         success = sorted_df[csv_avg_success]
+        success_sd = sorted_sd["succ_sd"]
         precision = sorted_df[csv_avg_precision]
+        precision_sd = sorted_sd["prec_sd"]
 
-
-        ind = np.arange(len(success))  # the x locations for the groups
-        width = 0.35  # the width of the bars
+        ind = np.arange(len(success))  # the x locations datapoints
 
         fig, ax = plt.subplots()
 
-        rects1 = ax.bar(ind, success, width, color='#648fff')
-        rects2 = ax.bar(ind + width, precision, width, color='#ffb000')
+        success_graph = ax.errorbar(ind, success, yerr=success_sd, color='#648fff', capsize=3)
+        precision_graph = ax.errorbar(ind, precision, yerr=precision_sd, color='#ffb000', capsize=3)
 
         # add some text for labels, title and axes ticks
         ax.set_ylabel('Scores')
+        ax.set_xlabel(str(parameter_name))
         ax.set_title('Avg. Precision and Success over parameter values')
-        ax.set_xticks(ind + width / 2)
+        ax.set_xticks(ind)
         ax.set_xticklabels(sorted_df[parameter_name])
 
-        ax.legend((rects1[0], rects2[0]), ('Avg. Success', 'Avg. Precision'))
+        ax.legend((success_graph[0], precision_graph[0]), ('Avg. Success', 'Avg. Precision'))
         ax.set_ylim(0, 1)
 
         def autolabel(rects):
@@ -828,8 +909,8 @@ def create_graphs_from_opt_csv(obt_folder):
                         '%d' % int(height),
                         ha='center', va='bottom')
 
-        #autolabel(rects1)
-        #autolabel(rects2)
+        # autolabel(rects1)
+        # autolabel(rects2)
 
         # plt.show()
         figure_file3 = os.path.join(obt_folder, 'parameter_vs_metrics.pdf')
@@ -837,24 +918,38 @@ def create_graphs_from_opt_csv(obt_folder):
 
         # ================ PARAMETER vs FRAMERATE ================
         framerate = sorted_df[csv_avg_fps]
+        framerate_sd = sorted_sd["avg_fps_sd"]
+        log_framerate = [np.log(x) for x in framerate]
+        log_framerate_sd = [np.log(x) for x in framerate_sd]
+
         se_framerate = sorted_df[csv_avg_se_fps]
+        se_framerate_sd = sorted_sd["avg_se_fps_sd"]
+        log_se_framerate = [np.log(x) for x in se_framerate]
+        log_se_framerate_sd = [np.log(x) for x in se_framerate_sd]
 
         ind = np.arange(len(framerate))  # the x locations for the groups
         width = 0.35  # the width of the bars
 
         fig, ax = plt.subplots()
 
-        rects1 = ax.bar(ind, framerate, width, color='#785ef0')
-        rects2 = ax.bar(ind + width, se_framerate, width, color='#fe6100')
+        # ax2 = ax.twinx()
+        # ax2.set_ylim([min(se_framerate) - 10, max(se_framerate) + 10])
+
+        framerate_bar = ax.bar(ind, log_framerate, width, color='#785ef0')
+        se_framerate_bar = ax.bar(ind + width, log_se_framerate, width, color='#fe6100')
+
+        success_graph = ax.errorbar(ind, framerate, yerr=framerate_sd, color='#785ef0', capsize=3)
+        precision_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#fe6100', capsize=3)
 
         # add some text for labels, title and axes ticks
         ax.set_ylabel('Frame-rate')
         ax.set_title('Avg. FPS hiob and avg. FPS  of SE module over parameter values')
         ax.set_xticks(ind + width / 2)
         ax.set_xticklabels(sorted_df[parameter_name])
+        ax.set_xlabel(str(parameter_name))
 
-        ax.legend((rects1[0], rects2[0]), ('Avg. Frame-rate', 'Avg. SE Frame-rate'))
-        ax.set_ylim(0, max(se_framerate) + 5)
+        ax.legend((success_graph[0], precision_graph[0]), ('Avg. Frame-rate', 'Avg. SE Frame-rate'))
+        ax.set_ylim(0, max(log_se_framerate) + min(log_framerate))
 
         def autolabel(rects):
             """
@@ -872,7 +967,6 @@ def create_graphs_from_opt_csv(obt_folder):
         # plt.show()
         figure_file3 = os.path.join(obt_folder, 'parameter_vs_framerate.pdf')
         plt.savefig(figure_file3)
-
 
 
 # ================================= HELPER FUNCTIONS =================================
@@ -1164,7 +1258,8 @@ def get_same_parameter_values(trackings):
             del changing_parameter_values["c_number_scales"]
 
             if len(changing_parameter_values) != 1:
-                raise ValueError("Still multiple changing parameters, aborting: " + str(changing_parameter_values.keys()))
+                raise ValueError(
+                    "Still multiple changing parameters, aborting: " + str(changing_parameter_values.keys()))
 
     # get trackings where value is the same to average over those
     parameter_value_trackings = {}
@@ -1226,4 +1321,3 @@ if __name__ == "__main__":
             get_avg_results_from_experiment(results_path)
             print("creating graphs for average experiment metrics")
             create_graphs_metrics_for_set(results_path, "avg_full_set")
-
