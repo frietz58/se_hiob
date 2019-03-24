@@ -626,11 +626,12 @@ def create_opt_csv(experiment_folder, eval_folder):
             ])
 
             # get the average values for the same parameter value for a row in the opt csv
-            avg_succs = []
-            avg_precs = []
-            se_framerates = []
-            framerates = []
+
             for i, value in enumerate(same_parameter_value_collection.values()):
+                avg_succs = []
+                avg_precs = []
+                se_framerates = []
+                framerates = []
                 # get value for one row
                 for single_tracking in value:
                     with open(single_tracking["tracking"] + "/evaluation.txt", "r") as evaltxt:
@@ -657,6 +658,11 @@ def create_opt_csv(experiment_folder, eval_folder):
                                  csv_avg_fps: final_framerate,
                                  csv_avg_se_fps: final_se_framerate,
                                  changing_parameter: value[0]["value"]})
+
+                print("succs: " + str(avg_succs))
+                print("precs: " + str(avg_precs))
+                print("framerates: " + str(framerates))
+                print("se_framerates: " + str(se_framerates))
 
                 # calc sds
                 succ_sd_helper = [x - final_avg_succ for x in avg_succs]
