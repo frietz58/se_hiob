@@ -963,6 +963,7 @@ def create_graphs_from_opt_csv(obt_folder):
             ax.set_title(str(parameter_name))
             ax.set_xticks(ind)
             ax.set_xticklabels(sorted_df[parameter_name])
+            ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
             if len(ind) > 5:
                 plt.xticks(rotation=45)
 
