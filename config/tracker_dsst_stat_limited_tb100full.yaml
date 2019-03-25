@@ -129,7 +129,7 @@ scale_estimator:
   scale_window_step_size: 0.2 # the deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
   adjust_max_scale_diff: false # adjust the max_scale_difference value if the factor has been limited n time sin a row, necessary for extreme scale changes that exceed the max_scale_difference between frames
   adjust_max_scale_diff_after: 10 # the number after how many times of the scale factor being limited the max scale_difference gets adjusted
-    c_change_aspect_ratio: false # change aspect ratio of bouding box
+  c_change_aspect_ratio: false # change aspect ratio of bouding box
 
 
 

@@ -916,7 +916,6 @@ def create_graphs_from_opt_csv(obt_folder):
 
         # add some text for labels, title and axes ticks
         ax.set_ylabel('Scores')
-        ax.set_xlabel(str(parameter_name))
         ax.set_title(str(parameter_name))
         ax.set_xticks(ind)
         ax.set_xticklabels(sorted_df[parameter_name])
@@ -976,7 +975,7 @@ def create_graphs_from_opt_csv(obt_folder):
             ax.set_title(str(parameter_name))
             ax.set_xticks(ind)
             ax.set_xticklabels(sorted_df[parameter_name])
-            if len(ind) > 5 :
+            if len(ind) > 5:
                 plt.xticks(rotation=45)
 
             framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
@@ -984,7 +983,6 @@ def create_graphs_from_opt_csv(obt_folder):
             ax2.set_ylabel('Frame-rate')
             ax2.set_xticks(ind)
             ax2.set_xticklabels(sorted_df[parameter_name])
-            ax2.set_xlabel(str(parameter_name))
 
             ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
 
