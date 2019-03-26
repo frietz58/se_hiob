@@ -1115,11 +1115,14 @@ def create_graphs_from_opt_csv(obt_folder):
 
         # add some text for labels, title and axes ticks
         ax.set_ylabel('Scores')
-        ax.set_x_label(str(parameter_name))
+        fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
         ax.set_xticks(ind)
         ax.set_xticklabels(sorted_df[parameter_name])
         if len(ind) > 5:
             plt.xticks(rotation=45)
+            plt.subplots_adjust(bottom=0.2)
+        else:
+            plt.subplots_adjust(bottom=0.15)
 
         ax.legend((success_graph[0], precision_graph[0]), (csv_avg_success, csv_avg_precision))
         ax.set_ylim(0, 1)
@@ -1159,13 +1162,15 @@ def create_graphs_from_opt_csv(obt_folder):
             #ax.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(se_framerate) + max(se_framerate_sd) * 5))
             ax.set_ylim(0, 60)
             ax.set_ylabel('Frame-rate')
-            ax.set_x_label(str(parameter_name))
+            fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
             ax.set_xticks(ind)
             ax.set_xticklabels(sorted_df[parameter_name])
             ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
             if len(ind) > 5:
                 plt.xticks(rotation=45)
-                plt.subplots_adjust(bottom=0.1)
+                plt.subplots_adjust(bottom=0.2)
+            else:
+                plt.subplots_adjust(bottom=0.15)
 
         else:
             fig, (ax, ax2) = plt.subplots(2, 1, sharex=True)
@@ -1173,12 +1178,14 @@ def create_graphs_from_opt_csv(obt_folder):
             se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
             ax.set_ylim((min(se_framerate) - max(se_framerate_sd) * 5), (max(se_framerate) + max(se_framerate_sd) * 5))
             ax.set_ylabel('SE Frame-rate')
-            ax.set_title(str(parameter_name))
+            fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
             ax.set_xticks(ind)
             ax.set_xticklabels(sorted_df[parameter_name])
             if len(ind) > 5:
                 plt.xticks(rotation=45)
-                plt.subplots_adjust(bottom=0.1)
+                plt.subplots_adjust(bottom=0.2)
+            else:
+                plt.subplots_adjust(bottom=0.15)
 
             framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
             ax2.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(framerate) + max(framerate_sd) * 5))
