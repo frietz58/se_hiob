@@ -410,14 +410,18 @@ def get_avg_results_from_experiment(experiment_folder):
 
             score_dict = get_metrics_from_rects("attribute", all_preds=flat_preds, all_gts=flat_gts)
 
-            writer.writerow({
+            row = {
                 "Attribute": attribute,
                 "Samples": len(unique_samples),
                 "Frames": int(frames / (len(specific_attribute_sequences) / len(unique_samples))),
                 csv_avg_precision: np.around(score_dict["Total Precision"], decimals=3),
                 csv_avg_success: np.around(score_dict["Total Success"], decimals=3),
                 csv_avg_ss: score_dict["Size Score"]
-            })
+            }
+
+            writer.writerow(row)
+
+            print(row)
 
             # writer.writerow({
             #     "Attribute": attribute,
@@ -492,11 +496,15 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
     for index, row in df.iterrows():
         line = ""
         for key in df.keys():
-            line += str(row[key]) + " & "
+            if type(row[key]) == float:
+                line += str(np.around(row[key], decimals=3)) + " & "
+            else:
+                line += str(row[key]) + " & "
         # remove & at end of lline
         line = line[0:-2]
         line += "\\\\ \n"
         lines.append(line)
+        print(line)
 
     lines[-1] = lines[-1][0:-2] + " \\bottomrule\n"
     lines.append("\\end{tabular}\n")
@@ -668,8 +676,14 @@ def create_attribute_score_csv(result_folder, eval_folder):
                     csv_avg_ss: score_dict["Size Score"]
                 }
 
+                print(row)
+
                 writer.writerow(row)
                 rows.append(row)
+
+    create_attribute_tex_table_include(save_path=eval_path,
+                                       csv_file=out_csv,
+                                       tex_name="attribute_averages_tab_include.tex")
 
         # # get the average values of the rows:
         # final_precs = []
