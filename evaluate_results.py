@@ -1408,7 +1408,7 @@ def get_approach_from_yaml(tracking_dir):
         items_in_folder = os.listdir(tracking_dir)
         for item in items_in_folder:
             if 'hiob-execution' in item:
-                get_approach_from_yaml(item)
+                get_approach_from_yaml(os.path.join(tracking_dir, item))
 
     with open(tracking_dir + "/tracker.yaml", "r") as stream:
         try:
