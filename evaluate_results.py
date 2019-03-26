@@ -1666,16 +1666,21 @@ if __name__ == "__main__":
                 create_graphs_metrics_for_set(results_path, "avg_full_set")
 
     elif len(results_path) >= 2:
-        # -pts /path/to/tracking1 /path/to/tracking2
+        print("len >= 2")
+        # -ptr /path/to/tracking1 /path/to/tracking2
         folder_types = [determine_folder_type(folder) for folder in results_path]
         if 'matlab_tracking_folder' in folder_types:
+            print("matlab tracking dir")
             multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
         elif only_item_in_list('hiob_tracking_folder', results_path):
-            if "tb100" in args.pathgt:
+            print("hiob trackings only")
+            if "tb100" in args.pathgt or "tb100" in args.pta:
+                print("tb100 in ptgt or pta")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=results_path[0],
                                           what_is_plotted="Approaches on TB100")
             elif "nico" in args.pathgt:
+                print("nico in pathgt")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=results_path[0],
                                           what_is_plotted="Approaches on NICO")
