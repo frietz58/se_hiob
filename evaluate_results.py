@@ -1403,27 +1403,55 @@ def get_approach_from_yaml(tracking_dir):
         algorithm = None
 
         if not scale_estimator_conf["use_scale_estimation"]:
-            algorithm = "Baseline"
+            algorithm = "No se"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
+                and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST static"
+            algorithm = "DSST static cont"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
+                and scale_estimator_conf["update_strategy"] == "limited" \
+                and not scale_estimator_conf["d_change_aspect_ratio"]:
+            algorithm = "DSST static limited"
+
+        elif scale_estimator_conf["use_scale_estimation"] \
+                and scale_estimator_conf["approach"] == "custom_dsst" \
+                and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST dynamic"
+            algorithm = "DSST dynamic cont"
+
+        elif scale_estimator_conf["use_scale_estimation"] \
+                and scale_estimator_conf["approach"] == "custom_dsst" \
+                and scale_estimator_conf["update_strategy"] == "limited" \
+                and scale_estimator_conf["d_change_aspect_ratio"]:
+            algorithm = "DSST dynamic limited"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
+                and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates dynamic"
+            algorithm = "Candidates dynamic cont"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
+                and scale_estimator_conf["update_strategy"] == "limited" \
+                and scale_estimator_conf["c_change_aspect_ratio"]:
+            algorithm = "Candidates dynamic limited"
+
+        elif scale_estimator_conf["use_scale_estimation"] \
+                and scale_estimator_conf["approach"] == "candidates" \
+                and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates static"
+            algorithm = "Candidates static cont"
+
+        elif scale_estimator_conf["use_scale_estimation"] \
+                and scale_estimator_conf["approach"] == "candidates" \
+                and scale_estimator_conf["update_strategy"] == "limited" \
+                and not scale_estimator_conf["c_change_aspect_ratio"]:
+            algorithm = "Candidates static limited"
 
         return algorithm
 
