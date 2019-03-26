@@ -1405,7 +1405,10 @@ def get_approach_from_yaml(tracking_dir):
     if folder_type == 'matlab_tracking_folder':
         return "DSST reference"
     elif folder_type == 'multiple_hiob_executions':
-        return "DSST hiob"
+        items_in_folder = os.listdir(tracking_dir)
+        for item in items_in_folder:
+            if 'hiob-execution' in item:
+                get_approach_from_yaml(item)
 
     with open(tracking_dir + "/tracker.yaml", "r") as stream:
         try:
