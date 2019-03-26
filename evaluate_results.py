@@ -1673,7 +1673,7 @@ if __name__ == "__main__":
         if 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
             multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
-        elif only_item_in_list('hiob_tracking_folder', folder_types):
+        elif only_item_in_list('hiob_tracking_folder', folder_types) or only_item_in_list('multiple_hiob_executions', folder_types):
             print("hiob trackings only")
             if "tb100" in args.pathgt or "tb100" in args.pta:
                 print("tb100 in ptgt or pta")
