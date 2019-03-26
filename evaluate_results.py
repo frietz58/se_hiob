@@ -119,7 +119,10 @@ def get_tb100_gt_rects_from_zip(sequence):
             if "\r" in coord_string:
                 coord_string = coord_string.replace("\r", "")
 
-            coord_list = [pos_int_form_string(number) for number in coord_string.split(",")]
+            if "," in coord_string:
+                coord_list = [pos_int_form_string(number) for number in coord_string.split(",")]
+            elif " " in coord_string:
+                coord_list = [pos_int_form_string(number) for number in coord_string.split(" ")]
             try:
                 gt_rect = Rect(int(coord_list[0]), int(coord_list[1]), int(coord_list[2]), int(coord_list[3]))
             except ValueError:
@@ -1592,3 +1595,6 @@ if __name__ == "__main__":
     elif len(results_path) <= 2:
         # -pts /path/to/tracking1 /path/to/tracking2
         multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
+
+    else:
+        print("nothing matches path")
