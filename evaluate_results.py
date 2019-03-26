@@ -1669,6 +1669,7 @@ if __name__ == "__main__":
         print("len >= 2")
         # -ptr /path/to/tracking1 /path/to/tracking2
         folder_types = [determine_folder_type(folder) for folder in results_path]
+        print(str(folder_types))
         if 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
             multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
