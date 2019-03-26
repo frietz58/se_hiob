@@ -58,6 +58,30 @@ sd_csv_name = "standard_deviations.csv"
 font = {'size': 15}
 matplotlib.rc('font', **font)
 
+# ======= parameter name formatter =======
+
+parameter_names = {
+    "scale_factor": "Scale factor",
+    "scale_sigma_factor": "Scale sigma",
+    "learning_rate": "Learning rate",
+    "scale_model_max": "Max scale model size",
+    "scale_model_size": "Static scale model size",
+    "dsst_number_scales": "Number samples",
+    "d_change_aspect_ratio": "Change aspect ratio",
+    "hog_cell_size": "Hog cell size",
+    "hog_block_norm_size": "Hog block norm size",
+
+    "c_scale_factor": "Scale factor",
+    "inner_punish_threshold": "Inner punish threshold",
+    "outer_punish_threshold": "Outer punish threshold",
+    "c_number_scales": "Number candidates",
+    "max_scale_difference": "Limit scale difference",
+    "scale_window_step_size": "Scale window steps",
+    "adjust_max_scale_diff": "Adjust scale limit",
+    "adjust_max_scale_diff_after": "Adjust scale limit after",
+    "c_change_aspect_ratio": "Change aspect ratio"
+}
+
 
 # ================================= GET FUNCTIONS =================================
 # get all workplace files
@@ -361,7 +385,7 @@ def get_avg_results_from_experiment(experiment_folder):
 
             for sequence in specific_attribute_sequences:
                 if sequence.split("/")[-1].split("-")[-1] not in unique_samples:
-                    unique_samples.append(sequitems_in_firstence.split("/")[-1].split("-")[-1])
+                    unique_samples.append(sequence.split("/")[-1].split("-")[-1])
 
                 sequence_preds, sequence_gts = get_all_rects(sequence)
                 sequence_results = get_metrics_from_rects("attribute", all_preds=sequence_preds, all_gts=sequence_gts)
@@ -1091,7 +1115,7 @@ def create_graphs_from_opt_csv(obt_folder):
 
         # add some text for labels, title and axes ticks
         ax.set_ylabel('Scores')
-        ax.set_title(str(parameter_name))
+        ax.set_x_label(str(parameter_name))
         ax.set_xticks(ind)
         ax.set_xticklabels(sorted_df[parameter_name])
         if len(ind) > 5:
@@ -1135,7 +1159,7 @@ def create_graphs_from_opt_csv(obt_folder):
             #ax.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(se_framerate) + max(se_framerate_sd) * 5))
             ax.set_ylim(0, 60)
             ax.set_ylabel('Frame-rate')
-            ax.set_title(str(parameter_name))
+            ax.set_x_label(str(parameter_name))
             ax.set_xticks(ind)
             ax.set_xticklabels(sorted_df[parameter_name])
             ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
