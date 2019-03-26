@@ -361,7 +361,7 @@ def get_avg_results_from_experiment(experiment_folder):
 
             for sequence in specific_attribute_sequences:
                 if sequence.split("/")[-1].split("-")[-1] not in unique_samples:
-                    unique_samples.append(sequence.split("/")[-1].split("-")[-1])
+                    unique_samples.append(sequitems_in_firstence.split("/")[-1].split("-")[-1])
 
                 sequence_preds, sequence_gts = get_all_rects(sequence)
                 sequence_results = get_metrics_from_rects("attribute", all_preds=sequence_preds, all_gts=sequence_gts)
@@ -1155,7 +1155,7 @@ def create_graphs_from_opt_csv(obt_folder):
             if len(ind) > 5:
                 plt.xticks(rotation=45)
                 plt.subplots_adjust(bottom=0.1)
-
+items_in_first
             framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
             ax2.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(framerate) + max(framerate_sd) * 5))
             ax2.set_ylabel('Frame-rate')
@@ -1594,7 +1594,19 @@ if __name__ == "__main__":
 
     elif len(results_path) >= 2:
         # -pts /path/to/tracking1 /path/to/tracking2
-        multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
+        folder_types = [determine_folder_type(folder) for folder in results_path]
+        if 'matlab_tracking_folder' in folder_types:
+            multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
+        elif only_item_in_list('hiob_tracking_folder', results_path):
+            if "tb100" in args.pathgt:
+                multiple_trackings_graphs(tracking_folders=results_path,
+                                          eval_folder=results_path[0],
+                                          what_is_plotted="Approaches on TB100")
+            elif "nico" in args.pathgt:
+                multiple_trackings_graphs(tracking_folders=results_path,
+                                          eval_folder=results_path[0],
+                                          what_is_plotted="Approaches on NICO")
+
 
     else:
         print("nothing matches path")
