@@ -1592,7 +1592,7 @@ if __name__ == "__main__":
                 print("creating graphs for average experiment metrics")
                 create_graphs_metrics_for_set(results_path, "avg_full_set")
 
-    elif len(results_path) <= 2:
+    elif len(results_path) >= 2:
         # -pts /path/to/tracking1 /path/to/tracking2
         multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
 
