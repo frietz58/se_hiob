@@ -74,16 +74,19 @@ def main():
         "dsst_stat_limited_tb100full",
 
         "dsst_dyn_cont_tb100full",
-        "dsst_dyn_limited_tb100full"
+        "dsst_dyn_limited_tb100full",
+
+        "no_se"
     ]
 
     log_progress = True
 
     for experiment in experiment_names:
 
-        if experiment in args.skipping:
-            print("as specified, skipping: " + str(experiment))
-            continue
+        if args.skipping is not None:
+            if experiment in args.skipping:
+                print("as specified, skipping: " + str(experiment))
+                continue
 
         if log_progress:
             progress = get_progress_from_log()
