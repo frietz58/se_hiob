@@ -1155,7 +1155,7 @@ def create_graphs_from_opt_csv(obt_folder):
             if len(ind) > 5:
                 plt.xticks(rotation=45)
                 plt.subplots_adjust(bottom=0.1)
-items_in_first
+
             framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
             ax2.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(framerate) + max(framerate_sd) * 5))
             ax2.set_ylabel('Frame-rate')
