@@ -139,6 +139,8 @@ scale_estimator:
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
   # = NICOVISON = #
+  - SET/nicovision
+  #- nicovision/push_blue_patterned_plush_ball_01
   #- nicovision/bang_blue_tissue_01
   #- nicovision/bang_sponge_01
   #- lift_blue_car_01
@@ -183,22 +185,22 @@ tracking:
   #- nicovision/push_tomato_01
   #- nicovision/scoot_blue_ball_02
   #- nicovision/scoot_blue_car_01
-  - nicovision/scoot_blue_car_02
-  - nicovision/scoot_blue_tissue_01
-  - nicovision/scoot_green_car_01
-  - nicovision/scoot_plush_banana_01
-  - nicovision/shake_big_light_banana_01
-  - nicovision/shake_blue_plush_ball_01
-  - nicovision/shake_blue_tissue_01
-  - nicovision/shake_brown_plush_ball_01
-  - nicovision/shake_heavy_banana_01
-  - nicovision/shake_heavy_banana_04
-  - nicovision/shake_red_tissue_01
-  - nicovision/shake_small_banana_04
-  - nicovision/shake_small_banana_06
-  - nicovision/shake_small_yellow_cube_01
-  - nicovision/shake_sponge_01
-  - nicovision/shake_styrofoam_cube_01
+  #- nicovision/scoot_blue_car_02
+  #- nicovision/scoot_blue_tissue_01
+  #- nicovision/scoot_green_car_01
+  #- nicovision/scoot_plush_banana_01
+  #- nicovision/shake_big_light_banana_01
+  #- nicovision/shake_blue_plush_ball_01
+  #- nicovision/shake_blue_tissue_01
+  #- nicovision/shake_brown_plush_ball_01
+  #- nicovision/shake_heavy_banana_01
+  #- nicovision/shake_heavy_banana_04
+  #- nicovision/shake_red_tissue_01
+  #- nicovision/shake_small_banana_04
+  #- nicovision/shake_small_banana_06
+  #- nicovision/shake_small_yellow_cube_01
+  #- nicovision/shake_sponge_01
+  #- nicovision/shake_styrofoam_cube_01
 
 
 #= Short Test Set = #

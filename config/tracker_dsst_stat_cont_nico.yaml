@@ -137,6 +137,7 @@ scale_estimator:
 # which samples shall be tracked? Accepts samples, data sets, and data collections
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
+#  - nicovision/push_blue_patterned_plush_ball_01
   - SET/nicovision
 # = Short Test Set = #
 #- tb100/Deer
