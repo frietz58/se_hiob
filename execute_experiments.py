@@ -53,8 +53,6 @@ def main():
     logger.info("specified GPU: " + args.gpu + ", experiments: " + str(args.experiments))
 
     experiment_names = [
-        "candidates_stat_cont_tb100full",
-        "candidates_stat_limited_tb100full",
 
         "dsst_validation0",
         "dsst_validation1",
@@ -67,7 +65,10 @@ def main():
         "dsst_validation8",
         "dsst_validation9",
 
+        "candidates_stat_cont_tb100full",
         "candidates_dyn_cont_tb100full",
+
+        "candidates_stat_limited_tb100full",
         "candidates_dyn_limited_tb100full",
 
         "dsst_stat_cont_tb100full",
@@ -76,7 +77,21 @@ def main():
         "dsst_dyn_cont_tb100full",
         "dsst_dyn_limited_tb100full",
 
-        "no_se"
+        "no_se_tb100full",
+
+        "candidates_stat_cont_nico",
+        "candidates_dyn_cont_nico",
+
+        "candidates_stat_limited_nico",
+        "candidates_dyn_limited_nico",
+
+        "dsst_stat_cont_nico",
+        "dsst_stat_limited_nico",
+
+        "dsst_dyn_cont_nico",
+        "dsst_dyn_limited_nico",
+
+        "no_se_nico",
     ]
 
     log_progress = True

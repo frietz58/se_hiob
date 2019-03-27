@@ -96,7 +96,7 @@ tracking_conf:
   shuffle: false
 
 scale_estimator:
-  use_scale_estimation: true   # Enable or disable scale estimation
+  use_scale_estimation: false   # Enable or disable scale estimation
   update_strategy: cont
   dyn_min_se_treshold: 0.2
   dyn_max_se_treshold: 0.4
@@ -133,12 +133,10 @@ scale_estimator:
 
 
 
-
 # = tracking =
 # which samples shall be tracked? Accepts samples, data sets, and data collections
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
-#  - nicovision/lift_sponge_02
   - SET/nicovision
 # = Short Test Set = #
 #- tb100/Deer

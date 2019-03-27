@@ -47,7 +47,7 @@ samples:
 - actual_frames: 595
   attributes: [bright, size-change, non-square, part-occlusion]
   name: lift_sponge_01
-- actual_frames: 772
+- actual_frames: 596
   attributes: [bright, part-occlusion]
   name: lift_sponge_02
 - actual_frames: 772
