@@ -73,7 +73,7 @@ class Sample(object):
         path = os.path.join(self.data_set.path, name + '.zip')
         self.zip_file = zipfile.ZipFile(path, 'r')
         # get ground truth:
-        r = re.compile(r"(\d+)\D+(\d+)\D+(\d+)\D+(\d+)")
+        r = re.compile(r"(-?\d+)\D+(-?\d+)\D+(-?\d+)\D+(-?\d+)")
         gt = []
         with self.zip_file.open(gt_name, 'r') as gtf:
             for line in gtf.readlines():
