@@ -943,7 +943,11 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
 
     if len(tracking_folders) > 2:
         wide_legend = True
+    else:
+        wide_legend = False
 
+    labels = []
+    lines = []
     for tracking_folder in tracking_folders:
         all_preds, all_gts = get_all_rects(tracking_folder)
         center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
@@ -952,19 +956,24 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         dfun = build_dist_fun(center_distances)
         y = [dfun(a) for a in x]
         at20 = dfun(20)
-        tx = "prec(20) = %0.4f" % at20
+        tx = "prec(20) = %0.4f" % at20#
         # plt.text(5.05, 0.05, tx)
         plt.xlabel("center distance [pixels]")
         plt.ylabel("occurrence")
-        plt.axvline(x=20, linestyle=':', color='k')
         plt.xlim(xmin=0, xmax=50)
         plt.ylim(ymin=0.0, ymax=1.0)
-        plt.plot(x, y, label=str(np.around(at20, decimals=3)) + " " + algorithm)
+        label = str(np.around(at20, decimals=3)) + " " + algorithm
+        line = plt.plot(x, y, label=label)
+        lines.append(line)
+        labels.append(label)
+    plt.axvline(x=20, linestyle=':', color='k')
     plt.title(str(what_is_plotted))
+    labels.sort()
     if wide_legend:
-        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        plt.legend(labels, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        plt.subplots_adjust(bottom=0.35)
     else:
-        plt.legend()
+        plt.legend(lines, labels)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
@@ -975,6 +984,8 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     figure_file2 = os.path.join(eval_path, 'multiple_success_plot.svg')
     figure_file3 = os.path.join(eval_path, 'multiple_success_plot.pdf')
 
+    labels = []
+    lines = []
     for tracking_folder in tracking_folders:
         all_preds, all_gts = get_all_rects(tracking_folder)
         center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
@@ -989,14 +1000,17 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.ylabel("occurrence")
         plt.xlim(xmin=0.0, xmax=1.0)
         plt.ylim(ymin=0.0, ymax=1.0)
-        plt.plot(x, y, label=str(np.around(auc, decimals=3)) + " " + algorithm)
+        label = str(np.around(at20, decimals=3)) + " " + algorithm
+        line = plt.plot(x, y, label=label)
+        lines.append(line)
+        labels.append(label)
     plt.title(str(what_is_plotted))
     #plt.legend(loc='upper center', bbox_to_anchor=(0, 0.5, -0.05))
     if wide_legend:
-        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        plt.legend(labels, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        plt.subplots_adjust(bottom=0.35)
     else:
-        plt.legend()
-    plt.subplots_adjust(bottom=0.3)
+        plt.legend(lines, labels)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
