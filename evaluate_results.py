@@ -55,8 +55,8 @@ sd_csv_name = "standard_deviations.csv"
 # ======= plot font =======
 # font = {'family': 'normal',
 #         'size': 15}
-font = {'size': 15}
-matplotlib.rc('font', **font)
+# font = {'size': 15}
+# matplotlib.rc('font', **font)
 
 # ======= parameter name formatter =======
 
@@ -927,7 +927,8 @@ def create_opt_csv(experiment_folder, eval_folder):
 
 
 # create figure with precision and success of different trackings
-def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted):
+def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, font):
+    plt.rcParams.update(font)
     eval_path = os.path.join(eval_folder, "multiple_graphs_fig")
     print("saving multiple graphs figs at: " + str(eval_path))
 
@@ -984,34 +985,38 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted):
         plt.ylim(ymin=0.0, ymax=1.0)
         plt.plot(x, y, label=str(np.around(auc, decimals=3)) + " " + algorithm)
     plt.title(str(what_is_plotted))
+    #plt.legend(loc='upper center', bbox_to_anchor=(0, 0.5, -0.05))
     plt.legend()
+    plt.subplots_adjust(bottom=0.2)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
 
     create_multiple_graphs_tex_include(save_folder=eval_path,
                                        path_in_src="dsst_validation",
-                                       tex_name="reference_vs_hiob_fig_include.tex")
+                                       tex_name="reference_vs_hiob_fig_include.tex",
+                                       subfigures=["multiple_precision_plot", "multiple_success_plot"])
 
 
 # create a tex figure inclue with the the precision and success graph of multiple trackings:
-def create_multiple_graphs_tex_include(save_folder, path_in_src, tex_name):
+def create_multiple_graphs_tex_include(save_folder, path_in_src, tex_name, subfigures):
     tex_path = os.path.join(save_folder, tex_name)
+    print("saving tex figure to " + str(tex_path))
     with open(tex_path, "w") as tex_file:
         tex_file.writelines(
             [
                 "\\begin{figure}[H]\label{TODO}\n"
                 "\\begin{subfigure}[t]{0.5\\textwidth}\n",
                 "\\centering\\captionsetup{width=.9\\linewidth}\n",
-                "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, "multiple_precision_plot") + "}\n",
+                "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, str(subfigures[0])) + "}\n",
                 "\\subcaption{The precision plot.}",
                 "\\end{subfigure}\n",
                 "\\begin{subfigure}[t]{0.5\\textwidth}\n",
                 "\\centering\\captionsetup{width=.9\\linewidth}\n",
-                "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, "multiple_success_plot") + "}\n",
+                "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, str(subfigures[1])) + "}\n",
                 "\\subcaption{The success plot.}",
                 "\\end{subfigure}\n",
-                "\\caption{The plotted results of TODOTODOTODOTODOTODOTODOTODOTOOD}"
+                "\\caption{The plotted results of TODO. Generate from " + str(save_folder) + "}"
                 "\\end{figure}"
             ]
         )
@@ -1030,6 +1035,7 @@ def create_graphs_from_rects(result_folder, eval_folder):
         os.mkdir(eval_path)
 
     # precision plot
+    plt.rcParams.update({'font.size': 15})
     dfun = build_dist_fun(center_distances)
     figure_file2 = os.path.join(eval_path, 'precision_plot.svg')
     figure_file3 = os.path.join(eval_path, 'precision_plot.pdf')
@@ -1049,6 +1055,7 @@ def create_graphs_from_rects(result_folder, eval_folder):
     plt.close()
 
     # success plot
+    plt.rcParams.update({'font.size': 15})
     ofun = build_over_fun(overlap_scores)
     figure_file2 = os.path.join(eval_path, 'success_plot.svg')
     figure_file3 = os.path.join(eval_path, 'success_plot.pdf')
@@ -1087,6 +1094,11 @@ def create_graphs_from_rects(result_folder, eval_folder):
     plt.savefig(figure_file3)
     plt.close()
 
+    create_multiple_graphs_tex_include(save_folder=eval_path,
+                                       path_in_src="CHANGE/IN/TEX",
+                                       tex_name="precision_vs_success_fig_include.tex",
+                                       subfigures=["precision_plot", "success_plot"])
+
 
 # create graphs and metrics for a specific set of results
 def create_graphs_metrics_for_set(set_of_results, set_name):
@@ -1096,6 +1108,9 @@ def create_graphs_metrics_for_set(set_of_results, set_name):
 
 # create the graphs for the opt plotting parameter value vs x
 def create_graphs_from_opt_csv(obt_folder):
+    # set font size for graphs that are generated
+    plt.rcParams.update({'font.size': 15})
+
     # obt folder are named like the parameter that is obtimized, this:
     if obt_folder.split("/")[-1] == "":
         parameter_name = obt_folder.split("/")[-2]
@@ -1676,19 +1691,24 @@ if __name__ == "__main__":
         print(str(folder_types))
         if 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
-            multiple_trackings_graphs(results_path, results_path[0], what_is_plotted="DSST reference vs implementation")
+            multiple_trackings_graphs(results_path,
+                                      results_path[0],
+                                      what_is_plotted="DSST reference vs implementation",
+                                      font={'font.size': 15})
         elif only_item_in_list('hiob_tracking_folder', folder_types) or only_item_in_list('multiple_hiob_executions', folder_types):
             print("hiob trackings only")
             if "tb100" in args.pathgt or "tb100" in args.pta:
                 print("tb100 in ptgt or pta")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=results_path[0],
-                                          what_is_plotted="Approaches on TB100")
+                                          what_is_plotted="Approaches on TB100",
+                                          font={'font.size': 10})
             elif "nico" in args.pathgt:
                 print("nico in pathgt")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=results_path[0],
-                                          what_is_plotted="Approaches on NICO")
+                                          what_is_plotted="Approaches on NICO",
+                                          font={'font.size': 10})
 
 
     else:
