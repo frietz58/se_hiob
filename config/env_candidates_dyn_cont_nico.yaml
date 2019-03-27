@@ -11,7 +11,7 @@ environment_name: candidates_dyn_cont_nico
 log_dir: ../candidates_dyn_cont_nico/
 
 # directory in which data samples are kept:
-data_dir: ./data
+data_dir: /media/finn/linux-ssd
 
 # directory in which net weight files are kept:
 net_dir: ./net

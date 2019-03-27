@@ -432,37 +432,37 @@ def get_avg_results_from_experiment(experiment_folder):
             #     csv_avg_ss: np.around(size_score_sum / len(specific_attribute_sequences),a decimals=3)
             # })
 
-        # # get the average values of the rows:
-        # final_precs = []
-        # final_succs = []
-        # final_ss = []
-        # final_fails = []
-        # final_updates = []
-        # samples = 0
-        # frames = 0
-        # for row in rows:
-        #     final_precs.append(row["Precision"])
-        #     final_succs.append(row["Success"])
-        #     final_ss.append(row["Size Score"])
-        #     final_fails.append(row["Fail %"])
-        #     final_updates.append(row["Updates"])
-        #     samples += 1
-        #     frames += int(row["Frames"])
-        # final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
-        # final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
-        # final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
-        # final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
-        # final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
-        #
-        # summarizing_row = {
-        #     "Attribute": "Summary",
-        #     "Samples": samples,
-        #     "Frames": int(np.around(frames / samples)),
-        #     csv_avg_precision: final_avg_precs,
-        #     csv_avg_success: final_avg_succs,
-        #     csv_avg_ss: final_avg_ss}
-        #
-        # writer.writerow(summarizing_row)
+        # get the average values of the rows:
+        final_precs = []
+        final_succs = []
+        final_ss = []
+        final_fails = []
+        final_updates = []
+        samples = 0
+        frames = 0
+        for row in rows:
+            final_precs.append(row["Precision"])
+            final_succs.append(row["Success"])
+            final_ss.append(row["Size Score"])
+            final_fails.append(row["Fail %"])
+            final_updates.append(row["Updates"])
+            samples += 1
+            frames += int(row["Frames"])
+        final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
+        final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
+        final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
+        final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
+        final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
+
+        summarizing_row = {
+            "Attribute": "TB100",
+            "Samples": samples,
+            "Frames": np.around(frames / samples),
+            csv_avg_precision: final_avg_precs,
+            csv_avg_success: final_avg_succs,
+            csv_avg_ss: final_avg_ss}
+
+        writer.writerow(summarizing_row)
 
     create_attribute_tex_table_include(save_path=eval_path,
                                        csv_file=out_csv,
@@ -681,39 +681,39 @@ def create_attribute_score_csv(result_folder, eval_folder):
                 writer.writerow(row)
                 rows.append(row)
 
+        # get the average values of the rows:
+        final_precs = []
+        final_succs = []
+        final_ss = []
+        final_fails = []
+        final_updates = []
+        samples = 0
+        frames = 0
+        for row in rows:
+            final_precs.append(row[csv_total_precision])
+            final_succs.append(row[csv_total_success])
+            final_ss.append(row[csv_avg_ss])
+            samples += 1
+            frames += int(row["Frames"])
+        final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
+        final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
+        final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
+        final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
+        final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
+
+        summarizing_row = {
+            "Attribute": "TB100",
+            "Samples": samples,
+            "Frames": int(np.around(frames / samples)),
+            csv_total_precision: final_avg_precs,
+            csv_total_success: final_avg_succs,
+            csv_avg_ss: final_avg_ss}
+
+        writer.writerow(summarizing_row)
+
     create_attribute_tex_table_include(save_path=eval_path,
                                        csv_file=out_csv,
                                        tex_name="attribute_averages_tab_include.tex")
-
-        # # get the average values of the rows:
-        # final_precs = []
-        # final_succs = []
-        # final_ss = []
-        # final_fails = []
-        # final_updates = []
-        # samples = 0
-        # frames = 0
-        # for row in rows:
-        #     final_precs.append(row[csv_total_precision])
-        #     final_succs.append(row[csv_total_success])
-        #     final_ss.append(row[csv_avg_ss])
-        #     samples += 1
-        #     frames += int(row["Frames"])
-        # final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
-        # final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
-        # final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
-        # final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
-        # final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
-        #
-        # summarizing_row = {
-        #     "Attribute": "Summary",
-        #     "Samples": samples,
-        #     "Frames": int(np.around(frames / samples)),
-        #     csv_total_precision: final_avg_precs,
-        #     csv_total_success: final_avg_succs,
-        #     csv_avg_ss: final_avg_ss}
-        #
-        # writer.writerow(summarizing_row)
 
 
 # create a csv comparing the trackings in one csv folder (opt)
