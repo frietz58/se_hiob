@@ -1000,7 +1000,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.ylabel("occurrence")
         plt.xlim(xmin=0.0, xmax=1.0)
         plt.ylim(ymin=0.0, ymax=1.0)
-        label = str(np.around(at20, decimals=3)) + " " + algorithm
+        label = str(np.around(auc, decimals=3)) + " " + algorithm
         line = plt.plot(x, y, label=label)
         lines.append(line)
         labels.append(label)
