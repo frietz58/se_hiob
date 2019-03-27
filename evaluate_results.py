@@ -941,6 +941,9 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     figure_file2 = os.path.join(eval_path, 'multiple_precision_plot.svg')
     figure_file3 = os.path.join(eval_path, 'multiple_precision_plot.pdf')
 
+    if len(tracking_folders) > 2:
+        wide_legend = True
+
     for tracking_folder in tracking_folders:
         all_preds, all_gts = get_all_rects(tracking_folder)
         center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
@@ -958,7 +961,10 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.ylim(ymin=0.0, ymax=1.0)
         plt.plot(x, y, label=str(np.around(at20, decimals=3)) + " " + algorithm)
     plt.title(str(what_is_plotted))
-    plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    if wide_legend:
+        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    else:
+        plt.legend()
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
@@ -986,7 +992,10 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.plot(x, y, label=str(np.around(auc, decimals=3)) + " " + algorithm)
     plt.title(str(what_is_plotted))
     #plt.legend(loc='upper center', bbox_to_anchor=(0, 0.5, -0.05))
-    plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    if wide_legend:
+        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    else:
+        plt.legend()
     plt.subplots_adjust(bottom=0.3)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
