@@ -477,7 +477,7 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
     print("saving table include tex to: " + str(tex_path))
     df = pd.read_csv(csv_file)
     lines = [
-        "\\begin{table}[]\label{tab:asdasd}\n",
+        #"\\begin{table}[]\label{tab:asdasd}\n",
         "\\centering",
         "\\resizebox{\\textwidth}{!}{\n",
         "\\begin{tabular}{@{}cccccc@{}}\n",
@@ -510,7 +510,7 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
     lines.append("\\end{tabular}\n")
     lines.append("}\n")
     lines.append("\\caption{Generated from:" + str(csv_file).replace("_", "\_") + "}\n")
-    lines.append("\\end{table}")
+    #lines.append("\\end{table}")
 
     with open(tex_path, "w") as tex_file:
         tex_file.writelines(lines)
@@ -927,7 +927,7 @@ def create_opt_csv(experiment_folder, eval_folder):
 
 
 # create figure with precision and success of different trackings
-def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, font):
+def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, font, tex_name):
     plt.rcParams.update(font)
     eval_path = os.path.join(eval_folder, "multiple_graphs_fig")
     print("saving multiple graphs figs at: " + str(eval_path))
@@ -994,8 +994,10 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
 
     create_multiple_graphs_tex_include(save_folder=eval_path,
                                        path_in_src="dsst_validation",
-                                       tex_name="reference_vs_hiob_fig_include.tex",
-                                       subfigures=["multiple_precision_plot", "multiple_success_plot"])
+                                       #tex_name="reference_vs_hiob_fig_include.tex",
+                                       tex_name=tex_name,
+                                       subfigures=["multiple_precision_plot", "multiple_success_plot"],
+                                       )
 
 
 # create a tex figure inclue with the the precision and success graph of multiple trackings:
@@ -1095,7 +1097,7 @@ def create_graphs_from_rects(result_folder, eval_folder):
     plt.close()
 
     create_multiple_graphs_tex_include(save_folder=eval_path,
-                                       path_in_src="CHANGE/IN/TEX",
+                                       path_in_src=eval_path,
                                        tex_name="precision_vs_success_fig_include.tex",
                                        subfigures=["precision_plot", "success_plot"])
 
@@ -1684,6 +1686,7 @@ if __name__ == "__main__":
                 print("creating graphs for average experiment metrics")
                 create_graphs_metrics_for_set(results_path, "avg_full_set")
 
+
     elif len(results_path) >= 2:
         print("len >= 2")
         # -ptr /path/to/tracking1 /path/to/tracking2
@@ -1691,10 +1694,13 @@ if __name__ == "__main__":
         print(str(folder_types))
         if 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
-            multiple_trackings_graphs(results_path,
-                                      results_path[0],
+            multiple_trackings_graphs(tracking_folders=results_path,
+                                      eval_folder=results_path[0],
                                       what_is_plotted="DSST reference vs implementation",
-                                      font={'font.size': 15})
+                                      font={'font.size': 15},
+                                      tex_name="reference_vs_hiob_fig_include.tex",
+                                      )
+
         elif only_item_in_list('hiob_tracking_folder', folder_types) or only_item_in_list('multiple_hiob_executions', folder_types):
             print("hiob trackings only")
             if "tb100" in args.pathgt or "tb100" in args.pta:
@@ -1702,13 +1708,15 @@ if __name__ == "__main__":
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=results_path[0],
                                           what_is_plotted="Approaches on TB100",
-                                          font={'font.size': 10})
+                                          font={'font.size': 10},
+                                          tex_name="tb100full_all_approaches_fig_include.tex")
             elif "nico" in args.pathgt:
                 print("nico in pathgt")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=results_path[0],
                                           what_is_plotted="Approaches on NICO",
-                                          font={'font.size': 10})
+                                          font={'font.size': 10},
+                                          tex_name="nico_all_approaches_fig_include.tex")
 
 
     else:
