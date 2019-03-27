@@ -968,7 +968,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         labels.append(label)
     plt.axvline(x=20, linestyle=':', color='k')
     plt.title(str(what_is_plotted))
-    labels.sort()
+    labels.sort(key=ignore_leading_value)
     if wide_legend:
         plt.legend(labels, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
         plt.subplots_adjust(bottom=0.35)
@@ -1006,6 +1006,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         labels.append(label)
     plt.title(str(what_is_plotted))
     #plt.legend(loc='upper center', bbox_to_anchor=(0, 0.5, -0.05))
+    labels.sort(key=ignore_leading_value)
     if wide_legend:
         plt.legend(labels, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
         plt.subplots_adjust(bottom=0.35)
@@ -1668,6 +1669,11 @@ def only_item_in_list(item, list_of_items):
 # check whether tracking run completed
 def is_valid_tracking(tracking_dir):
     return "evaluation.txt" in os.listdir(tracking_dir)
+
+
+# cut the first word from string and return for sort:
+def ignore_leading_value(label):
+    return " ".join(label.split(" ")[1:])
 
 
 if __name__ == "__main__":
