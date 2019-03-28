@@ -1547,7 +1547,16 @@ def get_attribute_collections(tracking_dir):
                             "OPR": [],
                             "OV": [],
                             "BC": [],
-                            "LR": []}
+                            "LR": [],
+                            "bright": [],
+                            "square": [],
+                            "size-change": [],
+                            "occlusion": [],
+                            "dark": [],
+                            "motion-blur": [],
+                            "part-occlusion": [],
+                            "non-square": [],
+                            "contrast": []}
 
     with open(tb100_attributes_path, "r") as stream:
         try:
