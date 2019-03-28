@@ -393,6 +393,9 @@ def get_avg_results_from_experiment(experiment_folder):
             if attribute_sequences != []:
                 all_preds = []
                 all_gts = []
+            elif attribute_sequences == []:
+                print("no sequences for : " + str(attribute) + ", skipping")
+                continue
 
             prec_sum = 0
             succ_sum = 0
