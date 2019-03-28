@@ -24,23 +24,29 @@ parser.add_argument("-ptr", "--pathresults", nargs='+', help="Absolute path to t
                                                   "script determines what can of folder it is handling and gets the "
                                                   "results accordingly")
 
-parser.add_argument("-ptgt", "--pathgt", help=" Absolute path to the folder containing the sequence zip files, so that "
-                                              "the ground truths can be obtained")
-
-parser.add_argument("-pta", "--attributes", help="Absolute path to the TB100 collection file, which contains the "
-                                                 "attributes for each sequence. Those are needed to create CSVs based "
-                                                 "the attributes of the sequences")
-
 parser.add_argument("-m", "--mode", help="To differentiate between an opt folder with multiple hiob executions and an "
                                          "experiment folder with multiple hiob executions")
 
+parser.add_argument("-p_mfig", "--path_multi_figure", help="Path where the figure with multiple graphs shall be saved")
+
 args = parser.parse_args()
 
+
 results_path = args.pathresults
-tb100_gt_path = args.pathgt
-tb100_attributes_path = args.attributes
 mode = args.mode
-nicovis_gt_path = args.pathgt
+tb100_gt_path = "data/tb100"
+tb100_attributes_path = "config/data_sets/tb100.yaml"
+nicovis_attributes_path = "config/data_sets/nicovision.yaml"
+
+if os.path.isdir("/media/finn/linux-ssd/nicovision"):
+    nicovis_gt_path = "/media/finn/linux-ssd/nicovision"
+else:
+    nicovis_gt_path = "data/nicovision"
+
+if args.path_multi_figure is not None:
+    path_multi_figure = args.path_multi_figure
+else:
+    path_multi_figure = results_path[0]
 
 # ======= csv names =======
 csv_avg_success = "Avg. Success"
@@ -81,6 +87,18 @@ parameter_names = {
     "adjust_max_scale_diff": "Adjust scale limit",
     "adjust_max_scale_diff_after": "Adjust scale limit after",
     "c_change_aspect_ratio": "Change aspect ratio"
+}
+
+approach_names = {
+    "candidates_stat_cont": "Candidates static continuous",
+    "candidates_stat_limited": "Candidates static limited",
+    "candidates_dyn_limited": "Candidates dynamic limited",
+    "candidates_dyn_cont": "Candidates dynamic continuous",
+    "dsst_stat_cont": "DSST static continuous",
+    "dsst_stat_limited": "DSST static limited",
+    "dsst_dyn_cont": "DSST dynamic continuous",
+    "dsst_dyn_limited": "DSST dynamic limited",
+    "no_se": "Baseline"
 }
 
 
@@ -955,20 +973,19 @@ def create_opt_csv(experiment_folder, eval_folder):
 
 
 # create figure with precision and success of different trackings
-def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, font, tex_name):
+def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, font, tex_name, legend_by):
 
     plt.rcParams.update(font)
-    eval_path = os.path.join(eval_folder, "multiple_graphs_fig")
-    print("saving multiple graphs figs at: " + str(eval_path))
 
-    if not os.path.isdir(eval_path):
-        os.mkdir(eval_path)
+    if not os.path.isdir(eval_folder):
+        os.mkdir(eval_folder)
+    print("saving multiple graphs figs at: " + str(eval_folder))
 
     # precision plot
     f = plt.figure()
     x = np.arange(0., 50.1, .1)
-    figure_file2 = os.path.join(eval_path, 'multiple_precision_plot.svg')
-    figure_file3 = os.path.join(eval_path, 'multiple_precision_plot.pdf')
+    figure_file2 = os.path.join(eval_folder, 'multiple_precision_plot.svg')
+    figure_file3 = os.path.join(eval_folder, 'multiple_precision_plot.pdf')
 
     if len(tracking_folders) > 2:
         wide_legend = True
@@ -981,6 +998,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         all_preds, all_gts = get_all_rects(tracking_folder)
         center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
         algorithm = get_approach_from_yaml(tracking_folder)
+        dataset = get_dataset_from_name(tracking_folder)
 
         dfun = build_dist_fun(center_distances)
         y = [dfun(a) for a in x]
@@ -991,18 +1009,27 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.ylabel("occurrence")
         plt.xlim(xmin=0, xmax=50)
         plt.ylim(ymin=0.0, ymax=1.0)
-        label = str(np.around(at20, decimals=3)) + " " + algorithm
+        if legend_by == "algorithm":
+            label = str(np.around(at20, decimals=3)) + " " + algorithm
+        elif legend_by == "dataset":
+            label = str(np.around(at20, decimals=3)) + " on " + dataset
         line = plt.plot(x, y, label=label)
         lines.append(line)
         labels.append(label)
+
     plt.axvline(x=20, linestyle=':', color='k')
-    plt.title(str(what_is_plotted))
-    labels.sort(key=ignore_leading_value)
     if wide_legend:
-        plt.legend(labels, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
         plt.subplots_adjust(bottom=0.35)
+        plt.title(str(what_is_plotted))
     else:
-        plt.legend(lines, labels)
+        plt.legend(loc="lower right")
+        plt.subplots_adjust(bottom=0.15)
+        if legend_by == "dataset":
+            plt.title(str(algorithm + " precision"))
+        elif legend_by == "algorithm":
+            plt.title(str(what_is_plotted))
+
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
@@ -1010,8 +1037,8 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     # success plot
     f = plt.figure()
     x = np.arange(0., 1.001, 0.001)
-    figure_file2 = os.path.join(eval_path, 'multiple_success_plot.svg')
-    figure_file3 = os.path.join(eval_path, 'multiple_success_plot.pdf')
+    figure_file2 = os.path.join(eval_folder, 'multiple_success_plot.svg')
+    figure_file3 = os.path.join(eval_folder, 'multiple_success_plot.pdf')
 
     labels = []
     lines = []
@@ -1019,6 +1046,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         all_preds, all_gts = get_all_rects(tracking_folder)
         center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
         algorithm = get_approach_from_yaml(tracking_folder)
+        dataset = get_dataset_from_name(tracking_folder)
 
         ofun = build_over_fun(overlap_scores)
         y = [ofun(a) for a in x]
@@ -1029,25 +1057,32 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.ylabel("occurrence")
         plt.xlim(xmin=0.0, xmax=1.0)
         plt.ylim(ymin=0.0, ymax=1.0)
-        label = str(np.around(auc, decimals=3)) + " " + algorithm
+        if legend_by == "algorithm":
+            label = str(np.around(auc, decimals=3)) + " " + algorithm
+        elif legend_by == "dataset":
+            label = str(np.around(auc, decimals=3)) + " on " + dataset
         line = plt.plot(x, y, label=label)
         lines.append(line)
         labels.append(label)
-    plt.title(str(what_is_plotted))
-    #plt.legend(loc='upper center', bbox_to_anchor=(0, 0.5, -0.05))
-    labels.sort(key=ignore_leading_value)
+
     if wide_legend:
-        plt.legend(labels, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
         plt.subplots_adjust(bottom=0.35)
+        plt.title(str(what_is_plotted))
     else:
-        plt.legend(lines, labels)
+        plt.legend(loc="lower left")
+        plt.subplots_adjust(bottom=0.15)
+        if legend_by == "dataset":
+            plt.title(str(algorithm + " success"))
+        elif legend_by == "algorithm":
+            plt.title(str(what_is_plotted))
+
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
 
-    create_multiple_graphs_tex_include(save_folder=eval_path,
+    create_multiple_graphs_tex_include(save_folder=eval_folder,
                                        path_in_src="dsst_validation",
-                                       #tex_name="reference_vs_hiob_fig_include.tex",
                                        tex_name=tex_name,
                                        subfigures=["multiple_precision_plot", "multiple_success_plot"],
                                        )
@@ -1497,7 +1532,7 @@ def get_approach_from_yaml(tracking_dir):
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST static cont"
+            algorithm = "DSST static continuous"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
@@ -1509,7 +1544,7 @@ def get_approach_from_yaml(tracking_dir):
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST dynamic cont"
+            algorithm = "DSST dynamic continuous"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
@@ -1521,7 +1556,7 @@ def get_approach_from_yaml(tracking_dir):
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates dynamic cont"
+            algorithm = "Candidates dynamic continuous"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
@@ -1533,7 +1568,7 @@ def get_approach_from_yaml(tracking_dir):
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates static cont"
+            algorithm = "Candidates static continuous"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
@@ -1543,6 +1578,13 @@ def get_approach_from_yaml(tracking_dir):
 
         return algorithm
 
+
+# get the tracking dataset based on the tracking name
+def get_dataset_from_name(tracking_name):
+    if "tb100" in tracking_name:
+        return "TB100"
+    else:
+        return "NICO"
 
 # get attribute collections for a tracking
 def get_attribute_collections(tracking_dir):
@@ -1754,7 +1796,6 @@ if __name__ == "__main__":
                 print("creating graphs for average experiment metrics")
                 create_graphs_metrics_for_set(results_path, "avg_full_set")
 
-
     elif len(results_path) >= 2:
         print("len >= 2")
         # -ptr /path/to/tracking1 /path/to/tracking2
@@ -1767,25 +1808,37 @@ if __name__ == "__main__":
                                       what_is_plotted="DSST reference vs implementation",
                                       font={'font.size': 15},
                                       tex_name="reference_vs_hiob_fig_include.tex",
-                                      )
+                                      legend_by="algorithm")
 
         elif only_item_in_list('hiob_tracking_folder', folder_types) or only_item_in_list('multiple_hiob_executions', folder_types):
-            print("hiob trackings only")
-            if "tb100" in args.pathgt or "tb100" in args.pta:
-                print("tb100 in ptgt or pta")
+            if all("tb100full" in tracking for tracking in results_path):
+                print("only tb100 trackings")
                 multiple_trackings_graphs(tracking_folders=results_path,
-                                          eval_folder=results_path[0],
+                                          eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on TB100",
                                           font={'font.size': 10},
-                                          tex_name="tb100full_all_approaches_fig_include.tex")
-            elif "nico" in args.pathgt:
-                print("nico in pathgt")
+                                          tex_name="tb100full_all_approaches_fig_include.tex",
+                                          legend_by="algorithm")
+            elif all("nico" in tracking for tracking in results_path):
+                print("only nico trackings")
                 multiple_trackings_graphs(tracking_folders=results_path,
-                                          eval_folder=results_path[0],
+                                          eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on NICO",
                                           font={'font.size': 10},
-                                          tex_name="nico_all_approaches_fig_include.tex")
+                                          tex_name="nico_all_approaches_fig_include.tex",
+                                          legend_by="algorithm")
 
+            elif all("nico" or "tb100full" in tracking for tracking in results_path):
+                print("nico and tb100 trackings")
+                multiple_trackings_graphs(tracking_folders=results_path,
+                                          eval_folder=path_multi_figure,
+                                          what_is_plotted="Approaches on NICO and TB100",
+                                          font={'font.size': 15},
+                                          tex_name="nico_all_approaches_fig_include.tex",
+                                          legend_by="dataset")
+
+            else:
+                print("no matching implementation for collection ofn tracking folders")
 
     else:
         print("nothing matches path")

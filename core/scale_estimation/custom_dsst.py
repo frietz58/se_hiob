@@ -169,6 +169,8 @@ class CustomDsst:
 
             # extract the test sample for the feature map for the scale filter
             sample = self.extract_scale_sample(self.frame, tracking)
+            # print(sample.sum(axis=0))
+            # print(np.argmax(sample.sum(axis=0)))
 
             # calculate the correlation response
             if not self.d_change_aspect_ratio:
@@ -456,10 +458,16 @@ class CustomDsst:
                     out = {'x': np.zeros((np.size(x_hog), self.number_scales)),
                            'y': np.zeros((np.size(y_hog), self.number_scales))}
 
+                # print(str(i) + " unpunished x: " + str(out['x'].sum()))
+                # print(str(i) + " unpunished y: " + str(out['y'].sum()))
+
                 # punish each candidate based on its divergence to 1
                 out['x'][:, i] = np.multiply(x_hog.flatten(), self.scale_window[i])
                 #out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])(self.hog_cell_size[0], self.hog_cell_size[1])
                 out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])
+
+                # print(str(i) + " punished x: " + str(out['x'].sum()))
+                # print(str(i) + " punished y: " + str(out['y'].sum()))
 
         return out
 
