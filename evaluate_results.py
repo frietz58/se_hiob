@@ -540,6 +540,9 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None, sequence
     if all_preds is None and all_gts is None:
         all_preds, all_gts = get_all_rects(result_folder)
 
+    print("all_preds:" + str(all_preds))
+    print("all_gts: " + str(all_gts))
+
     if result_folder != "attribute":
         folder_type = determine_folder_type(result_folder)
     center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
