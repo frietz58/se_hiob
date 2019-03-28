@@ -236,7 +236,6 @@ def get_all_rects(result_dir):
         if "tb100" in result_dir:
             gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
         elif "nicovision" in result_dir:
-            print("getting nico sequence gts")
             gts = get_gt_rects_from_zip(sequence_name, nicovis_gt_path)
         pred_gt_rects["preds"].append(preds)
         pred_gt_rects["gts"].append(gts)
@@ -250,7 +249,6 @@ def get_all_rects(result_dir):
             if "tb100" in sequence_folder:
                 gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
             elif "nicovision" in sequence_folder:
-                print("getting nico sequence gts")
                 gts = get_gt_rects_from_zip(sequence_name, nicovis_gt_path)
             pred_gt_rects["preds"].append(preds)
             pred_gt_rects["gts"].append(gts)
@@ -267,7 +265,6 @@ def get_all_rects(result_dir):
                 if "tb100" in sequence:
                     gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
                 elif "nicovision" in sequence:
-                    print("getting nico sequence gts")
                     gts = get_gt_rects_from_zip(sequence_name, nicovis_gt_path)
                 pred_gt_rects["preds"].append(preds)
                 pred_gt_rects["gts"].append(gts)
@@ -468,12 +465,14 @@ def get_avg_results_from_experiment(experiment_folder):
             final_updates.append(row["Updates"])
             samples += 1
             frames += int(row["Frames"])
+
+        print("size_score_sum: " + str(final_ss))
         final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
         final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
         final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
         final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
         final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
-
+        print("avg_size_score: " + str(final_avg_ss))
         summarizing_row = {
             "Attribute": "TB100",
             "Samples": samples,
@@ -542,9 +541,6 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None, sequence
 
     if all_preds is None and all_gts is None:
         all_preds, all_gts = get_all_rects(result_folder)
-
-    print("all_preds:" + str(all_preds))
-    print("all_gts: " + str(all_gts))
 
     if result_folder != "attribute":
         folder_type = determine_folder_type(result_folder)
