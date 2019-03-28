@@ -17,7 +17,7 @@ args = parser.parse_args()
 def main():
     for source_folder in args.sources:
 
-        print("getting files for " + str(source_folder) + "into " + str(args.target))
+        print("getting files for " + str(source_folder) + " into " + str(args.target))
         local_source_name = name_helper(source_folder.split("/"))
 
         call = "scp -r " + str(args.connect) + ":" + str(source_folder) + " " \
@@ -37,7 +37,7 @@ def main():
 
 def name_helper(list_of_strings):
     for word in list_of_strings:
-        if "candidates" in word or "dsst" in word:
+        if "candidates" in word or "dsst" in word or "no_se" in word:
             return word
 
 

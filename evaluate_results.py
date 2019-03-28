@@ -433,7 +433,8 @@ def get_avg_results_from_experiment(experiment_folder):
                 "Frames": int(frames / (len(specific_attribute_sequences) / len(unique_samples))),
                 csv_avg_precision: np.around(score_dict["Total Precision"], decimals=3),
                 csv_avg_success: np.around(score_dict["Total Success"], decimals=3),
-                csv_avg_ss: score_dict["Size Score"]
+                # dont take value from score dict, that normalizes across every sequences adn thus is always to small
+                csv_avg_ss: np.around(size_score_sum / len(specific_attribute_sequences), decimals=3)
             }
 
             writer.writerow(row)
@@ -446,7 +447,7 @@ def get_avg_results_from_experiment(experiment_folder):
             #     "Frames": int(frames) / (len(specific_attribute_sequences) / len(unique_samples)),
             #     csv_avg_precision: np.around(prec_sum / len(specific_attribute_sequences), decimals=3),
             #     csv_avg_success: np.around(succ_sum / len(specific_attribute_sequences), decimals=3),
-            #     csv_avg_ss: np.around(size_score_sum / len(specific_attribute_sequences),a decimals=3)
+            #     csv_avg_ss: np.around(size_score_sum / len(specific_attribute_sequences), decimals=3)
             # })
 
         # get the average values of the rows:
@@ -470,13 +471,13 @@ def get_avg_results_from_experiment(experiment_folder):
         final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
         final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
         final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
-        final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
-        final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
+        # final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
+        # final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
         print("avg_size_score: " + str(final_avg_ss))
         summarizing_row = {
             "Attribute": "TB100",
             "Samples": samples,
-            "Frames": np.around(frames / samples),
+            "Frames": np.around(frames),
             csv_avg_precision: final_avg_precs,
             csv_avg_success: final_avg_succs,
             csv_avg_ss: final_avg_ss}
