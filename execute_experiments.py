@@ -22,7 +22,7 @@ logger.addHandler(ch)
 # python execute_experiments.py -g 0 -exp all // -exp exp1 exp2 exp3 exp4
 # to star a complete new run (aka do every experiment a second time, empty the log file or rename the )
 parser = argparse.ArgumentParser(description='Execute hiob experiments')
-parser.add_argument('-g', '--gpu')
+parser.add_argument('-g', '--gpu', required=True)
 parser.add_argument('-exp', '--experiments', nargs='+', required=True)
 parser.add_argument('-skip', '--skipping', nargs='+')
 

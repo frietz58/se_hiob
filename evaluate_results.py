@@ -40,6 +40,7 @@ results_path = args.pathresults
 tb100_gt_path = args.pathgt
 tb100_attributes_path = args.attributes
 mode = args.mode
+nicovis_gt_path = "data/nicovision/"
 
 # ======= csv names =======
 csv_avg_success = "Avg. Success"
@@ -119,9 +120,13 @@ def get_rects_from_workplace(workplace):
     return preds, gts
 
 
-# get the gt rects from a tb100 tip file
-def get_tb100_gt_rects_from_zip(sequence):
-    zip = zipfile36.ZipFile(os.path.join(tb100_gt_path, sequence + ".zip"))
+# get the gt rects from a tb100 zip file
+def get_gt_rects_from_zip(sequence, dataset_path=None):
+
+    if dataset_path is None:
+        dataset_path = tb100_gt_path
+
+    zip = zipfile36.ZipFile(os.path.join(dataset_path, sequence + ".zip"))
     items_in_archive = zipfile36.ZipFile.namelist(zip)
     gts = []
 
@@ -228,7 +233,11 @@ def get_all_rects(result_dir):
     elif current_folder_type == "hiob_sequence_folder":
         sequence_name = result_dir.split("/")[-1].split("-")[-1]
         preds = get_pred_rects_from_sequence(result_dir)
-        gts = get_tb100_gt_rects_from_zip(sequence_name)
+        if "tb100" in result_dir:
+            gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
+        elif "nicovision" in result_dir:
+            print("getting nico sequence gts")
+            gts = get_gt_rects_from_zip(sequence_name, nicovis_gt_path)
         pred_gt_rects["preds"].append(preds)
         pred_gt_rects["gts"].append(gts)
 
@@ -238,7 +247,11 @@ def get_all_rects(result_dir):
         for sequence_folder in sequence_folders:
             sequence_name = sequence_folder.split("/")[-1].split("-")[-1]
             preds = get_pred_rects_from_sequence(os.path.join(result_dir, sequence_folder))
-            gts = get_tb100_gt_rects_from_zip(sequence_name)
+            if "tb100" in sequence_folder:
+                gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
+            elif "nicovision" in sequence_folder:
+                print("getting nico sequence gts")
+                gts = get_gt_rects_from_zip(sequence_name, nicovis_gt_path)
             pred_gt_rects["preds"].append(preds)
             pred_gt_rects["gts"].append(gts)
 
@@ -251,7 +264,11 @@ def get_all_rects(result_dir):
                 sequence_folder = os.path.join(hiob_execution, sequence)
                 sequence_name = os.path.basename(sequence_folder).split("-")[-1]
                 preds = get_pred_rects_from_sequence(os.path.join(result_dir, sequence_folder))
-                gts = get_tb100_gt_rects_from_zip(sequence_name)
+                if "tb100" in sequence:
+                    gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
+                elif "nicovision" in sequence:
+                    print("getting nico sequence gts")
+                    gts = get_gt_rects_from_zip(sequence_name, nicovis_gt_path)
                 pred_gt_rects["preds"].append(preds)
                 pred_gt_rects["gts"].append(gts)
 
@@ -928,6 +945,7 @@ def create_opt_csv(experiment_folder, eval_folder):
 
 # create figure with precision and success of different trackings
 def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, font, tex_name):
+
     plt.rcParams.update(font)
     eval_path = os.path.join(eval_folder, "multiple_graphs_fig")
     print("saving multiple graphs figs at: " + str(eval_path))
