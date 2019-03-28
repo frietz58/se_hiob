@@ -177,7 +177,7 @@ samples:
   attributes: [dark, contrast, part-occlusion, size-change, motion-blur]
   name: shake_blue_plush_ball_01
 - actual_frames: 1085
-  attributes: [dark, nonsquare, size-change, motion-blur]
+  attributes: [dark, non-square, size-change, motion-blur]
   name: shake_blue_tissue_01
 - actual_frames: 1045
   attributes: [dark, part-occlusion, size-change, motion-blur]
