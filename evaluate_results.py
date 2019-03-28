@@ -1834,7 +1834,7 @@ if __name__ == "__main__":
                                           eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on NICO and TB100",
                                           font={'font.size': 15},
-                                          tex_name="nico_all_approaches_fig_include.tex",
+                                          tex_name="nico_tb100_compare.tex",
                                           legend_by="dataset")
 
             else:
