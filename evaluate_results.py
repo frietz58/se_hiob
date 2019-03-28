@@ -390,10 +390,10 @@ def get_avg_results_from_experiment(experiment_folder):
             print("attribute: {0}".format(attribute))
             print("loading all rects for sequences with same attribute")
             specific_attribute_sequences = attribute_sequences[attribute]
-            if attribute_sequences != []:
+            if specific_attribute_sequences != []:
                 all_preds = []
                 all_gts = []
-            elif attribute_sequences == []:
+            elif specific_attribute_sequences == []:
                 print("no sequences for : " + str(attribute) + ", skipping")
                 continue
 
