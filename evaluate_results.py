@@ -40,7 +40,7 @@ results_path = args.pathresults
 tb100_gt_path = args.pathgt
 tb100_attributes_path = args.attributes
 mode = args.mode
-nicovis_gt_path = "data/nicovision/"
+nicovis_gt_path = args.pathgt
 
 # ======= csv names =======
 csv_avg_success = "Avg. Success"
@@ -266,8 +266,16 @@ def get_all_rects(result_dir):
                     gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
                 elif "nicovision" in sequence:
                     gts = get_gt_rects_from_zip(sequence_name, nicovis_gt_path)
+
+                # nico dataset seems to have some problems with the ground truth, as they are often one of
+                if len(preds) != len(gts):
+                    print("diff in pred vs gts: " + str(abs(len(preds) - len(gts))) + ", sequence: " + str(sequence))
+                    gts = gts[0:len(preds)]
+
                 pred_gt_rects["preds"].append(preds)
                 pred_gt_rects["gts"].append(gts)
+
+
 
     elif current_folder_type == "matlab_sequnce_file":
         preds, gts = get_rects_from_workplace(result_dir)
@@ -311,7 +319,7 @@ def get_avg_results_from_experiment(experiment_folder):
             execution_results[sequence_name] = sequence_results
         experiment_results[hiob_execution] = execution_results
 
-    # calculate average metrics each sequence sequence
+    # calculate average metrics on each sequence
     sequence_result_collection = {}
     for execution in experiment_results.values():
         for sequence in execution.values():
@@ -543,14 +551,14 @@ def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None, sequence
     if all_preds is None and all_gts is None:
         all_preds, all_gts = get_all_rects(result_folder)
 
-    if result_folder != "attribute":
+    if result_folder != "attribute" and result_folder is not None:
         folder_type = determine_folder_type(result_folder)
     center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
 
     # calculate the metrics based on the results for each frame of the sequences in the collection
     scores_for_rects = {}
 
-    if result_folder != "attribute":
+    if result_folder != "attribute" and result_folder is not None:
         sequences = get_sequences(result_folder)
         scores_for_rects["Samples"] = len(sequences)
     else:
@@ -630,7 +638,7 @@ def create_sequence_score_csv(result_folder, eval_folder):
         writer.writeheader()
 
         for sequence in sequences:
-            score_dict = get_metrics_from_rects(os.path.join(results_path, sequence))
+            score_dict = get_metrics_from_rects(os.path.join(results_path, sequence[0]))
             sequence_name = sequence.split("-")[-1]
             writer.writerow({
                 "Sample": sequence_name,
@@ -1713,6 +1721,7 @@ if __name__ == "__main__":
         # just one sequence folder from one tracking folder
         if folder_type == "hiob_sequence_folder":
             print("detected single sequence folder")
+            create_sequence_score_csv(results_path, "sequence_results_test")
             create_graphs_metrics_for_set(results_path, "avg_full_set")
 
         # one hiob execution containing multiple sequence folders
