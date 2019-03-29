@@ -1463,6 +1463,13 @@ def plot_dsst_framerate_fig(dsst_dicts, eval_folder):
     ax.set_xticklabels(list(dsst_dicts.keys()))
     ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
 
+    if not os.path.isdir(eval_folder):
+        os.mkdir(eval_folder)
+
+    figure_file2 = os.path.join(eval_folder, 'dsst_parameter_vs_framerate.pdf')
+    plt.savefig(figure_file2)
+    print("saved candidates framerates figure to " + figure_file2)
+
 
 # plot the candidates framerate figure with split y axis
 def plot_candidates_framrate_fig(candidate_dicts, eval_folder):
@@ -1511,7 +1518,7 @@ def plot_candidates_framrate_fig(candidate_dicts, eval_folder):
     if not os.path.isdir(eval_folder):
         os.mkdir(eval_folder)
 
-    figure_file2 = os.path.join(eval_folder, 'parameter_vs_framerate.pdf')
+    figure_file2 = os.path.join(eval_folder, 'cand_parameter_vs_framerate.pdf')
     plt.savefig(figure_file2)
     print("saved candidates framerates figure to " + figure_file2)
 
