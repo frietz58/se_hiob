@@ -8,7 +8,7 @@
 environment_name: env_dsst_stat_cont_tb100full.yaml
 
 # directory to which execution logs are written:
-log_dir: ../dsst_validation/
+log_dir: ../dsst_validation_paper_conf/
 
 # directory in which data samples are kept:
 data_dir: ./data
