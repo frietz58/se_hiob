@@ -580,6 +580,55 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
         tex_file.writelines(lines)
 
 
+def create_framerate_tex_include(eval_folder, dict=None):
+    hard_values = {
+        "Candidats static cont.": [8.03, 5.52, 518.81, 587.09],
+        "Candidates static limited": [8.01, 5.68, 3092.23, 3237.78],
+        "Candidates dynamic cont.": [7.71, 5.7, 331.68, 330.09],
+        "Candidates dynamic limited": [7.8, 5.75, 2399.54, 2574.43],
+        "DSST static cont.": [7.82, 5.23, 80.19, 54.58],
+        "DSST staic limited": [7.82, 5.78, 949.44, 734.70],
+        "DSST dynamic cont.": [6.64, 4.37, 46.74, 17.49],
+        "DSST dynamic limited": [7.73, 5.64, 573.09, 280.75],
+        "No SE": [7.86, 5.84, "-", "-"]
+    }
+
+    lines = [
+        #"\\begin{table}[]\label{tab:asdasd}\n",
+        "\\centering",
+        "\\resizebox{\\textwidth}{!}{\n",
+        "\\begin{tabular}{@{}cccccc@{}}\n",
+        "\\toprule\n",
+    ]
+
+    header_line = "\\textbf{Approach} & \\textbf{FPS on TB100} & \\textbf{FPS on NICO} & \\textbf{SE FPS on TB100} & \\textbf{SE FPS on NICO} \\\\ \midrule \n"
+    lines.append(header_line)
+
+    for key in hard_values.keys():
+        line = str(key.replace("_", "\_")) + " & "
+        for val in hard_values[key]:
+            line += str(val) + " & "
+        # remove & at end of lline
+        line = line[0:-2]
+        line += "\\\\ \n"
+        lines.append(line)
+        print(line)
+
+    lines[-1] = lines[-1][0:-2] + " \\bottomrule\n"
+    lines.append("\\end{tabular}\n")
+    lines.append("}\n")
+    lines.append("\\caption{Framerates of overall tracker and isolated SE module on both datasets}\n")
+    #lines.append("\\end{table}")
+
+    if not os.path.isdir(eval_folder):
+        os.mkdir(eval_folder)
+
+    with open(os.path.join(eval_folder, "fps_vs_approach_tab_include.tex"), "w") as tex_file:
+        tex_file.writelines(lines)
+
+
+
+
 # get metric from rects
 def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None, sequences=None):
     print("getting metrics for {0}".format(result_folder))
@@ -1370,6 +1419,7 @@ def create_obt_fig_tex_include(dataframe, obt_folder, tex_name, path_in_src, par
 
 # create a figure with the framerates of the different approaches
 def create_framerate_vs_approach_fig(trackings, eval_folder):
+
     # get the approaches from all trackings
     approaches = {}
     for tracking in trackings:
@@ -1966,6 +2016,7 @@ def main(results_path):
 
         if args.task == "framerate_vs_approach":
             create_framerate_vs_approach_fig(trackings=results_path, eval_folder=path_multi_figure)
+            create_framerate_tex_include(eval_folder=path_multi_figure)
 
         elif 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
