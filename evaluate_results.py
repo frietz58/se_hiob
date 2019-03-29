@@ -20,14 +20,16 @@ parser = argparse.ArgumentParser(description="Evaluates tracking results. Can be
                                              " a hiob sequence folder, a hiob tracking folder, or a hiob experiment "
                                              "folder containing multiple tracking folders")
 
-parser.add_argument("-ptr", "--pathresults", nargs='+', help="Absolute path to the folder that contains the tracking results, the "
-                                                  "script determines what can of folder it is handling and gets the "
-                                                  "results accordingly")
+parser.add_argument("-ptr", "--pathresults", nargs='+', help="Absolute path to the folder that contains the tracking "
+                                                             "results, the script determines what can of folder it "
+                                                             "is handling and gets the results accordingly")
 
 parser.add_argument("-m", "--mode", help="To differentiate between an opt folder with multiple hiob executions and an "
                                          "experiment folder with multiple hiob executions")
 
 parser.add_argument("-p_mfig", "--path_multi_figure", help="Path where the figure with multiple graphs shall be saved")
+
+parser.add_argument("-t", "--task", help="Which task the shall be executed? framerate_vs_approach")
 
 args = parser.parse_args()
 
@@ -860,16 +862,16 @@ def create_opt_csv(experiment_folder, eval_folder):
 
                 # calc sds
                 succ_sd_helper = [x - final_avg_succ for x in avg_succs]
-                succ_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in succ_sd_helper]), len(avg_succs) - 1))
+                succ_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in succ_sd_helper]), len(avg_succs)))
 
                 prec_sd_helper = [x - final_avg_precc for x in avg_precs]
-                prec_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in prec_sd_helper]), len(avg_precs) - 1))
+                prec_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in prec_sd_helper]), len(avg_precs)))
 
                 avg_fps_helper = [x - final_framerate for x in framerates]
-                avg_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_fps_helper]), len(framerates) - 1))
+                avg_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_fps_helper]), len(framerates)))
 
                 avg_se_fps_helper = [x - final_se_framerate for x in se_framerates]
-                avg_se_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_se_fps_helper]), len(se_framerates) - 1))
+                avg_se_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_se_fps_helper]), len(se_framerates)))
 
                 sd_df.loc[i] = [
                     value[0]["value"],
@@ -1261,19 +1263,6 @@ def create_graphs_from_opt_csv(obt_folder):
         ax.legend((success_graph[0], precision_graph[0]), (csv_avg_success, csv_avg_precision))
         ax.set_ylim(0, 1)
 
-        def autolabel(rects):
-            """
-            Attach a text label above each bar displaying its height
-            """
-            for rect in rects:
-                height = rect.get_height()
-                ax.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
-                        '%d' % int(height),
-                        ha='center', va='bottom')
-
-        # autolabel(rects1)
-        # autolabel(rects2)
-
         # plt.show()
         figure_file1 = os.path.join(obt_folder, 'parameter_vs_metrics.pdf')
         plt.savefig(figure_file1)
@@ -1293,7 +1282,6 @@ def create_graphs_from_opt_csv(obt_folder):
             se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
             framerate_graph = ax.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
 
-            #ax.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(se_framerate) + max(se_framerate_sd) * 5))
             ax.set_ylim(0, 60)
             ax.set_ylabel('Frame-rate')
             fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
@@ -1380,7 +1368,154 @@ def create_obt_fig_tex_include(dataframe, obt_folder, tex_name, path_in_src, par
             )
 
 
+# create a figure with the framerates of the different approaches
+def create_framerate_vs_approach_fig(trackings, eval_folder):
+    # get the approaches from all trackings
+    approaches = {}
+    for tracking in trackings:
+        approach = get_approach_from_yaml(tracking)
+        if approach not in approaches.keys():
+            approaches[str(approach)] = {}
+            approaches[str(approach)]["trackings"] = []
+            approaches[str(approach)]["overall_fps"] = 0
+            approaches[str(approach)]["se_fps"] = 0
+            approaches[str(approach)]["trackings"].append(tracking)
+        else:
+            approaches[str(approach)]["trackings"].append(tracking)
+
+    # get the fps of all trackings of one approach
+    print("gettings fps and se_fps for approaches")
+
+    # split into candidates and dsst
+    dsst_dicts = {}
+    candidate_dicts = {}
+
+    for approach in approaches:
+        overall_fps = 0
+        overall_fps_singles = []
+        se_fps = 0
+        se_fps_singles = []
+        for tracking in approaches[approach]["trackings"]:
+            hiob_executions = get_tracking_folders(tracking)
+            if len(hiob_executions) > 1:
+                print("warning, found multiple hiob executions, might cause buggy behavious")
+            # read fps form eval
+            with open(os.path.join(hiob_executions[0], "evaluation.txt"), "r") as eval_txt:
+                lines = eval_txt.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    key_val = line.split("=")
+                    if key_val[0] == "frame_rate":
+                        overall_fps += float(key_val[1])
+                        overall_fps_singles.append(key_val[1])
+                    elif key_val[0] == "se_frame_rate":
+                        se_fps += float(key_val[1])
+                        se_fps_singles.append(key_val[1])
+
+        approaches[approach]["overall_fps"] = overall_fps / len(approaches[approach]["trackings"])  # mean
+        approaches[approach]["overall_fps_singles"] = overall_fps_singles
+        approaches[approach]["se_fps"] = se_fps / len(approaches[approach]["trackings"])  # mean
+        approaches[approach]["se_fps_singles"] = se_fps_singles
+
+        # calc std
+        overall_fps_sd_helper = [float(x) - approaches[approach]["overall_fps"] for x in approaches[approach]["overall_fps_singles"]]
+        overall_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in overall_fps_sd_helper]), len(overall_fps_singles)))
+
+        se_fps_sd_helper = [float(x) - approaches[approach]["se_fps"] for x in approaches[approach]["se_fps_singles"]]
+        se_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in se_fps_sd_helper]), len(se_fps_singles)))
+
+        approaches[approach]["overall_fps_sd"] = overall_fps_sd
+        approaches[approach]["se_fps_sd"] = se_fps_sd
+
+        if ("candidates" or "cand") in approach.lower():
+            candidate_dicts[str(approach)] = approaches[approach]
+        elif "dsst" in approach.lower():
+            dsst_dicts[str(approach)] = approaches[approach]
+        elif "no_se" in approach:
+            pass
+
+    # plot figures
+    plot_candidates_framrate_fig(candidate_dicts, eval_folder)
+
+    plot_dsst_framerate_fig(dsst_dicts, eval_folder)
+
+
 # ================================= HELPER FUNCTIONS =================================
+
+def plot_dsst_framerate_fig(dsst_dicts, eval_folder):
+    dsst_ind = np.arange(len(dsst_dicts))  # the x locations for the groups
+
+    dsst_overall_fps = [dsst_dicts[approach]["overall_fps"] for approach in dsst_dicts]
+    dsst_overall_fps_sd = [dsst_dicts[approach]["overall_fps_sd"] for approach in dsst_dicts]
+
+    dsst_se_fps = [dsst_dicts[approach]["se_fps"] for approach in dsst_dicts]
+    dsst_se_sd = [dsst_dicts[approach]["se_fps_sd"] for approach in dsst_dicts]
+
+    fig, ax = plt.subplots()
+
+    se_framerate_graph = ax.errorbar(dsst_ind, dsst_se_fps, yerr=dsst_se_sd, color='#785ef0', capsize=3)
+    framerate_graph = ax.errorbar(dsst_ind, dsst_overall_fps, yerr=dsst_overall_fps_sd, color='#fe6100', capsize=3)
+
+    ax.set_ylim(0, 60)
+    ax.set_ylabel('Frame-rate')
+    # fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
+    ax.set_xticks(dsst_ind)
+    ax.set_xticklabels(list(dsst_dicts.keys()))
+    ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
+
+
+# plot the candidates framerate figure with split y axis
+def plot_candidates_framrate_fig(candidate_dicts, eval_folder):
+    cand_ind = np.arange(len(candidate_dicts))  # the x locations for the groups
+
+    cand_overall_fps = [candidate_dicts[approach]["overall_fps"] for approach in candidate_dicts]
+    cand_overall_fps_sd = [candidate_dicts[approach]["overall_fps_sd"] for approach in candidate_dicts]
+
+    cand_se_fps = [candidate_dicts[approach]["se_fps"] for approach in candidate_dicts]
+    cand_se_sd = [candidate_dicts[approach]["se_fps_sd"] for approach in candidate_dicts]
+
+    fig, (ax, ax2) = plt.subplots(2, 1, sharex=True)
+
+    cand_se_framerate_graph = ax.errorbar(cand_ind, cand_se_fps, yerr=cand_se_sd, color='#785ef0', capsize=3)
+    ax.set_ylim((min(cand_se_fps) - max(cand_se_sd) * 5),
+                (max(cand_se_fps) + max(cand_se_sd) * 5))
+    ax.set_ylabel('SE Frame-rate')
+    # fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
+    ax.set_xticks(cand_ind)
+    ax.set_xticklabels(list(candidate_dicts.keys()))
+
+    cand_overall_framerate_graph = ax2.errorbar(cand_ind, cand_overall_fps, yerr=cand_overall_fps_sd, color='#fe6100', capsize=3)
+    ax2.set_ylim((min(cand_overall_fps) - max(cand_overall_fps_sd) * 5), (max(cand_overall_fps) + max(cand_overall_fps_sd) * 5))
+    ax2.set_ylabel('Frame-rate')
+    ax2.set_xticks(cand_ind)
+    ax2.set_xticklabels(list(candidate_dicts.keys()))
+
+    # ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
+
+    # hide the spines between ax and ax2
+    ax.spines['bottom'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax.xaxis.tick_top()
+    ax.tick_params(labeltop='off')  # don't put tick labels at the top
+    ax2.xaxis.tick_bottom()
+
+    d = .015  # how big to make the diagonal lines in axes coordinates
+    kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+    ax.plot((-d, +d), (-d, +d), **kwargs)  # top-left diagonal
+    ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
+
+    kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
+    ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+    ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+
+    if not os.path.isdir(eval_folder):
+        os.mkdir(eval_folder)
+
+    figure_file2 = os.path.join(eval_folder, 'parameter_vs_framerate.pdf')
+    plt.savefig(figure_file2)
+    print("saved candidates framerates figure to " + figure_file2)
+
+
 # helper function for metric
 def build_dist_fun(dists):
     def f(thresh):
@@ -1776,7 +1911,7 @@ def ignore_leading_value(label):
     return " ".join(label.split(" ")[1:])
 
 
-if __name__ == "__main__":
+def main(results_path):
     if len(results_path) == 1:
         results_path = results_path[0]
         folder_type = determine_folder_type(results_path)
@@ -1821,7 +1956,11 @@ if __name__ == "__main__":
         # -ptr /path/to/tracking1 /path/to/tracking2
         folder_types = [determine_folder_type(folder) for folder in results_path]
         print(str(folder_types))
-        if 'matlab_tracking_folder' in folder_types:
+
+        if args.task == "framerate_vs_approach":
+            create_framerate_vs_approach_fig(trackings=results_path, eval_folder=path_multi_figure)
+
+        elif 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
             multiple_trackings_graphs(tracking_folders=results_path,
                                       eval_folder=results_path[0],
@@ -1862,3 +2001,7 @@ if __name__ == "__main__":
 
     else:
         print("nothing matches path")
+
+
+if __name__ == "__main__":
+    main(results_path)
