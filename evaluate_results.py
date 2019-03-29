@@ -89,19 +89,6 @@ parameter_names = {
     "c_change_aspect_ratio": "Change aspect ratio"
 }
 
-approach_names = {
-    "candidates_stat_cont": "Candidates static continuous",
-    "candidates_stat_limited": "Candidates static limited",
-    "candidates_dyn_limited": "Candidates dynamic limited",
-    "candidates_dyn_cont": "Candidates dynamic continuous",
-    "dsst_stat_cont": "DSST static continuous",
-    "dsst_stat_limited": "DSST static limited",
-    "dsst_dyn_cont": "DSST dynamic continuous",
-    "dsst_dyn_limited": "DSST dynamic limited",
-    "no_se": "Baseline"
-}
-
-
 # ================================= GET FUNCTIONS =================================
 # get all workplace files
 def get_saved_workplaces(result_dir):
@@ -314,7 +301,7 @@ def get_all_rects(result_dir):
     return all_preds, all_gts
 
 
-# get the evaluation values from each tracking in an excperiment
+# get the evaluation values from each tracking in an experiment
 def get_avg_results_from_experiment(experiment_folder):
     hiob_executions = get_tracking_folders(experiment_folder)
     # get the raw values from evaluation.txt
@@ -493,15 +480,43 @@ def get_avg_results_from_experiment(experiment_folder):
             samples += 1
             frames += int(row["Frames"])
 
-        print("size_score_sum: " + str(final_ss))
+        hiob_executions = get_tracking_folders(experiment_folder)
+
+        if len(hiob_executions) != 1:
+            raise ValueError("Multiple HIOB executions, cant get total precision from eval.txt")
+        else:
+            # read values from tracking eval file
+            tracking_results = {}
+            with open(os.path.join(hiob_executions[0], "evaluation.txt"), "r") as eval_txt:
+                lines = eval_txt.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    key_val = line.split("=")
+                    tracking_results[str(key_val[0])] = key_val[1]
+
         final_avg_precs = np.around(np.sum(final_precs) / samples, decimals=3)
         final_avg_succs = np.around(np.sum(final_succs) / samples, decimals=3)
         final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
         # final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
         # final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
-        print("avg_size_score: " + str(final_avg_ss))
+
+
+        datasets = [get_dataset_from_name(tracking) for tracking in experiment_folder]
+        if all("TB100" in ds for ds in datasets):
+            dataset = "TB100"
+        elif all("NICO" in ds for ds in datasets):
+            dataset = "NICO"
+
         summarizing_row = {
-            "Attribute": "TB100",
+            "Attribute": dataset,
+            "Samples": samples,
+            "Frames": np.around(frames),
+            csv_avg_precision: np.around(float(tracking_results["total_precision_rating"]), decimals=3),
+            csv_avg_success: np.around(float(tracking_results["total_success_rating"]), decimals=3),
+            csv_avg_ss: final_avg_ss}
+
+        summarizing_row2 = {
+            "Attribute": dataset,
             "Samples": samples,
             "Frames": np.around(frames),
             csv_avg_precision: final_avg_precs,
@@ -509,6 +524,7 @@ def get_avg_results_from_experiment(experiment_folder):
             csv_avg_ss: final_avg_ss}
 
         writer.writerow(summarizing_row)
+        #writer.writerow(summarizing_row2)
 
     create_attribute_tex_table_include(save_path=eval_path,
                                        csv_file=out_csv,
@@ -897,7 +913,6 @@ def create_opt_csv(experiment_folder, eval_folder):
             ])
 
             # get the average values for the same parameter value for a row in the opt csv
-
             for i, value in enumerate(same_parameter_value_collection.values()):
                 avg_succs = []
                 avg_precs = []
@@ -1611,9 +1626,14 @@ def get_attribute_collections(tracking_dir):
                             "non-square": [],
                             "contrast": []}
 
-    with open(tb100_attributes_path, "r") as stream:
+    if get_dataset_from_name(tracking_dir) == "TB100":
+        dataset_path = tb100_attributes_path
+    elif get_dataset_from_name(tracking_dir) == "NICO":
+        dataset_path = nicovis_attributes_path
+
+    with open(dataset_path, "r") as stream:
         try:
-            tb100 = yaml.safe_load(stream)
+            data_set = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
 
@@ -1626,7 +1646,7 @@ def get_attribute_collections(tracking_dir):
                 sequence_name = sequence.split("_")[0]
             else:
                 sequence_name = sequence.split("/")[-1].split("-")[-1]
-            for sample in tb100["samples"]:
+            for sample in data_set["samples"]:
                 if sample["name"] == sequence_name:
                     for attribute in sample["attributes"]:
                         attribute_collection[attribute].append(sequence)
