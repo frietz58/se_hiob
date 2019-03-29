@@ -5,7 +5,7 @@
 # Can be fed to program via command line argument --environment [path]
 
 # name describing this environment (for log purposes):
-environment_name: env_dsst_stat_cont_tb100full.yaml
+environment_name: dsst_validation_paper_conf.yaml
 
 # directory to which execution logs are written:
 log_dir: ../dsst_validation_paper_conf/
