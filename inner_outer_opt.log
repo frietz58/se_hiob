@@ -1,4 +1,69 @@
-2019-03-29 19:00:27,154 | INFO | completed experiments so far: []
-2019-03-29 19:00:27,259 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.1']]
-2019-03-29 19:00:27,959 | INFO | starting experiment inner0.1_outer0.1
-2019-03-29 19:00:29,034 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag -g 0
+2019-03-29 19:02:29,330 | INFO | completed experiments so far: []
+2019-03-29 19:02:29,330 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.1']]
+2019-03-29 19:02:29,330 | INFO | starting experiment inner0.1_outer0.1
+2019-03-29 19:02:29,330 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 19:28:08,780 | INFO | finished experiment inner0.1_outer0.1
+2019-03-29 19:28:08,781 | INFO | completed experiments so far: ['inner0.1_outer0.1']
+2019-03-29 19:28:08,781 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.2']]
+2019-03-29 19:28:08,781 | INFO | starting experiment inner0.1_outer0.2
+2019-03-29 19:28:08,781 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 19:53:28,366 | INFO | finished experiment inner0.1_outer0.2
+2019-03-29 19:53:28,367 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2']
+2019-03-29 19:53:28,367 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.3']]
+2019-03-29 19:53:28,367 | INFO | starting experiment inner0.1_outer0.3
+2019-03-29 19:53:28,367 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 20:18:49,566 | INFO | finished experiment inner0.1_outer0.3
+2019-03-29 20:18:49,567 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3']
+2019-03-29 20:18:49,567 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.4']]
+2019-03-29 20:18:49,567 | INFO | starting experiment inner0.1_outer0.4
+2019-03-29 20:18:49,567 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 20:45:27,210 | INFO | finished experiment inner0.1_outer0.4
+2019-03-29 20:45:27,211 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4']
+2019-03-29 20:45:27,211 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.5']]
+2019-03-29 20:45:27,211 | INFO | starting experiment inner0.1_outer0.5
+2019-03-29 20:45:27,211 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 21:12:06,829 | INFO | finished experiment inner0.1_outer0.5
+2019-03-29 21:12:06,831 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5']
+2019-03-29 21:12:06,831 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.6']]
+2019-03-29 21:12:06,831 | INFO | starting experiment inner0.1_outer0.6
+2019-03-29 21:12:06,831 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 21:39:27,682 | INFO | finished experiment inner0.1_outer0.6
+2019-03-29 21:39:27,684 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6']
+2019-03-29 21:39:27,684 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.7']]
+2019-03-29 21:39:27,684 | INFO | starting experiment inner0.1_outer0.7
+2019-03-29 21:39:27,684 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 22:05:57,670 | INFO | finished experiment inner0.1_outer0.7
+2019-03-29 22:05:57,672 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6', 'inner0.1_outer0.7']
+2019-03-29 22:05:57,672 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.8']]
+2019-03-29 22:05:57,672 | INFO | starting experiment inner0.1_outer0.8
+2019-03-29 22:05:57,672 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 22:32:26,979 | INFO | finished experiment inner0.1_outer0.8
+2019-03-29 22:32:26,981 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6', 'inner0.1_outer0.7', 'inner0.1_outer0.8']
+2019-03-29 22:32:26,981 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.9']]
+2019-03-29 22:32:26,981 | INFO | starting experiment inner0.1_outer0.9
+2019-03-29 22:32:26,981 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 22:59:23,392 | INFO | finished experiment inner0.1_outer0.9
+2019-03-29 22:59:23,393 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6', 'inner0.1_outer0.7', 'inner0.1_outer0.8', 'inner0.1_outer0.9']
+2019-03-29 22:59:23,393 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '1.0']]
+2019-03-29 22:59:23,393 | INFO | starting experiment inner0.1_outer1.0
+2019-03-29 22:59:23,393 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 23:25:42,642 | INFO | finished experiment inner0.1_outer1.0
+2019-03-29 23:25:42,643 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6', 'inner0.1_outer0.7', 'inner0.1_outer0.8', 'inner0.1_outer0.9', 'inner0.1_outer1.0']
+2019-03-29 23:25:42,644 | INFO | curr change: [['inner_punish_threshold', '0.2'], ['outer_punish_threshold', '0.1']]
+2019-03-29 23:25:42,644 | INFO | starting experiment inner0.2_outer0.1
+2019-03-29 23:25:42,644 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-29 23:52:37,694 | INFO | finished experiment inner0.2_outer0.1
+2019-03-29 23:52:37,696 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6', 'inner0.1_outer0.7', 'inner0.1_outer0.8', 'inner0.1_outer0.9', 'inner0.1_outer1.0', 'inner0.2_outer0.1']
+2019-03-29 23:52:37,696 | INFO | curr change: [['inner_punish_threshold', '0.2'], ['outer_punish_threshold', '0.2']]
+2019-03-29 23:52:37,696 | INFO | starting experiment inner0.2_outer0.2
+2019-03-29 23:52:37,696 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-30 00:19:00,258 | INFO | finished experiment inner0.2_outer0.2
+2019-03-30 00:19:00,259 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6', 'inner0.1_outer0.7', 'inner0.1_outer0.8', 'inner0.1_outer0.9', 'inner0.1_outer1.0', 'inner0.2_outer0.1', 'inner0.2_outer0.2']
+2019-03-30 00:19:00,259 | INFO | curr change: [['inner_punish_threshold', '0.2'], ['outer_punish_threshold', '0.3']]
+2019-03-30 00:19:00,259 | INFO | starting experiment inner0.2_outer0.3
+2019-03-30 00:19:00,260 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
+2019-03-30 00:45:12,840 | INFO | finished experiment inner0.2_outer0.3
+2019-03-30 00:45:12,842 | INFO | completed experiments so far: ['inner0.1_outer0.1', 'inner0.1_outer0.2', 'inner0.1_outer0.3', 'inner0.1_outer0.4', 'inner0.1_outer0.5', 'inner0.1_outer0.6', 'inner0.1_outer0.7', 'inner0.1_outer0.8', 'inner0.1_outer0.9', 'inner0.1_outer1.0', 'inner0.2_outer0.1', 'inner0.2_outer0.2', 'inner0.2_outer0.3']
+2019-03-30 00:45:12,842 | INFO | curr change: [['inner_punish_threshold', '0.2'], ['outer_punish_threshold', '0.4']]
+2019-03-30 00:45:12,842 | INFO | starting experiment inner0.2_outer0.4
+2019-03-30 00:45:12,842 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag.yaml -g 1
