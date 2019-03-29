@@ -1,0 +1,4 @@
+2019-03-29 19:00:27,154 | INFO | completed experiments so far: []
+2019-03-29 19:00:27,259 | INFO | curr change: [['inner_punish_threshold', '0.1'], ['outer_punish_threshold', '0.1']]
+2019-03-29 19:00:27,959 | INFO | starting experiment inner0.1_outer0.1
+2019-03-29 19:00:29,034 | INFO | python hiob_cli.py -e config/environment_candidates_nachtrag.yaml -t config/tracker_candidates_nachtrag -g 0

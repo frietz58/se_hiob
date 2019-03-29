@@ -101,7 +101,7 @@ def main():
 
                 call = "python hiob_cli.py -e config/" + args.environment + " -t config/" + args.tracker + " -g " + args.gpu
                 logger.info(call)
-                if not args.test_run:
+                if args.test_run == "False":
                     p = Popen(call, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
                     output, err = p.communicate()
                     rc = p.returncode
