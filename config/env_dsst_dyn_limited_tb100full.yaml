@@ -5,10 +5,10 @@
 # Can be fed to program via command line argument --environment [path]
 
 # name describing this environment (for log purposes):
-environment_name: dsst_dyn_limited_tb100full.yaml
+environment_name: paper_dsst_dyn_limited_tb100full.yaml
 
 # directory to which execution logs are written:
-log_dir: ../dsst_dyn_limited_tb100full/
+log_dir: ../paper_dsst_dyn_limited_tb100full/
 
 # directory in which data samples are kept:
 data_dir: ./data

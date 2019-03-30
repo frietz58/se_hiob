@@ -2,10 +2,10 @@ import argparse
 from subprocess import Popen, PIPE
 import logging
 
-logger = logging.getLogger('experiment_execution')
+logger = logging.getLogger('dsst_paper_exp')
 logger.setLevel(logging.DEBUG)
 
-fh = logging.FileHandler('experiment_execution.log')
+fh = logging.FileHandler('dsst_paper_exp.log')
 fh.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler()
@@ -54,16 +54,16 @@ def main():
 
     experiment_names = [
 
-        "dsst_validation0",
-        "dsst_validation1",
-        "dsst_validation2",
-        "dsst_validation3",
-        "dsst_validation4",
-        "dsst_validation5",
-        "dsst_validation6",
-        "dsst_validation7",
-        "dsst_validation8",
-        "dsst_validation9",
+        # "dsst_validation0",
+        # "dsst_validation1",
+        # "dsst_validation2",
+        # "dsst_validation3",
+        # "dsst_validation4",
+        # "dsst_validation5",
+        # "dsst_validation6",
+        # "dsst_validation7",
+        # "dsst_validation8",
+        # "dsst_validation9",
         #
         # "candidates_stat_cont_tb100full",
         # "candidates_dyn_cont_tb100full",
@@ -71,11 +71,11 @@ def main():
         # "candidates_stat_limited_tb100full",
         # "candidates_dyn_limited_tb100full",
         #
-        # "dsst_stat_cont_tb100full",
-        # "dsst_stat_limited_tb100full",
-        #
-        # "dsst_dyn_cont_tb100full",
-        # "dsst_dyn_limited_tb100full",
+        "dsst_stat_cont_tb100full",
+        "dsst_stat_limited_tb100full",
+
+        "dsst_dyn_cont_tb100full",
+        "dsst_dyn_limited_tb100full",
         #
         # "no_se_tb100full",
 
@@ -85,11 +85,11 @@ def main():
         # "candidates_stat_limited_nico",
         # "candidates_dyn_limited_nico",
         #
-        # "dsst_stat_cont_nico",
-        # "dsst_stat_limited_nico",
-        #
-        # "dsst_dyn_cont_nico",
-        # "dsst_dyn_limited_nico",
+        "dsst_stat_cont_nico",
+        "dsst_stat_limited_nico",
+
+        "dsst_dyn_cont_nico",
+        "dsst_dyn_limited_nico",
         #
         # "no_se_nico",
     ]

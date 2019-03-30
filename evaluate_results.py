@@ -627,8 +627,6 @@ def create_framerate_tex_include(eval_folder, dict=None):
         tex_file.writelines(lines)
 
 
-
-
 # get metric from rects
 def get_metrics_from_rects(result_folder, all_preds=None, all_gts=None, sequences=None):
     print("getting metrics for {0}".format(result_folder))
@@ -813,6 +811,9 @@ def create_attribute_score_csv(result_folder, eval_folder):
         final_avg_ss = np.around(np.sum(final_ss) / samples, decimals=3)
         final_avg_fails = np.around(np.sum(final_fails) / samples, decimals=3)
         final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
+
+        if samples == 0:
+            samples = 1
 
         summarizing_row = {
             "Attribute": "TB100",
@@ -1792,6 +1793,7 @@ def get_dataset_from_name(tracking_name):
         return "TB100"
     else:
         return "NICO"
+
 
 # get attribute collections for a tracking
 def get_attribute_collections(tracking_dir):

@@ -5,10 +5,10 @@
 # Can be fed to program via command line argument --environment [path]
 
 # name describing this environment (for log purposes):
-environment_name: env_dsst_stat_cont_nico
+environment_name: paper_dsst_stat_cont_nico
 
 # directory to which execution logs are written:
-log_dir: ../env_dsst_stat_cont_nico/
+log_dir: ../paper_dsst_stat_cont_nico/
 
 # directory in which data samples are kept:
 data_dir: ./data
