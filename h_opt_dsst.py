@@ -53,12 +53,14 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
         val_changes_bigger = additional_parameters
         val_changes_bigger.append([str(parameter_name), val_change])
 
-        set_keyval(key_val_list=val_changes_bigger, load_from="config/backup_tracker.yaml",
+        if not test:
+            set_keyval(key_val_list=val_changes_bigger, load_from="config/backup_tracker.yaml",
                    save_to=args.tracker)
 
         environment_change = [["environment_name", "dsst"],
                               ["log_dir", "../dsst_opt/" + str(parameter_name)]]
-        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+        if not test:
+            set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
         if not test:
             subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
@@ -73,12 +75,13 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
     start_val.append([str(parameter_name), start])
 
     print()
-
-    set_keyval(key_val_list=start_val, load_from="config/backup_tracker.yaml", save_to=args.tracker)
+    if not test:
+        set_keyval(key_val_list=start_val, load_from="config/backup_tracker.yaml", save_to=args.tracker)
 
     environment_change = [["environment_name", "dsst"],
                           ["log_dir", "../dsst_opt/" + str(parameter_name)]]
-    set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+    if not test:
+        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
     if not test:
         subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
@@ -102,12 +105,14 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
             val_changes_smaller = additional_parameters
             val_changes_smaller.append([str(parameter_name), val_change])
 
-            set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
+            if not test:
+                set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
                        save_to=args.tracker)
 
             environment_change = [["environment_name", "dsst"],
                                   ["log_dir", "../dsst_opt/" + str(parameter_name)]]
-            set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+            if not test:
+                set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
             if not test:
                 subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
@@ -201,10 +206,12 @@ def change_dsst_number_scales(start, step, i, direction):
             raise ValueTooSmallError
         return int(np.around(start - step ** i, decimals=2))
 
+
 def change_hog_conf(change_dict):
     environment_change = [["environment_name", "dsst"],
                           ["log_dir", "../dsst_opt/hog_conf"]]
-    set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+    if not test:
+        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
 
     for i in range(0, len(next(iter(change_dict.values())))):
         change_list = []
@@ -212,7 +219,8 @@ def change_hog_conf(change_dict):
             print([str(key), change_dict[key][i]])
             change_list.append([str(key), change_dict[key][i]])
 
-        set_keyval(key_val_list=change_list, load_from="config/backup_tracker.yaml",
+        if not test:
+            set_keyval(key_val_list=change_list, load_from="config/backup_tracker.yaml",
                    save_to=args.tracker)
 
         print("running wit above vals...")
@@ -227,7 +235,7 @@ if __name__ == '__main__':
     if args.gpu is None:
         args.gpu = 0
 
-    test = False
+    test = True
 
     print("==== execution 0 ==== \n")
     change_hog_conf(change_dict={"hog_cell_size": [1, 2, 4, 8],
