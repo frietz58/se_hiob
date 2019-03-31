@@ -40,6 +40,10 @@ def create_inner_outer_csv():
             outer = configuration["scale_estimator"]["outer_punish_threshold"]
 
         # get prec succ
+        if not os.path.exists(os.path.join(hiob_execution, "evaluation.txt")):
+            print("didnt find evaluation.txt in " + str(hiob_execution) + " skipping")
+            continue
+
         with open(os.path.join(hiob_execution, "evaluation.txt"), "r") as eval_txt:
             lines = eval_txt.readlines()
             for line in lines:
