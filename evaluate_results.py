@@ -100,6 +100,10 @@ def get_saved_workplaces(result_dir):
         if not ".mat" in file:
             del files_in_dir[i]
 
+    for i, file in enumerate(files_in_dir):
+        if not ".mat" in file:
+            del files_in_dir[i]
+
     return files_in_dir
 
 
@@ -351,7 +355,7 @@ def get_avg_results_from_experiment(experiment_folder):
 
     out_csv = os.path.join(eval_path, "sequence_averages.csv")
     with open(out_csv, 'w', newline='') as outcsv:
-        csv_fields = ["Sample", "Frames", "Precision", "Success", "Size Score", "Fail %", "Updates"]
+        csv_fields = ["Sample", "Frames", "Precision", "Success", "Size Score"]
         writer = csv.DictWriter(outcsv, fieldnames=csv_fields)
         writer.writeheader()
 
@@ -373,21 +377,21 @@ def get_avg_results_from_experiment(experiment_folder):
             avg_prec = np.around(sum(prec_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
             avg_succ = np.around(sum(succ_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
             avg_ss_rating = np.around(sum(ss_ratings) / len(sequence_result_collection[sequence_result]), decimals=3)
-            avg_fail_percentages = np.around(sum(fail_percentages) / len(sequence_result_collection[sequence_result]),
-                                             decimals=3)
-            avg_updates = np.around(sum(update_totals) / len(sequence_result_collection[sequence_result]), decimals=3)
 
             row_dict = {
                 "Sample": sample,
                 "Frames": frames,
                 "Precision": avg_prec,
                 "Success": avg_succ,
-                "Size Score": avg_ss_rating,
-                "Fail %": avg_fail_percentages,
-                "Updates": avg_updates}
+                "Size Score": avg_ss_rating}
 
             writer.writerow(row_dict)
             rows.append(row_dict)
+
+    create_attribute_tex_table_include(save_path=eval_path,
+                                       csv_file=out_csv,
+                                       tex_name="sequence_averages_tab_include.tex")
+
 
     # create csv with the average values for each attribute
     print("creating average over attributes csv")
@@ -477,15 +481,32 @@ def get_avg_results_from_experiment(experiment_folder):
             final_precs.append(row["Precision"])
             final_succs.append(row["Success"])
             final_ss.append(row["Size Score"])
-            final_fails.append(row["Fail %"])
-            final_updates.append(row["Updates"])
+            # final_fails.append(row["Fail %"])
+            # final_updates.append(row["Updates"])
             samples += 1
             frames += int(row["Frames"])
 
         hiob_executions = get_tracking_folders(experiment_folder)
 
         if len(hiob_executions) != 1:
-            raise ValueError("Multiple HIOB executions, cant get total precision from eval.txt")
+            # get average of totals
+            total_succs = []
+            total_precs = []
+            tracking_results = {}
+            for hiob_execution in hiob_executions:
+                with open(os.path.join(hiob_executions[0], "evaluation.txt"), "r") as eval_txt:
+                    lines = eval_txt.readlines()
+                    for line in lines:
+                        line = line.replace("\n", "")
+                        key_val = line.split("=")
+                        if key_val[0] == "total_precision_rating":
+                            total_precs.append(float(key_val[1]))
+                        elif key_val[0] == "total_success_rating":
+                            total_succs.append(float(key_val[1]))
+
+            tracking_results["total_precision_rating"] = sum(total_precs) / len(total_precs)
+            tracking_results["total_success_rating"] = sum(total_succs) / len(total_succs)
+
         else:
             # read values from tracking eval file
             tracking_results = {}
@@ -540,6 +561,8 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
     tex_path = os.path.join(save_path, tex_name)
     print("saving table include tex to: " + str(tex_path))
     df = pd.read_csv(csv_file)
+    cols = list(df)
+    sorted = df.sort_values(cols[0])
     lines = [
         #"\\begin{table}[]\label{tab:asdasd}\n",
         "\\centering",
@@ -549,7 +572,7 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
     ]
 
     header_line = ""
-    for key in df.keys():
+    for key in sorted.keys():
         header_line += "\\textbf{" + str(key) + "} & "
     # remove & at end of lline
     header_line = header_line[0:-2]
@@ -557,9 +580,9 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
 
     lines.append(header_line)
 
-    for index, row in df.iterrows():
+    for index, row in sorted.iterrows():
         line = ""
-        for key in df.keys():
+        for key in sorted.keys():
             if type(row[key]) == float:
                 line += str(np.around(row[key], decimals=3)) + " & "
             else:
@@ -721,7 +744,10 @@ def create_sequence_score_csv(result_folder, eval_folder):
         writer.writeheader()
 
         for sequence in sequences:
-            score_dict = get_metrics_from_rects(os.path.join(results_path, sequence[0]))
+            if type(results_path) == list and type(sequence) == str:
+                score_dict = get_metrics_from_rects(os.path.join(results_path[0], sequence))
+            elif type(results_path) == str and type(sequence) == list:
+                score_dict = get_metrics_from_rects(os.path.join(results_path, sequence[0]))
             sequence_name = sequence.split("-")[-1]
             writer.writerow({
                 "Sample": sequence_name,
@@ -730,6 +756,8 @@ def create_sequence_score_csv(result_folder, eval_folder):
                 "Success": np.around(score_dict["Total Success"], decimals=3),
                 "Size Score": score_dict["Size Score"]
             })
+
+    create_attribute_tex_table_include(result_folder, out_csv, "sequences_tab_tex_include.tex")
 
 
 # create a csv for the attribute collections from one tracking
@@ -1994,6 +2022,7 @@ def main(results_path):
             create_sequence_score_csv(results_path, "sequence_results")
             create_attribute_score_csv(results_path, "attribute_results")
 
+
         # experiment folder containing multiple hiob executions, h_opt for example
         elif folder_type == "multiple_hiob_executions":
             if mode == "" or None:
@@ -2023,7 +2052,7 @@ def main(results_path):
         elif 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
             multiple_trackings_graphs(tracking_folders=results_path,
-                                      eval_folder=results_path[0],
+                                      eval_folder=path_multi_figure,
                                       what_is_plotted="DSST reference vs implementation",
                                       font={'font.size': 15},
                                       tex_name="reference_vs_hiob_fig_include.tex",
