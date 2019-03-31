@@ -83,7 +83,7 @@ def main():
     if args.test_run is None:
         args.test_run = True
 
-    for i in np.arange(0.6, 1.1, 0.1):
+    for i in np.arange(0.1, 0.6, 0.1):
         for j in np.arange(0.1, 1.1, 0.1):
             change_list = [
                 ["inner_punish_threshold", float(np.around(i, decimals=1))],
