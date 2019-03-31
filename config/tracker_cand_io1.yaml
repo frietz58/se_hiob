@@ -121,8 +121,8 @@ scale_estimator:
 
   # candidate params:
   c_scale_factor: 1.02 # scale factor between candidates
-  inner_punish_threshold: 0.3 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
-  outer_punish_threshold: 0.3 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
+  inner_punish_threshold: 0.9 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
+  outer_punish_threshold: 1.0 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
   c_number_scales: 17 # number of scaled candidates to generate
   max_scale_difference: 0.02 # max value the scale may change between two frames
   scale_window_step_size: 0.005 # the deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
