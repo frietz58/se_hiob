@@ -1,0 +1,33 @@
+2019-03-29 15:00:06,283 | INFO | =========== NEW EXECUTION ===========
+2019-03-29 15:00:06,284 | INFO | specified GPU: 0, experiments: ['all']
+2019-03-29 15:00:06,284 | INFO | completed experiments so far: []
+2019-03-29 15:00:06,284 | INFO | starting experiment dsst_validation0
+2019-03-29 15:31:12,567 | INFO | finished experiment dsst_validation0
+2019-03-29 15:31:12,567 | INFO | completed experiments so far: ['dsst_validation0']
+2019-03-29 15:31:12,567 | INFO | starting experiment dsst_validation1
+2019-03-29 16:02:10,006 | INFO | finished experiment dsst_validation1
+2019-03-29 16:02:10,006 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1']
+2019-03-29 16:02:10,006 | INFO | starting experiment dsst_validation2
+2019-03-29 16:33:33,380 | INFO | finished experiment dsst_validation2
+2019-03-29 16:33:33,382 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2']
+2019-03-29 16:33:33,382 | INFO | starting experiment dsst_validation3
+2019-03-29 17:11:14,732 | INFO | finished experiment dsst_validation3
+2019-03-29 17:11:14,733 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3']
+2019-03-29 17:11:14,733 | INFO | starting experiment dsst_validation4
+2019-03-29 17:43:07,943 | INFO | finished experiment dsst_validation4
+2019-03-29 17:43:07,944 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4']
+2019-03-29 17:43:07,944 | INFO | starting experiment dsst_validation5
+2019-03-29 18:14:53,103 | INFO | finished experiment dsst_validation5
+2019-03-29 18:14:53,104 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5']
+2019-03-29 18:14:53,104 | INFO | starting experiment dsst_validation6
+2019-03-29 18:46:24,890 | INFO | finished experiment dsst_validation6
+2019-03-29 18:46:24,890 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6']
+2019-03-29 18:46:24,891 | INFO | starting experiment dsst_validation7
+2019-03-29 19:17:36,872 | INFO | finished experiment dsst_validation7
+2019-03-29 19:17:36,872 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7']
+2019-03-29 19:17:36,872 | INFO | starting experiment dsst_validation8
+2019-03-29 19:49:12,400 | INFO | finished experiment dsst_validation8
+2019-03-29 19:49:12,400 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8']
+2019-03-29 19:49:12,400 | INFO | starting experiment dsst_validation9
+2019-03-29 20:20:27,728 | INFO | finished experiment dsst_validation9
+2019-03-29 20:20:27,729 | WARNING | EXECUTED EACH EXPERIMENT ONCE

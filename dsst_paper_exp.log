@@ -1,0 +1,27 @@
+2019-03-30 01:04:04,269 | INFO | =========== NEW EXECUTION ===========
+2019-03-30 01:04:04,270 | INFO | specified GPU: 0, experiments: ['all']
+2019-03-30 01:04:04,270 | INFO | completed experiments so far: []
+2019-03-30 01:04:04,270 | INFO | starting experiment dsst_stat_cont_tb100full
+2019-03-30 03:32:49,304 | INFO | finished experiment dsst_stat_cont_tb100full
+2019-03-30 03:32:49,304 | INFO | completed experiments so far: ['dsst_stat_cont_tb100full']
+2019-03-30 03:32:49,304 | INFO | starting experiment dsst_stat_limited_tb100full
+2019-03-30 05:32:10,312 | INFO | finished experiment dsst_stat_limited_tb100full
+2019-03-30 05:32:10,312 | INFO | completed experiments so far: ['dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full']
+2019-03-30 05:32:10,312 | INFO | starting experiment dsst_dyn_cont_tb100full
+2019-03-30 08:23:54,827 | INFO | finished experiment dsst_dyn_cont_tb100full
+2019-03-30 08:23:54,828 | INFO | completed experiments so far: ['dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full']
+2019-03-30 08:23:54,828 | INFO | starting experiment dsst_dyn_limited_tb100full
+2019-03-30 10:27:21,842 | INFO | finished experiment dsst_dyn_limited_tb100full
+2019-03-30 10:27:21,842 | INFO | completed experiments so far: ['dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full']
+2019-03-30 10:27:21,842 | INFO | starting experiment dsst_stat_cont_nico
+2019-03-30 12:48:35,875 | INFO | finished experiment dsst_stat_cont_nico
+2019-03-30 12:48:35,896 | INFO | completed experiments so far: ['dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'dsst_stat_cont_nico']
+2019-03-30 12:48:35,896 | INFO | starting experiment dsst_stat_limited_nico
+2019-03-30 14:41:17,053 | INFO | finished experiment dsst_stat_limited_nico
+2019-03-30 14:41:17,068 | INFO | completed experiments so far: ['dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'dsst_stat_cont_nico', 'dsst_stat_limited_nico']
+2019-03-30 14:41:17,068 | INFO | starting experiment dsst_dyn_cont_nico
+2019-03-30 17:56:24,887 | INFO | finished experiment dsst_dyn_cont_nico
+2019-03-30 17:56:24,905 | INFO | completed experiments so far: ['dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'dsst_stat_cont_nico', 'dsst_stat_limited_nico', 'dsst_dyn_cont_nico']
+2019-03-30 17:56:24,905 | INFO | starting experiment dsst_dyn_limited_nico
+2019-03-30 19:52:39,392 | INFO | finished experiment dsst_dyn_limited_nico
+2019-03-30 19:52:39,417 | WARNING | EXECUTED EACH EXPERIMENT ONCE

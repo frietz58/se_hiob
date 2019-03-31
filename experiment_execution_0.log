@@ -1,0 +1,237 @@
+2019-03-25 00:43:27,418 | INFO | =========== NEW EXECUTION ===========
+2019-03-25 00:43:27,418 | INFO | specified GPU: 1, experiments: ['all']
+2019-03-25 00:43:27,419 | INFO | completed experiments so far: []
+2019-03-25 00:43:27,419 | INFO | starting experiment dsst_validation0
+2019-03-25 01:12:59,531 | INFO | finished experiment dsst_validation0
+2019-03-25 01:12:59,532 | INFO | completed experiments so far: ['dsst_validation0']
+2019-03-25 01:12:59,532 | INFO | starting experiment dsst_validation1
+2019-03-25 01:42:01,336 | INFO | finished experiment dsst_validation1
+2019-03-25 01:42:01,337 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1']
+2019-03-25 01:42:01,338 | INFO | starting experiment dsst_validation2
+2019-03-25 02:11:00,688 | INFO | finished experiment dsst_validation2
+2019-03-25 02:11:00,689 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2']
+2019-03-25 02:11:00,689 | INFO | starting experiment dsst_validation3
+2019-03-25 02:39:53,700 | INFO | finished experiment dsst_validation3
+2019-03-25 02:39:53,701 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3']
+2019-03-25 02:39:53,701 | INFO | starting experiment dsst_validation4
+2019-03-25 03:08:57,190 | INFO | finished experiment dsst_validation4
+2019-03-25 03:08:57,190 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4']
+2019-03-25 03:08:57,190 | INFO | starting experiment dsst_validation5
+2019-03-25 03:37:34,144 | INFO | finished experiment dsst_validation5
+2019-03-25 03:37:34,144 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5']
+2019-03-25 03:37:34,144 | INFO | starting experiment dsst_validation6
+2019-03-25 04:06:45,206 | INFO | finished experiment dsst_validation6
+2019-03-25 04:06:45,207 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6']
+2019-03-25 04:06:45,207 | INFO | starting experiment dsst_validation7
+2019-03-25 04:36:14,930 | INFO | finished experiment dsst_validation7
+2019-03-25 04:36:14,931 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7']
+2019-03-25 04:36:14,931 | INFO | starting experiment dsst_validation8
+2019-03-25 05:05:17,474 | INFO | finished experiment dsst_validation8
+2019-03-25 05:05:17,474 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8']
+2019-03-25 05:05:17,474 | INFO | starting experiment dsst_validation9
+2019-03-25 05:34:10,856 | INFO | finished experiment dsst_validation9
+2019-03-25 05:34:10,857 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9']
+2019-03-25 05:34:10,858 | INFO | starting experiment candidates_dyn_cont_tb100full
+2019-03-25 07:41:47,801 | INFO | finished experiment candidates_dyn_cont_tb100full
+2019-03-25 07:41:47,801 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full']
+2019-03-25 07:41:47,802 | INFO | starting experiment candidates_dyn_limited_tb100full
+2019-03-25 09:47:57,705 | INFO | finished experiment candidates_dyn_limited_tb100full
+2019-03-25 09:47:57,706 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full']
+2019-03-25 09:47:57,706 | INFO | starting experiment dsst_stat_cont_tb100full
+2019-03-25 09:47:59,542 | ERROR | EXPERIMENT dsst_stat_cont_tb100full FAILED!
+2019-03-25 09:47:59,543 | ERROR | Log:
+2019-03-25 09:47:59,543 | ERROR | CREATING NEW TRACKER
+Traceback (most recent call last):
+  File "hiob_cli.py", line 87, in <module>
+    main()
+  File "hiob_cli.py", line 74, in main
+    silent=args.silent)
+  File "hiob_cli.py", line 40, in track
+    tracker = Tracker(conf)
+  File "/data/5rietz/wtm-scale-estimation/core/Tracker.py", line 106, in __init__
+    self.configuration['tracking'], self.configuration['tracking_conf'])
+  File "/data/5rietz/wtm-scale-estimation/core/sample_provider/DataDirectory.py", line 88, in evaluate_sample_list
+    samples.append(self.get_sample(set_name, sample_name, tracking_conf))
+  File "/data/5rietz/wtm-scale-estimation/core/sample_provider/DataDirectory.py", line 57, in get_sample
+    sample = ds.samples_by_name[sample_name]
+KeyError: 'Deerlimited'
+
+2019-03-25 09:47:59,543 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full']
+2019-03-25 09:47:59,544 | INFO | starting experiment dsst_stat_limited_tb100full
+2019-03-25 09:48:01,083 | ERROR | EXPERIMENT dsst_stat_limited_tb100full FAILED!
+2019-03-25 09:48:01,083 | ERROR | Log:
+2019-03-25 09:48:01,083 | ERROR | Traceback (most recent call last):
+  File "hiob_cli.py", line 87, in <module>
+    main()
+  File "hiob_cli.py", line 74, in main
+    silent=args.silent)
+  File "hiob_cli.py", line 34, in track
+    silent=silent
+  File "/data/5rietz/wtm-scale-estimation/core/Configurator.py", line 38, in __init__
+    self.load_files()
+  File "/data/5rietz/wtm-scale-estimation/core/Configurator.py", line 54, in load_files
+    self.tracker = yaml.safe_load(f)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/__init__.py", line 94, in safe_load
+    return load(stream, SafeLoader)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/__init__.py", line 72, in load
+    return loader.get_single_data()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/constructor.py", line 35, in get_single_data
+    node = self.get_single_node()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 36, in get_single_node
+    document = self.compose_document()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 55, in compose_document
+    node = self.compose_node(None, None)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 84, in compose_node
+    node = self.compose_mapping_node(anchor)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 133, in compose_mapping_node
+    item_value = self.compose_node(node, item_key)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 84, in compose_node
+    node = self.compose_mapping_node(anchor)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 127, in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/parser.py", line 98, in check_event
+    self.current_event = self.state()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/parser.py", line 439, in parse_block_mapping_key
+    "expected <block end>, but found %r" % token.id, token.start_mark)
+yaml.parser.ParserError: while parsing a block mapping
+  in "config/tracker_dsst_stat_limited_tb100full.yaml", line 99, column 3
+expected <block end>, but found '<block mapping start>'
+  in "config/tracker_dsst_stat_limited_tb100full.yaml", line 132, column 5
+
+2019-03-25 09:48:01,084 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full']
+2019-03-25 09:48:01,084 | INFO | starting experiment dsst_dyn_cont_tb100full
+2019-03-25 12:16:11,470 | INFO | finished experiment dsst_dyn_cont_tb100full
+2019-03-25 12:16:11,471 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full']
+2019-03-25 12:16:11,471 | INFO | starting experiment dsst_dyn_limited_tb100full
+2019-03-25 14:23:28,472 | INFO | finished experiment dsst_dyn_limited_tb100full
+2019-03-25 14:23:28,472 | WARNING | EXECUTED EACH EXPERIMENT ONCE
+2019-03-25 17:59:33,631 | INFO | =========== NEW EXECUTION ===========
+2019-03-25 17:59:33,631 | INFO | specified GPU: 1, experiments: ['all']
+2019-03-25 17:59:58,270 | INFO | =========== NEW EXECUTION ===========
+2019-03-25 17:59:58,270 | INFO | specified GPU: 1, experiments: ['all']
+2019-03-25 17:59:58,270 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full']
+2019-03-25 17:59:58,271 | INFO | starting experiment candidates_stat_cont_tb100full
+2019-03-25 20:02:30,450 | INFO | finished experiment candidates_stat_cont_tb100full
+2019-03-25 20:02:30,450 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full']
+2019-03-25 20:02:30,451 | INFO | starting experiment candidates_stat_limited_tb100full
+2019-03-25 22:05:20,396 | INFO | finished experiment candidates_stat_limited_tb100full
+2019-03-25 22:05:20,397 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-25 22:05:20,397 | INFO | starting experiment dsst_stat_cont_tb100full
+2019-03-25 22:05:22,447 | ERROR | EXPERIMENT dsst_stat_cont_tb100full FAILED!
+2019-03-25 22:05:22,448 | ERROR | Log:
+2019-03-25 22:05:22,448 | ERROR | CREATING NEW TRACKER
+Traceback (most recent call last):
+  File "hiob_cli.py", line 87, in <module>
+    main()
+  File "hiob_cli.py", line 74, in main
+    silent=args.silent)
+  File "hiob_cli.py", line 40, in track
+    tracker = Tracker(conf)
+  File "/data/5rietz/wtm-scale-estimation/core/Tracker.py", line 106, in __init__
+    self.configuration['tracking'], self.configuration['tracking_conf'])
+  File "/data/5rietz/wtm-scale-estimation/core/sample_provider/DataDirectory.py", line 88, in evaluate_sample_list
+    samples.append(self.get_sample(set_name, sample_name, tracking_conf))
+  File "/data/5rietz/wtm-scale-estimation/core/sample_provider/DataDirectory.py", line 57, in get_sample
+    sample = ds.samples_by_name[sample_name]
+KeyError: 'Deerlimited'
+
+2019-03-25 22:05:22,448 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-25 22:05:22,449 | INFO | starting experiment dsst_stat_limited_tb100full
+2019-03-25 22:05:24,073 | ERROR | EXPERIMENT dsst_stat_limited_tb100full FAILED!
+2019-03-25 22:05:24,073 | ERROR | Log:
+2019-03-25 22:05:24,073 | ERROR | Traceback (most recent call last):
+  File "hiob_cli.py", line 87, in <module>
+    main()
+  File "hiob_cli.py", line 74, in main
+    silent=args.silent)
+  File "hiob_cli.py", line 34, in track
+    silent=silent
+  File "/data/5rietz/wtm-scale-estimation/core/Configurator.py", line 38, in __init__
+    self.load_files()
+  File "/data/5rietz/wtm-scale-estimation/core/Configurator.py", line 54, in load_files
+    self.tracker = yaml.safe_load(f)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/__init__.py", line 94, in safe_load
+    return load(stream, SafeLoader)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/__init__.py", line 72, in load
+    return loader.get_single_data()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/constructor.py", line 35, in get_single_data
+    node = self.get_single_node()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 36, in get_single_node
+    document = self.compose_document()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 55, in compose_document
+    node = self.compose_node(None, None)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 84, in compose_node
+    node = self.compose_mapping_node(anchor)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 133, in compose_mapping_node
+    item_value = self.compose_node(node, item_key)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 84, in compose_node
+    node = self.compose_mapping_node(anchor)
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/composer.py", line 127, in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/parser.py", line 98, in check_event
+    self.current_event = self.state()
+  File "/data/5rietz/hiob_env/lib/python3.6/site-packages/yaml/parser.py", line 439, in parse_block_mapping_key
+    "expected <block end>, but found %r" % token.id, token.start_mark)
+yaml.parser.ParserError: while parsing a block mapping
+  in "config/tracker_dsst_stat_limited_tb100full.yaml", line 99, column 3
+expected <block end>, but found '<block mapping start>'
+  in "config/tracker_dsst_stat_limited_tb100full.yaml", line 132, column 5
+
+2019-03-25 22:05:24,074 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-25 22:05:24,075 | WARNING | EXECUTED EACH EXPERIMENT ONCE
+2019-03-26 00:43:19,697 | INFO | =========== NEW EXECUTION ===========
+2019-03-26 00:43:19,697 | INFO | specified GPU: 1, experiments: ['all']
+2019-03-26 00:43:19,698 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full']
+2019-03-26 00:43:19,698 | INFO | starting experiment dsst_stat_cont_tb100full
+2019-03-26 03:01:36,242 | INFO | finished experiment dsst_stat_cont_tb100full
+2019-03-26 03:01:36,243 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full']
+2019-03-26 03:01:36,243 | INFO | starting experiment dsst_stat_limited_tb100full
+2019-03-26 05:07:25,286 | INFO | finished experiment dsst_stat_limited_tb100full
+2019-03-26 05:07:25,310 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full']
+2019-03-26 05:07:25,310 | WARNING | EXECUTED EACH EXPERIMENT ONCE
+2019-03-26 16:08:05,326 | INFO | =========== NEW EXECUTION ===========
+2019-03-26 16:08:05,327 | INFO | specified GPU: 1, experiments: ['no_se']
+2019-03-26 16:08:05,327 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full']
+2019-03-26 16:08:05,327 | INFO | starting experiment no_se
+2019-03-26 16:08:06,891 | ERROR | EXPERIMENT no_se FAILED!
+2019-03-26 16:08:06,891 | ERROR | Log:
+2019-03-26 16:08:06,891 | ERROR | Could not open environment configuration file: config/env_no_se.yaml - [Errno 2] No such file or directory: 'config/env_no_se.yaml'
+Could not open environment configuration file: config/env_no_se.yaml - [Errno 2] No such file or directory: 'config/env_no_se.yaml'
+
+2019-03-26 16:08:06,891 | WARNING | EXECUTED EACH EXPERIMENT ONCE
+2019-03-26 16:09:22,569 | INFO | =========== NEW EXECUTION ===========
+2019-03-26 16:09:22,569 | INFO | specified GPU: 1, experiments: ['no_se']
+2019-03-26 16:09:22,570 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full']
+2019-03-26 16:09:22,570 | INFO | starting experiment no_se
+2019-03-26 18:14:31,746 | INFO | finished experiment no_se
+2019-03-26 18:14:31,747 | WARNING | EXECUTED EACH EXPERIMENT ONCE
+2019-03-28 00:49:05,722 | INFO | =========== NEW EXECUTION ===========
+2019-03-28 00:49:05,750 | INFO | specified GPU: 1, experiments: ['all']
+2019-03-28 00:49:05,758 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se']
+2019-03-28 00:49:05,759 | INFO | starting experiment candidates_stat_cont_nico
+2019-03-28 02:49:28,071 | INFO | finished experiment candidates_stat_cont_nico
+2019-03-28 02:49:28,123 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico']
+2019-03-28 02:49:28,124 | INFO | starting experiment candidates_dyn_cont_nico
+2019-03-28 04:46:12,789 | INFO | finished experiment candidates_dyn_cont_nico
+2019-03-28 04:46:12,831 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico', 'candidates_dyn_cont_nico']
+2019-03-28 04:46:12,832 | INFO | starting experiment candidates_stat_limited_nico
+2019-03-28 06:43:13,750 | INFO | finished experiment candidates_stat_limited_nico
+2019-03-28 06:43:13,796 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico', 'candidates_dyn_cont_nico', 'candidates_stat_limited_nico']
+2019-03-28 06:43:13,796 | INFO | starting experiment candidates_dyn_limited_nico
+2019-03-28 08:38:57,771 | INFO | finished experiment candidates_dyn_limited_nico
+2019-03-28 08:38:57,815 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico', 'candidates_dyn_cont_nico', 'candidates_stat_limited_nico', 'candidates_dyn_limited_nico']
+2019-03-28 08:38:57,815 | INFO | starting experiment dsst_stat_cont_nico
+2019-03-28 10:46:12,817 | INFO | finished experiment dsst_stat_cont_nico
+2019-03-28 10:46:12,860 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico', 'candidates_dyn_cont_nico', 'candidates_stat_limited_nico', 'candidates_dyn_limited_nico', 'dsst_stat_cont_nico']
+2019-03-28 10:46:12,860 | INFO | starting experiment dsst_stat_limited_nico
+2019-03-28 12:41:17,520 | INFO | finished experiment dsst_stat_limited_nico
+2019-03-28 12:41:17,560 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico', 'candidates_dyn_cont_nico', 'candidates_stat_limited_nico', 'candidates_dyn_limited_nico', 'dsst_stat_cont_nico', 'dsst_stat_limited_nico']
+2019-03-28 12:41:17,560 | INFO | starting experiment dsst_dyn_cont_nico
+2019-03-28 15:13:31,623 | INFO | finished experiment dsst_dyn_cont_nico
+2019-03-28 15:13:31,670 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico', 'candidates_dyn_cont_nico', 'candidates_stat_limited_nico', 'candidates_dyn_limited_nico', 'dsst_stat_cont_nico', 'dsst_stat_limited_nico', 'dsst_dyn_cont_nico']
+2019-03-28 15:13:31,670 | INFO | starting experiment dsst_dyn_limited_nico
+2019-03-28 17:11:28,571 | INFO | finished experiment dsst_dyn_limited_nico
+2019-03-28 17:11:28,612 | INFO | completed experiments so far: ['dsst_validation0', 'dsst_validation1', 'dsst_validation2', 'dsst_validation3', 'dsst_validation4', 'dsst_validation5', 'dsst_validation6', 'dsst_validation7', 'dsst_validation8', 'dsst_validation9', 'candidates_dyn_cont_tb100full', 'candidates_dyn_limited_tb100full', 'dsst_dyn_cont_tb100full', 'dsst_dyn_limited_tb100full', 'candidates_stat_cont_tb100full', 'candidates_stat_limited_tb100full', 'dsst_stat_cont_tb100full', 'dsst_stat_limited_tb100full', 'no_se', 'candidates_stat_cont_nico', 'candidates_dyn_cont_nico', 'candidates_stat_limited_nico', 'candidates_dyn_limited_nico', 'dsst_stat_cont_nico', 'dsst_stat_limited_nico', 'dsst_dyn_cont_nico', 'dsst_dyn_limited_nico']
+2019-03-28 17:11:28,612 | INFO | starting experiment no_se_nico
+2019-03-28 19:05:26,859 | INFO | finished experiment no_se_nico
+2019-03-28 19:05:26,879 | WARNING | EXECUTED EACH EXPERIMENT ONCE
