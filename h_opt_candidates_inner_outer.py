@@ -90,7 +90,7 @@ def main():
                 ["outer_punish_threshold", float(np.around(j, decimals=1))]
             ]
 
-            set_keyval(key_val_list=change_list, load_from="config/tracker_candidates_nachtrag.yaml", save_to=args.tracker)
+            set_keyval(key_val_list=change_list, load_from="config/tracker_candidates_nachtrag.yaml", save_to="config/" + args.tracker)
 
             exp_key = "inner" + str(np.around(i, decimals=1)) + "_outer" + str(np.around(j, decimals=1))
 
