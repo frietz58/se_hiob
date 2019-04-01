@@ -20,6 +20,7 @@ class CandidateApproach:
         self.change_aspect_ration = None
         self.adjust_max_scale_diff = None
         self.adjust_max_scale_diff_after = None
+        self.update_strategy = None
 
         # run time
         self.frame = None
@@ -52,6 +53,7 @@ class CandidateApproach:
         self.change_aspect_ration = configuration['c_change_aspect_ratio']
         self.adjust_max_scale_diff = configuration['adjust_max_scale_diff']
         self.adjust_max_scale_diff_after = configuration['adjust_max_scale_diff_after']
+        self.update_strategy = configuration['update_strategy']
 
         self.calc_manual_scale_window(step_size=self.scale_window_step_size)
         self.hanning_scale_window = np.hanning(self.number_scales)
@@ -382,6 +384,9 @@ class CandidateApproach:
         :param axis: only for logger message: height width of both
         :return: if factors out of threshold, threshold factor, otherwise normal factor
         """
+
+        if self.update_strategy == "limited":
+            return new
 
         # see if the factor has been limited x times in a row, indicating a currently strong change
         if self.adjust_max_scale_diff:
