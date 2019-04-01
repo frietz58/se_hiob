@@ -17,6 +17,7 @@ args = parser.parse_args()
 def is_hiob_exe(file):
     return os.path.isdir(file) and "hiob-execution" in file
 
+
 def create_inner_outer_csv():
     files_in_dir = os.listdir(args.pathresults)
 
@@ -25,7 +26,7 @@ def create_inner_outer_csv():
         if is_hiob_exe(os.path.join(args.pathresults, file)):
             hiob_executions.append(os.path.join(args.pathresults, file))
 
-    df = pd.DataFrame(columns=["Inner punish threshold", "Outer punish threshold", "Total success", "Total precision"])
+    df = pd.DataFrame(columns=["Inner punish threshold", "Outer punish threshold", "Total success", "Total precision", "Average size score"])
     for hiob_execution in hiob_executions:
 
         # get inner outer
@@ -54,10 +55,30 @@ def create_inner_outer_csv():
                 elif key_val[0] == "total_success_rating":
                     total_succ = float(key_val[1])
 
+        # get size values for each sequence
+        files_in_execution = os.listdir(hiob_execution)
+        sequences_in_execution = []
+        for file in files_in_execution:
+            if "tracking" and os.path.isdir(os.path.join(hiob_execution, file)):
+                sequences_in_execution.append(os.path.join(hiob_execution, file))
+
+        curr_execution_size_scores = []
+        for sequence in sequences_in_execution:
+            with open(os.path.join(sequence, "evaluation.txt"), "r") as seq_eval_txt:
+                lines = seq_eval_txt.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    key_val = line.split("=")
+                    if key_val[0] == "area_between_size_curves":
+                        curr_execution_size_scores.append(float(key_val[1]))
+
+        average_size_score = np.around(sum(curr_execution_size_scores) / len(curr_execution_size_scores), decimals=3)
+
         row = {"Inner punish threshold": inner,
                "Outer punish threshold": outer,
                "Total success": total_succ,
-               "Total precision": total_prec}
+               "Total precision": total_prec,
+               "Average size score": average_size_score}
 
         df = df.append(row, ignore_index=True)
 
@@ -67,7 +88,7 @@ def create_inner_outer_csv():
     return csv_path
 
 
-def create_3d_scatter(csv_path):
+def create_3d_scatter(csv_path, z_axis, filename, z_lim_max):
     fig = plt.figure()
     ax = Axes3D(fig)
 
@@ -75,18 +96,25 @@ def create_3d_scatter(csv_path):
 
     sequence_containing_x_vals = list(df["Inner punish threshold"])
     sequence_containing_y_vals = list(df["Outer punish threshold"])
-    sequence_containing_z_vals = list(df["Total success"])
+    sequence_containing_z_vals = list(df[str(z_axis)])
+
+    color = np.abs(sequence_containing_z_vals)
 
     ax.set_xlim3d(0.1, 1.0)
     ax.set_ylim3d(0.1, 1.0)
-    ax.set_zlim3d(0.1, 1.0)
+
+    if z_lim_max == "dynamic":
+        z_lim_max = max(sequence_containing_z_vals) + 5
+
+    ax.set_zlim3d(0.1, z_lim_max)
 
     ax.set_xlabel('Inner punish threshold')
     ax.set_ylabel('Outer punish threshold')
-    ax.set_zlabel('Total success')
+    ax.set_zlabel(z_axis)
 
-    ax.scatter(sequence_containing_x_vals, sequence_containing_y_vals, sequence_containing_z_vals)
-    plt.savefig(os.path.join(os.path.dirname(csv_path), "3d_inner_outer_scater"))
+    cmhot = plt.get_cmap("hot")
+    ax.scatter(sequence_containing_x_vals, sequence_containing_y_vals, sequence_containing_z_vals, c=color, cmap=cmhot)
+    plt.savefig(os.path.join(os.path.dirname(csv_path), filename))
     plt.show()
 
 
@@ -126,7 +154,16 @@ def create_3d_surf(csv_path):
 
 def main():
     inner_outer_csv = create_inner_outer_csv()
-    create_3d_scatter(csv_path=inner_outer_csv)
+    create_3d_scatter(csv_path=inner_outer_csv,
+                      z_axis="Total success",
+                      filename="inner_outer_success",
+                      z_lim_max=1.0)
+
+    create_3d_scatter(csv_path=inner_outer_csv,
+                      z_axis="Average size score",
+                      filename="inner_outer_size",
+                      z_lim_max="dynamic")
+
     # create_3d_surf(csv_path=inner_outer_csv)
 
 

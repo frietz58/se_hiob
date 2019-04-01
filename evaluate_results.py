@@ -286,9 +286,7 @@ def get_all_rects(result_dir):
                 pred_gt_rects["preds"].append(preds)
                 pred_gt_rects["gts"].append(gts)
 
-
-
-    elif current_folder_type == "matlab_sequnce_file":
+    elif current_folder_type == "matlab_sequence_file":
         preds, gts = get_rects_from_workplace(result_dir)
         pred_gt_rects["preds"].append(preds)
         pred_gt_rects["gts"].append(gts)
@@ -708,7 +706,13 @@ def create_avg_score_csv(results_folder, eval_folder):
     score_dict = get_metrics_from_rects(results_folder)
     scores = score_dict.keys()
 
-    eval_path = os.path.join(results_folder, "evaluation")
+    folder_type = determine_folder_type(results_folder)
+    if folder_type == "matlab_sequence_file":
+        sequence_name = os.path.basename(results_folder).split("_")[0]
+        eval_path = os.path.join(os.path.dirname(results_folder), sequence_name + "_evaluation")
+    else:
+        eval_path = os.path.join(results_folder, "evaluation")
+
     if not os.path.isdir(eval_path):
         os.mkdir(eval_path)
 
@@ -727,8 +731,14 @@ def create_avg_score_csv(results_folder, eval_folder):
 # create a csv for the scores on each sequence
 def create_sequence_score_csv(result_folder, eval_folder):
     sequences = get_sequences(result_folder)
+    folder_type = determine_folder_type(result_folder)
 
-    eval_path = os.path.join(result_folder, "evaluation")
+    if folder_type == "matlab_sequence_file":
+        sequence_name = os.path.basename(result_folder).split("_")[0]
+        eval_path = os.path.join(os.path.dirname(result_folder), sequence_name + "_evaluation")
+    else:
+        eval_path = os.path.join(result_folder, "evaluation")
+
     if not os.path.isdir(eval_path):
         os.mkdir(eval_path)
 
@@ -743,12 +753,33 @@ def create_sequence_score_csv(result_folder, eval_folder):
         writer = csv.DictWriter(outcsv, fieldnames=csv_fields)
         writer.writeheader()
 
-        for sequence in sequences:
-            if type(results_path) == list and type(sequence) == str:
-                score_dict = get_metrics_from_rects(os.path.join(results_path[0], sequence))
-            elif type(results_path) == str and type(sequence) == list:
-                score_dict = get_metrics_from_rects(os.path.join(results_path, sequence[0]))
-            sequence_name = sequence.split("-")[-1]
+        if type(sequences) == list:
+            for sequence in sequences:
+                if type(results_path) == list and len(results_path) == 1:
+                    str_results_path = results_path[0]
+                elif type(results_path) == str:
+                    str_results_path = results_path
+
+                if type(sequence) == list:
+                    str_sequence = sequence[0]
+                elif type(sequence) == str:
+                    str_sequence = sequence
+
+                score_dict = get_metrics_from_rects(os.path.join(str_results_path, str_sequence))
+
+                sequence_name = str_sequence.split("-")[-1]
+                writer.writerow({
+                    "Sample": sequence_name,
+                    "Frames": score_dict["Frames"],
+                    "Precision": np.around(score_dict["Total Precision"], decimals=3),
+                    "Success": np.around(score_dict["Total Success"], decimals=3),
+                    "Size Score": score_dict["Size Score"]
+                })
+
+        elif type(sequences) == str and folder_type == "matlab_sequence_file":
+
+            score_dict = get_metrics_from_rects(results_path[0])
+
             writer.writerow({
                 "Sample": sequence_name,
                 "Frames": score_dict["Frames"],
@@ -757,14 +788,20 @@ def create_sequence_score_csv(result_folder, eval_folder):
                 "Size Score": score_dict["Size Score"]
             })
 
-    create_attribute_tex_table_include(result_folder, out_csv, "sequences_tab_tex_include.tex")
+    create_attribute_tex_table_include(eval_path, out_csv, "sequences_tab_tex_include.tex")
 
 
 # create a csv for the attribute collections from one tracking
 def create_attribute_score_csv(result_folder, eval_folder):
     sequences = get_sequences(result_folder)
+    folder_type = determine_folder_type(result_folder)
 
-    eval_path = os.path.join(result_folder, "evaluation")
+    if folder_type == "matlab_sequence_file":
+        sequence_name = os.path.basename(result_folder).split("_")[0]
+        eval_path = os.path.join(os.path.dirname(result_folder), sequence_name + "_evaluation")
+    else:
+        eval_path = os.path.join(result_folder, "evaluation")
+
     if not os.path.isdir(eval_path):
         os.mkdir(eval_path)
 
@@ -1067,6 +1104,66 @@ def create_opt_csv(experiment_folder, eval_folder):
     return None
 
 
+def sequence_boxplots(tracking_folder):
+    sequences_scores = {}
+    # get the sequence metrics
+    hiob_executions = get_tracking_folders(tracking_folder)
+    for hiob_execution in hiob_executions:
+        sequences = get_sequences(hiob_execution)
+        for sequence in sequences:
+            sequence_name = sequence.split("-")[-1]
+            if sequence_name == "Basketball":
+                continue
+            if sequence_name not in sequences_scores.keys():
+                sequences_scores[str(sequence_name)] = {
+                    "total_precs": [],
+                    "total_succs": [],
+                    "size_scores": []
+                }
+
+            with open(os.path.join(hiob_execution, sequence, "evaluation.txt"), "r") as eval_txt:
+                lines = eval_txt.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    key_val = line.split("=")
+                    if key_val[0] == "success_rating":
+                        sequences_scores[str(sequence_name)]["total_succs"].append(float(key_val[1]))
+                    elif key_val[0] == "precision_rating":
+                        sequences_scores[str(sequence_name)]["total_precs"].append(float(key_val[1]))
+                    elif key_val[0] == "area_between_size_curves":
+                        sequences_scores[str(sequence_name)]["size_scores"].append(float(key_val[1]))
+
+    # size score boxplots:
+    fig, ax = plt.subplots()
+    # y_ticks = np.arange(len(list(sequences_scores.keys()))), (list(sequences_scores.keys()))
+    y_ticks = np.arange(len(list(sequences_scores.keys())))
+    data = []
+    for ind, sequence in enumerate(list(sequences_scores.keys())):
+        data.append(sequences_scores[str(sequence)]["size_scores"])
+        print("{0} median ss: {1}". format(sequence, np.percentile(data, 50)))
+
+    ax.boxplot(data, 0, 'r+', 0, positions=y_ticks, labels=list(sequences_scores.keys()))
+
+    ax.set_title('Size score boxplots')
+    plt.yticks(y_ticks)
+    # plt.xlim(0, 150)
+    plt.savefig(os.path.join(tracking_folder, "sequences_size_boxplots.png"))
+
+    # precision boxplots:
+    fig, ax = plt.subplots()
+    # y_ticks = np.arange(len(list(sequences_scores.keys()))), (list(sequences_scores.keys()))
+    y_ticks = np.arange(len(list(sequences_scores.keys())))
+    data = []
+    for ind, sequence in enumerate(list(sequences_scores.keys())):
+        data.append(sequences_scores[str(sequence)]["total_precs"])
+
+    ax.boxplot(data, 0, 'r+', 0, positions=y_ticks, labels=list(sequences_scores.keys()))
+
+    ax.set_title('Precision rating boxplots')
+    plt.yticks(y_ticks)
+    plt.savefig(os.path.join(tracking_folder, "precision_boxplots.png"))
+
+
 # create figure with precision and success of different trackings
 def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, font, tex_name, legend_by):
 
@@ -1210,10 +1307,15 @@ def create_multiple_graphs_tex_include(save_folder, path_in_src, tex_name, subfi
 # create the graphs from rects
 def create_graphs_from_rects(result_folder, eval_folder):
     all_preds, all_gts = get_all_rects(result_folder)
-
     center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
+    folder_type = determine_folder_type(result_folder)
 
-    eval_path = os.path.join(result_folder, "evaluation")
+    if folder_type == "matlab_sequence_file":
+        sequence_name = os.path.basename(result_folder).split("_")[0]
+        eval_path = os.path.join(os.path.dirname(result_folder), sequence_name + "_evaluation")
+    else:
+        eval_path = os.path.join(result_folder, "evaluation")
+
     eval_path = os.path.join(eval_path, eval_folder)
 
     if not os.path.isdir(eval_path):
@@ -1228,13 +1330,16 @@ def create_graphs_from_rects(result_folder, eval_folder):
     x = np.arange(0., 50.1, .1)
     y = [dfun(a) for a in x]
     at20 = dfun(20)
-    tx = "prec(20) = %0.4f" % at20
-    plt.text(5.05, 0.05, tx)
+    tx = "Precision(20) = %0.4f" % at20
+    # plt.text(5.05, 0.05, tx)
     plt.xlabel("center distance [pixels]")
     plt.ylabel("occurrence")
     plt.xlim(xmin=0, xmax=50)
     plt.ylim(ymin=0.0, ymax=1.0)
-    plt.plot(x, y)
+    plt.plot(x, y, color="#ffb000", label=tx)
+    plt.axvline(20, color='k', linestyle=':')
+    plt.legend(loc="lower right")
+    plt.subplots_adjust(bottom=0.15)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
@@ -1249,12 +1354,14 @@ def create_graphs_from_rects(result_folder, eval_folder):
     y = [ofun(a) for a in x]
     auc = np.trapz(y, x)
     tx = "AUC = %0.4f" % auc
-    plt.text(0.05, 0.05, tx)
+    # plt.text(0.05, 0.05, tx)
     plt.xlabel("overlap score")
     plt.ylabel("occurrence")
     plt.xlim(xmin=0.0, xmax=1.0)
     plt.ylim(ymin=0.0, ymax=1.0)
-    plt.plot(x, y)
+    plt.plot(x, y, color='#648fff', label=tx)
+    plt.legend(loc="lower left")
+    plt.subplots_adjust(bottom=0.15)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
@@ -1266,14 +1373,16 @@ def create_graphs_from_rects(result_folder, eval_folder):
     figure_file2 = os.path.join(eval_path, 'size_over_time.svg')
     figure_file3 = os.path.join(eval_path, 'size_over_time.pdf')
     f = plt.figure()
-    plt.xlabel("frame")
-    plt.ylabel("size")
-    plt.text(x=10, y=10, s="abc={0}".format(abc))
-    plt.plot(dim, normalized_size_score, 'r-', label='predicted size')
-    plt.plot(dim, normalized_gt_size_scores, 'g-', label='groundtruth size', alpha=0.7)
-    plt.fill_between(dim, normalized_size_score, normalized_gt_size_scores, color="y")
-    plt.axhline(y=normalized_size_score[0], color='c', linestyle=':', label='initial size')
-    plt.legend(loc='best')
+    plt.xlabel("Frame")
+    plt.ylabel("Size")
+    # plt.text(x=10, y=10, s="abc={0}".format(abc))
+    size_label = "Size score = {0}".format(abc)
+    plt.fill_between(dim, normalized_size_score, normalized_gt_size_scores, color="#ffb000", alpha=0.7, label=size_label)
+    plt.plot(dim, normalized_gt_size_scores, color='#785ef0', label='Groundtruth size', alpha=1)
+    plt.plot(dim, normalized_size_score, color='#fe6100', label='Predicted size', alpha=1)
+    plt.axhline(y=normalized_size_score[0], color='k', linestyle=':', label='Initial size')
+    plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
+    plt.subplots_adjust(bottom=0.3)
     plt.xlim(1, len(normalized_size_score))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
@@ -1711,7 +1820,7 @@ def determine_folder_type(folder):
             found_positions_txt or found_tracking_folder or found_tracker_config or found_hiob_execution):
         return "matlab_tracking_folder"
     elif not_a_folder and "results.mat" in folder:
-        return "matlab_sequnce_file"
+        return "matlab_sequence_file"
     elif found_hiob_execution and not (
             found_positions_txt or found_tracker_config or found_tracking_folder or found_mat_files):
         return "multiple_hiob_executions"
@@ -2022,6 +2131,12 @@ def main(results_path):
             create_sequence_score_csv(results_path, "sequence_results")
             create_attribute_score_csv(results_path, "attribute_results")
 
+        elif folder_type == "matlab_sequence_file":
+            print("detected matlab_sequence file")
+            create_graphs_metrics_for_set(results_path, "avg_full_set")
+            create_sequence_score_csv(results_path, "sequence_results")
+            create_attribute_score_csv(results_path, "attribute_results")
+
 
         # experiment folder containing multiple hiob executions, h_opt for example
         elif folder_type == "multiple_hiob_executions":
@@ -2034,6 +2149,8 @@ def main(results_path):
                 print("creating graphs for parameter results")
                 create_graphs_from_opt_csv(results_path)
             elif mode == "exp":
+                print("creating sequence boxplots")
+                sequence_boxplots(tracking_folder=results_path)
                 print("detected multiple hiob executions, mode = exp")
                 get_avg_results_from_experiment(results_path)
                 print("creating graphs for average experiment metrics")
@@ -2067,6 +2184,9 @@ def main(results_path):
                                           font={'font.size': 10},
                                           tex_name="tb100full_all_approaches_fig_include.tex",
                                           legend_by="algorithm")
+
+
+
             elif all("nico" in tracking for tracking in results_path):
                 print("only nico trackings")
                 multiple_trackings_graphs(tracking_folders=results_path,
