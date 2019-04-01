@@ -163,7 +163,7 @@ def main():
     create_3d_scatter(csv_path=inner_outer_csv,
                       z_axis="Average size score",
                       filename="inner_outer_size",
-                      z_lim_max=500)
+                      z_lim_max=100)
 
     # create_3d_surf(csv_path=inner_outer_csv)
 
