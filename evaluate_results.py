@@ -29,7 +29,7 @@ parser.add_argument("-m", "--mode", help="To differentiate between an opt folder
 
 parser.add_argument("-p_mfig", "--path_multi_figure", help="Path where the figure with multiple graphs shall be saved")
 
-parser.add_argument("-t", "--task", help="Which task the shall be executed? framerate_vs_approach")
+parser.add_argument("-t", "--task", help="Which task the shall be executed? framerate_vs_approach gen_final_comp_tab")
 
 args = parser.parse_args()
 
@@ -1624,6 +1624,102 @@ def create_framerate_vs_approach_fig(trackings, eval_folder):
     plot_dsst_framerate_fig(dsst_dicts, eval_folder)
 
 
+
+def create_final_tab_comp(tracking_folders):
+    df = pd.DataFrame(
+        columns=["Approach", "Precision", "Success", "Average size score"])
+
+    for tracking in tracking_folders:
+        folder_type = determine_folder_type(tracking)
+        if folder_type == "multiple_hiob_executions":
+            hiob_exeutions = get_tracking_folders(tracking)
+            for hiob_execution in hiob_exeutions:
+                approach = get_approach_from_yaml(hiob_execution)
+
+                # get prec succ
+                with open(os.path.join(hiob_execution, "evaluation.txt"), "r") as eval_txt:
+                    lines = eval_txt.readlines()
+                    for line in lines:
+                        line = line.replace("\n", "")
+                        key_val = line.split("=")
+                        if key_val[0] == "total_precision_rating":
+                            total_prec = float(key_val[1])
+                        elif key_val[0] == "total_success_rating":
+                            total_succ = float(key_val[1])
+
+                # get size values for each sequence
+                files_in_execution = os.listdir(hiob_execution)
+                sequences_in_execution = []
+                for file in files_in_execution:
+                    if "tracking" and os.path.isdir(os.path.join(hiob_execution, file)):
+                        sequences_in_execution.append(os.path.join(hiob_execution, file))
+
+                curr_execution_size_scores = []
+                for sequence in sequences_in_execution:
+                    with open(os.path.join(sequence, "evaluation.txt"), "r") as seq_eval_txt:
+                        lines = seq_eval_txt.readlines()
+                        for line in lines:
+                            line = line.replace("\n", "")
+                            key_val = line.split("=")
+                            if key_val[0] == "area_between_size_curves":
+                                curr_execution_size_scores.append(float(key_val[1]))
+
+                average_size_score = np.around(sum(curr_execution_size_scores) / len(curr_execution_size_scores),
+                                               decimals=3)
+
+                row = {"Approach": approach,
+                       "Precision": total_prec,
+                       "Success": total_succ,
+                       "Average size score": average_size_score}
+
+                df = df.append(row, ignore_index=True)
+
+    if not os.path.isdir(path_multi_figure):
+        os.mkdir(path_multi_figure)
+
+    df.to_csv(os.path.join(path_multi_figure, "final_comp_table.csv"))
+    print("saved comparison tabel to " + str(os.path.join(path_multi_figure, "final_comp_table.csv")))
+
+    # write tex include file
+    lines = [
+        # "\\begin{table}[]\label{tab:asdasd}\n",
+        "\\centering",
+        "\\resizebox{\\textwidth}{!}{\n",
+        "\\begin{tabular}{@{}cccccc@{}}\n",
+        "\\toprule\n",
+    ]
+
+    header_line = "\\textbf{Approach} & \\textbf{Precision} & \\textbf{Success} & \\textbf{Average size score} \\\\ \\midrule \n"
+    lines.append(header_line)
+
+    for i in range(df.shape[0]):
+        line = ""
+        for key in df.keys():
+            curval = df.loc[i, key]
+            if type(curval) == float:
+                curval = np.around(curval, decimals=3)
+            line += str(curval) + " & "
+
+        # remove & at end of lline
+        line = line[0:-2]
+        line += "\\\\ \n"
+        lines.append(line)
+        print(line)
+
+    lines[-1] = lines[-1][0:-2] + " \\bottomrule\n"
+    lines.append("\\end{tabular}\n")
+    lines.append("}\n")
+    lines.append("\\caption{final comp table}\n")
+    # lines.append("\\end{table}")
+
+    if not os.path.isdir(path_multi_figure):
+        os.mkdir(path_multi_figure)
+
+    with open(os.path.join(path_multi_figure, "final_comp_table.tex"), "w") as tex_file:
+        tex_file.writelines(lines)
+    print("saved final comp table to " + str(os.path.join(path_multi_figure, "final_comp_table.tex")))
+
+
 # ================================= HELPER FUNCTIONS =================================
 
 def plot_dsst_framerate_fig(dsst_dicts, eval_folder):
@@ -2180,6 +2276,9 @@ def main(results_path):
         if args.task == "framerate_vs_approach":
             create_framerate_vs_approach_fig(trackings=results_path, eval_folder=path_multi_figure)
             create_framerate_tex_include(eval_folder=path_multi_figure)
+
+        elif args.task == "gen_final_comp_tab":
+            create_final_tab_comp(tracking_folders=results_path)
 
         elif 'matlab_tracking_folder' in folder_types:
             print("matlab tracking dir")
