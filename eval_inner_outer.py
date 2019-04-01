@@ -105,6 +105,7 @@ def create_3d_scatter(csv_path, z_axis, filename, z_lim_max):
 
     if z_lim_max == "dynamic":
         z_lim_max = max(sequence_containing_z_vals) + 5
+        print(max(sequence_containing_z_vals))
 
     ax.set_zlim3d(0.1, z_lim_max)
 
@@ -112,7 +113,7 @@ def create_3d_scatter(csv_path, z_axis, filename, z_lim_max):
     ax.set_ylabel('Outer punish threshold')
     ax.set_zlabel(z_axis)
 
-    cmhot = plt.get_cmap("hot")
+    cmhot = plt.get_cmap("viridis")
     ax.scatter(sequence_containing_x_vals, sequence_containing_y_vals, sequence_containing_z_vals, c=color, cmap=cmhot)
     plt.savefig(os.path.join(os.path.dirname(csv_path), filename))
     plt.show()
