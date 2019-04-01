@@ -2,10 +2,10 @@ import argparse
 from subprocess import Popen, PIPE
 import logging
 
-logger = logging.getLogger('dsst_paper_exp')
+logger = logging.getLogger('candidates_io_exp')
 logger.setLevel(logging.DEBUG)
 
-fh = logging.FileHandler('dsst_paper_exp.log')
+fh = logging.FileHandler('candidates_io_exp.log')
 fh.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler()
@@ -65,31 +65,31 @@ def main():
         # "dsst_validation8",
         # "dsst_validation9",
         #
-        # "candidates_stat_cont_tb100full",
-        # "candidates_dyn_cont_tb100full",
-        #
-        # "candidates_stat_limited_tb100full",
-        # "candidates_dyn_limited_tb100full",
-        #
-        "dsst_stat_cont_tb100full",
-        "dsst_stat_limited_tb100full",
+        "candidates_stat_cont_tb100full",
+        "candidates_dyn_cont_tb100full",
 
-        "dsst_dyn_cont_tb100full",
-        "dsst_dyn_limited_tb100full",
+        "candidates_stat_limited_tb100full",
+        "candidates_dyn_limited_tb100full",
+        #
+        # "dsst_stat_cont_tb100full",
+        # "dsst_stat_limited_tb100full",
+        #
+        # "dsst_dyn_cont_tb100full",
+        # "dsst_dyn_limited_tb100full",
         #
         # "no_se_tb100full",
 
-        # "candidates_stat_cont_nico",
-        # "candidates_dyn_cont_nico",
-        #
-        # "candidates_stat_limited_nico",
-        # "candidates_dyn_limited_nico",
-        #
-        "dsst_stat_cont_nico",
-        "dsst_stat_limited_nico",
+        "candidates_stat_cont_nico",
+        "candidates_dyn_cont_nico",
 
-        "dsst_dyn_cont_nico",
-        "dsst_dyn_limited_nico",
+        "candidates_stat_limited_nico",
+        "candidates_dyn_limited_nico",
+        #
+        # "dsst_stat_cont_nico",
+        # "dsst_stat_limited_nico",
+        #
+        # "dsst_dyn_cont_nico",
+        # "dsst_dyn_limited_nico",
         #
         # "no_se_nico",
     ]
