@@ -522,11 +522,7 @@ def get_avg_results_from_experiment(experiment_folder):
         # final_avg_updates = np.around(np.sum(final_updates) / samples, decimals=3)
 
 
-        datasets = [get_dataset_from_name(tracking) for tracking in experiment_folder]
-        if all("TB100" in ds for ds in datasets):
-            dataset = "TB100"
-        elif all("NICO" in ds for ds in datasets):
-            dataset = "NICO"
+        dataset = get_dataset_from_name(experiment_folder)
 
         summarizing_row = {
             "Attribute": dataset,
@@ -560,7 +556,7 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
     print("saving table include tex to: " + str(tex_path))
     df = pd.read_csv(csv_file)
     cols = list(df)
-    sorted = df.sort_values(cols[0])
+    # sorted = df.sort_values(cols[0])
     lines = [
         #"\\begin{table}[]\label{tab:asdasd}\n",
         "\\centering",
@@ -570,7 +566,7 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
     ]
 
     header_line = ""
-    for key in sorted.keys():
+    for key in df.keys():
         header_line += "\\textbf{" + str(key) + "} & "
     # remove & at end of lline
     header_line = header_line[0:-2]
@@ -578,9 +574,9 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
 
     lines.append(header_line)
 
-    for index, row in sorted.iterrows():
+    for index, row in df.iterrows():
         line = ""
-        for key in sorted.keys():
+        for key in df.keys():
             if type(row[key]) == float:
                 line += str(np.around(row[key], decimals=3)) + " & "
             else:
@@ -1926,10 +1922,30 @@ def get_approach_from_yaml(tracking_dir):
 
 # get the tracking dataset based on the tracking name
 def get_dataset_from_name(tracking_name):
-    if "tb100" in tracking_name:
-        return "TB100"
+
+    folder_type = determine_folder_type(tracking_name)
+
+    if folder_type == "multiple_hiob_executions":
+        hiob_executions = get_tracking_folders(tracking_name)
+        datasets = []
+        for hiob_execution in hiob_executions:
+            sequences = get_sequences(os.path.join(tracking_name, hiob_execution))
+            for sequence in sequences:
+                if "tb100" in sequence:
+                    datasets.append("tb100")
+                elif "nicovision" in sequence:
+                    datasets.append("nicovision")
+                else:
+                    raise ValueError("No datase for sequence")
     else:
+        print("here")
+
+    if all("tb100" in tracking for tracking in datasets):
+        return "TB100"
+    elif all("nicovision" in tracking for tracking in datasets):
         return "NICO"
+    else:
+        raise ValueError("could not determine dataset")
 
 
 # get attribute collections for a tracking
@@ -2136,7 +2152,6 @@ def main(results_path):
             create_graphs_metrics_for_set(results_path, "avg_full_set")
             create_sequence_score_csv(results_path, "sequence_results")
             create_attribute_score_csv(results_path, "attribute_results")
-
 
         # experiment folder containing multiple hiob executions, h_opt for example
         elif folder_type == "multiple_hiob_executions":
