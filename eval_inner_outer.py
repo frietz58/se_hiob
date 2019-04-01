@@ -115,6 +115,15 @@ def create_3d_scatter(csv_path, z_axis, filename, z_lim_max):
 
     cmhot = plt.get_cmap("viridis")
     ax.scatter(sequence_containing_x_vals, sequence_containing_y_vals, sequence_containing_z_vals, c=color, cmap=cmhot, vmax=z_lim_max)
+
+    ax.view_init(30, 160)
+
+    # for angle in range(0, 360):
+    #     ax.view_init(30, angle)
+    #     plt.draw()
+    #     plt.pause(.001)
+    #     print(ax.azim)
+
     plt.savefig(os.path.join(os.path.dirname(csv_path), filename))
     plt.show()
 

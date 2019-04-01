@@ -622,7 +622,7 @@ def create_framerate_tex_include(eval_folder, dict=None):
         "\\toprule\n",
     ]
 
-    header_line = "\\textbf{Approach} & \\textbf{FPS on TB100} & \\textbf{FPS on NICO} & \\textbf{SE FPS on TB100} & \\textbf{SE FPS on NICO} \\\\ \midrule \n"
+    header_line = "\\textbf{Approach} & \\textbf{Overall FPS TB100} & \\textbf{Overall FPS NICO} & \\textbf{SE FPS TB100} & \\textbf{SE FPS NICO} \\\\ \midrule \n"
     lines.append(header_line)
 
     for key in hard_values.keys():
@@ -2149,8 +2149,8 @@ def main(results_path):
                 print("creating graphs for parameter results")
                 create_graphs_from_opt_csv(results_path)
             elif mode == "exp":
-                print("creating sequence boxplots")
-                sequence_boxplots(tracking_folder=results_path)
+                # print("creating sequence boxplots")
+                # sequence_boxplots(tracking_folder=results_path)
                 print("detected multiple hiob executions, mode = exp")
                 get_avg_results_from_experiment(results_path)
                 print("creating graphs for average experiment metrics")
