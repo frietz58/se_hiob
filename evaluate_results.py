@@ -2206,6 +2206,7 @@ def only_item_in_list(item, list_of_items):
     for item_of_list in list_of_items:
         if item_of_list != item:
             return False
+
     return True
 
 
@@ -2220,6 +2221,7 @@ def ignore_leading_value(label):
 
 
 def main(results_path):
+    print("git test")
     if len(results_path) == 1:
         results_path = results_path[0]
         folder_type = determine_folder_type(results_path)
