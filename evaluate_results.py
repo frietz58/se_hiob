@@ -2298,7 +2298,7 @@ def main(results_path):
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on TB100",
-                                          font={'font.size': 10},
+                                          font={'font.size': 15},
                                           tex_name="tb100full_all_approaches_fig_include.tex",
                                           legend_by="algorithm")
 
@@ -2307,7 +2307,7 @@ def main(results_path):
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on NICO",
-                                          font={'font.size': 10},
+                                          font={'font.size': 15},
                                           tex_name="nico_all_approaches_fig_include.tex",
                                           legend_by="algorithm")
 
