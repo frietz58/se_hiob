@@ -1189,6 +1189,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         algorithm = get_approach_from_yaml(tracking_folder)
         dataset = get_dataset_from_name(tracking_folder)
         line_sytle = get_linestyle_for_algorithm(algorithm)
+        color = get_color_for_algorithm()
 
         dfun = build_dist_fun(center_distances)
         y = [dfun(a) for a in x]
@@ -1209,7 +1210,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
             if len(value) < 5:
                 value + "0"
             label = value + " on " + dataset
-        line = plt.plot(x, y, label=label, linestyle=line_sytle)
+        line = plt.plot(x, y, label=label, linestyle=line_sytle, color=color)
         lines.append(line)
         labels.append(label)
 
@@ -1342,26 +1343,26 @@ def get_color_for_algorithm(algorithm):
         return "#fe6100"  # orange
 
     elif "Candidates stat. HGC" in algorithm:
-
-        return "#ffb000"  # gold
-    elif "Candidates dyn. Full" in algorithm:
-
-        return "#dc267f"  # magenta
-    elif "Candidates dyn. HGC" in algorithm:
-
-        return "#785ef0"  # indigo
-    elif "DSST stat. Full" in algorithm:
-
         return "#321c4c"  # violet
+
+    elif "Candidates dyn. Full" in algorithm:
+        return "#dc267f"  # magenta
+
+    elif "Candidates dyn. HGC" in algorithm:
+        return "#34bc6e"  # green
+
+    elif "DSST stat. Full" in algorithm:
+        return "#ffb000"  # gold
+
     elif "DSST stat. HGC" in algorithm:
-
         return "#95d13c"  # lime
+
     elif "DSST dyn. Full" in algorithm:
-
         return "#777677"  # gray
-    elif "DSST dyn. HGC" in algorithm:
 
+    elif "DSST dyn. HGC" in algorithm:
         return "#e62325"  # red
+
     elif "No SE" in algorithm:
         return "#009bef"  # cerulean
 
