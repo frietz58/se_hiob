@@ -224,7 +224,7 @@ def create_multicolumn_csv_for_tab():
 
     # csv setup
     df = pd.DataFrame(columns=[
-        "Attribute",
+        "Algorithm",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]]["algorithm"]) + " Precision",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]]["algorithm"]) + " Success",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]]["algorithm"]) + " Size",
@@ -308,14 +308,97 @@ def create_multicolumn_csv_for_tab():
 
         df = df.append(row_dict, ignore_index=True)
 
+    if not os.path.isdir(args.savepath):
+        os.mkdir(args.savepath)
     csv_path = os.path.join(args.savepath, "nico_komplex_tab.csv")
     df.to_csv(csv_path, index=False)
 
     return csv_path
 
 
+# create a tex file with the value from the tab csv
+def create_tex_for_tab(csv_file, tex_name):
+    df = pd.read_csv(csv_file)
+
+    # normal tab header
+    lines = [
+         "\\begin{table}\n",
+        "\\centering\n",
+        "\\resizebox{\\textwidth}{!}{\n",
+        "\\begin{tabular}{c c c c|c c c|c c c}\n",
+        "\\toprule\n",
+    ]
+
+    # first row with the three algorithms
+    algorithm_row_str = "\\multicolumn"
+    algos_in_header = []
+    for entry in list(df.columns):
+        if entry == "Algorithm":
+            algorithm_row_str += "{1}{c}{Algorithm} & "
+        elif "No" in entry or "Candidates" in entry or "DSST" in entry:
+            words = entry.split(" ")
+            algorithm = " ".join(words[0:-1])
+            if algorithm not in algos_in_header:
+                algorithm_row_str += "\\multicolumn{3}{c}{" + algorithm + "} & "
+                algos_in_header.append(algorithm)
+
+    # remove last & at end of row and append//
+    algorithm_row_str = algorithm_row_str[0:-2] + "\\\\\n"
+    print(algorithm_row_str)
+    lines.append(algorithm_row_str)
+
+    lines.append("\\midrule\n")
+
+    # second row with metrics and precision success size repeating three times
+    pre_succ_size_row_str = "\\multicolumn{1}{c}{Metric} & Precision & Success & Size & Precision & Success & Size & Precision & Success & Size \\\\\n"
+    print(pre_succ_size_row_str)
+    lines.append(pre_succ_size_row_str)
+
+    lines.append("\\midrule\n")
+
+    # rows for an attribute for each metric of each algorithm
+    for index, row in df.iterrows():
+        attribute_row_str = ""
+        # skip the pre succ size... row
+        if row["Attribute"] == "Metric":
+            continue
+
+        attribute_row_str += row["Attribute"] + " & "
+
+        # get the cell values by iterating over the row
+        for column in row.keys():
+            if column == "Algorithm":
+                continue
+            elif column == "Attribute":
+                continue # attribute is already on row because it needs to be the first entry
+            else:
+                attribute_row_str += row[column] + " & "
+
+        # remove last & at end of row and append//
+        attribute_row_str = attribute_row_str[0:-2] + "\\\\\n"
+        print(attribute_row_str)
+        lines.append(attribute_row_str)
+
+    # finish table
+    lines.append("\\bottomrule\n")
+    lines.append("\\end{tabular}\n")
+    lines.append("}\n")
+    lines.append("\\end{table}\n")
+
+    tex_path = os.path.join(args.savepath, tex_name)
+    print("saving table include tex to: " + str(tex_path))
+
+    if not os.path.isdir(os.path.dirname(args.savepath)):
+        os.mkdir(os.path.dirname(args.savepath))
+
+    with open(tex_path, "w") as tex_file:
+        tex_file.writelines(lines)
+
+
+
 def main():
-    inner_outer_csv = create_multicolumn_csv_for_tab()
+    tab_csv = create_multicolumn_csv_for_tab()
+    create_tex_for_tab(tab_csv, "dataset_complex_tab.tex")
 
 
 if __name__ == "__main__":
