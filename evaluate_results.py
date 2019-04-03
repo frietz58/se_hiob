@@ -1189,7 +1189,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         algorithm = get_approach_from_yaml(tracking_folder)
         dataset = get_dataset_from_name(tracking_folder)
         line_sytle = get_linestyle_for_algorithm(algorithm)
-        color = get_color_for_algorithm()
+        color = get_color_for_algorithm(algorithm)
 
         dfun = build_dist_fun(center_distances)
         y = [dfun(a) for a in x]
