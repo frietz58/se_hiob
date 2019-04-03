@@ -405,7 +405,10 @@ def create_tex_for_tab(csv_file, tex_name):
         # get the cell values by iterating over the row
         for column in row.keys():
             if column == "Attribute":
-                continue  # attribute is already on row because it needs to be the first entry
+                if row[column] == "NICO" or row[column] == "TB100":
+                    lines.append("\\midrule\n")
+                else:
+                    continue  # attribute is already on row because it needs to be the first entry
             else:
                 if row[column] == "NICO" or row[column] == "TB100":
                     lines.append("\\midrule\n")
