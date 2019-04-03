@@ -1214,10 +1214,10 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     else:
         plt.legend(loc="lower right")
         plt.subplots_adjust(bottom=0.15)
-        if legend_by == "dataset":
-            plt.title(str(algorithm + " precision"))
-        elif legend_by == "algorithm":
-            plt.title(str(what_is_plotted))
+        # if legend_by == "dataset":
+        #     plt.title(str(algorithm + " precision"))
+        # elif legend_by == "algorithm":
+        #     plt.title(str(what_is_plotted))
 
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
@@ -1257,14 +1257,14 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     if wide_legend:
         plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
         plt.subplots_adjust(bottom=0.35)
-        plt.title(str(what_is_plotted))
+        # plt.title(str(what_is_plotted))
     else:
         plt.legend(loc="lower left")
         plt.subplots_adjust(bottom=0.15)
-        if legend_by == "dataset":
-            plt.title(str(algorithm + " success"))
-        elif legend_by == "algorithm":
-            plt.title(str(what_is_plotted))
+        # if legend_by == "dataset":
+        #     plt.title(str(algorithm + " success"))
+        # elif legend_by == "algorithm":
+        #     plt.title(str(what_is_plotted))
 
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
