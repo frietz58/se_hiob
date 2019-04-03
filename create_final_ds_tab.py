@@ -366,12 +366,10 @@ def create_tex_for_tab(csv_file, tex_name):
     ]
 
     # first row with the three algorithms
-    algorithm_row_str = "\\multicolumn"
+    algorithm_row_str = "\\multicolumn{1}{c}{Algorithm} & "
     algos_in_header = []
     for entry in list(df.columns):
-        if entry == "Algorithm":
-            algorithm_row_str += "{1}{c}{Algorithm} & "
-        elif "No" in entry or "Candidates" in entry or "DSST" in entry:
+        if "No" in entry or "Candidates" in entry or "DSST" in entry:
             words = entry.split(" ")
             algorithm = " ".join(words[0:-1])
             if algorithm not in algos_in_header:
