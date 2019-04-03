@@ -1217,8 +1217,10 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.ylabel("occurrence")
         if overall_dataset == "TB100":
             plt.xlim(xmin=0, xmax=50)
+            plt.axvline(x=20, linestyle=':', color='k')
         elif overall_dataset == "NICO":
             plt.xlim(xmin=0, xmax=100)
+            plt.axvline(x=40, linestyle=':', color='k')
         plt.ylim(ymin=0.0, ymax=1.0)
 
         # legend entries depending on legend settings and dataset
@@ -1248,7 +1250,6 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     ordered_handles, ordered_labels = order_handles_labels(handles=handles, labels=labels)
     print("legend order: " + str(ordered_labels))
 
-    plt.axvline(x=20, linestyle=':', color='k')
     if wide_legend:
         plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
         plt.subplots_adjust(bottom=0.4)
