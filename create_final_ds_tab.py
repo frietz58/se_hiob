@@ -339,7 +339,10 @@ def create_tex_for_tab(csv_file, tex_name):
             words = entry.split(" ")
             algorithm = " ".join(words[0:-1])
             if algorithm not in algos_in_header:
-                algorithm_row_str += "\\multicolumn{3}{c}{" + algorithm + "} & "
+                if len(algos_in_header) == 2:
+                    algorithm_row_str += "\\multicolumn{3}{c}{" + algorithm + "} & "  # last dont give bar at side
+                else:
+                    algorithm_row_str += "\\multicolumn{3}{c|}{" + algorithm + "} & "
                 algos_in_header.append(algorithm)
 
     # remove last & at end of row and append//
