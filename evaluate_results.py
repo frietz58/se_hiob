@@ -1188,6 +1188,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
         algorithm = get_approach_from_yaml(tracking_folder)
         dataset = get_dataset_from_name(tracking_folder)
+        line_sytle = get_linestyle_for_algorithm(algorithm)
 
         dfun = build_dist_fun(center_distances)
         y = [dfun(a) for a in x]
@@ -1202,14 +1203,14 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
             label = str(np.around(at20, decimals=3)) + " " + algorithm
         elif legend_by == "dataset":
             label = str(np.around(at20, decimals=3)) + " on " + dataset
-        line = plt.plot(x, y, label=label)
+        line = plt.plot(x, y, label=label, linestyle=line_sytle)
         lines.append(line)
         labels.append(label)
 
     plt.axvline(x=20, linestyle=':', color='k')
     if wide_legend:
-        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
-        plt.subplots_adjust(bottom=0.35)
+        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
+        plt.subplots_adjust(bottom=0.4)
         # plt.title(str(what_is_plotted))
     else:
         plt.legend(loc="lower right")
@@ -1236,6 +1237,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         center_distances, overlap_scores, gt_size_scores, size_scores, frames = get_scores_from_rects(all_preds, all_gts)
         algorithm = get_approach_from_yaml(tracking_folder)
         dataset = get_dataset_from_name(tracking_folder)
+        line_sytle = get_linestyle_for_algorithm(algorithm)
 
         ofun = build_over_fun(overlap_scores)
         y = [ofun(a) for a in x]
@@ -1250,13 +1252,13 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
             label = str(np.around(auc, decimals=3)) + " " + algorithm
         elif legend_by == "dataset":
             label = str(np.around(auc, decimals=3)) + " on " + dataset
-        line = plt.plot(x, y, label=label)
+        line = plt.plot(x, y, label=label, linestyle=line_sytle)
         lines.append(line)
         labels.append(label)
 
     if wide_legend:
-        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.15))
-        plt.subplots_adjust(bottom=0.35)
+        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
+        plt.subplots_adjust(bottom=0.4)
         # plt.title(str(what_is_plotted))
     else:
         plt.legend(loc="lower left")
@@ -1970,51 +1972,69 @@ def get_approach_from_yaml(tracking_dir):
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST static continuous"
+            # algorithm = "DSST static continuous"
+            algorithm = "DSST stat. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST static limited"
+            # algorithm = "DSST static limited"
+            algorithm = "DSST stat. HGC"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST dynamic continuous"
+            # algorithm = "DSST dynamic continuous"
+            algorithm = "DSST dyn. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST dynamic limited"
+            # algorithm = "DSST dynamic limited"
+            algorithm = "DSST dyn. HGC"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates dynamic continuous"
+            # algorithm = "Candidates dynamic continuous"
+            algorithm = "Candidates dyn. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates dynamic limited"
+            # algorithm = "Candidates dynamic limited"
+            algorithm = "Candidates dyn. HGC"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates static continuous"
+            # algorithm = "Candidates static continuous"
+            algorithm = "Candidates stat. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates static limited"
+            # algorithm = "Candidates static limited"
+            algorithm = "Candidates stat. Full"
 
         return algorithm
+
+
+# returns a matplotlib linestyle based on algorithm name
+def get_linestyle_for_algorithm(algorithm):
+    if "Candidates" in algorithm:
+        return ":"
+    elif "DSST" in algorithm:
+        return "--"
+    else:
+        return "-"
 
 
 # get the tracking dataset based on the tracking name
@@ -2316,7 +2336,7 @@ def main(results_path):
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on NICO and TB100",
-                                          font={'font.size': 15},
+                                          font={'font.size': 12},
                                           tex_name="nico_tb100_compare.tex",
                                           legend_by="dataset")
 
