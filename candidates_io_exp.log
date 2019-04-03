@@ -1,0 +1,30 @@
+2019-04-02 01:35:42,170 | INFO | =========== NEW EXECUTION ===========
+2019-04-02 01:35:42,170 | INFO | specified GPU: 0, experiments: ['all']
+2019-04-02 01:35:42,170 | INFO | completed experiments so far: []
+2019-04-02 01:35:42,170 | INFO | starting experiment candidates_stat_cont_tb100full
+2019-04-02 01:36:51,550 | INFO | =========== NEW EXECUTION ===========
+2019-04-02 01:36:51,550 | INFO | specified GPU: 1, experiments: ['all']
+2019-04-02 01:36:51,550 | INFO | completed experiments so far: []
+2019-04-02 01:36:51,550 | INFO | starting experiment candidates_stat_cont_nico
+2019-04-02 03:31:09,180 | INFO | finished experiment candidates_stat_cont_nico
+2019-04-02 03:31:09,300 | INFO | completed experiments so far: ['candidates_stat_cont_nico']
+2019-04-02 03:31:09,300 | INFO | starting experiment candidates_dyn_cont_nico
+2019-04-02 03:41:00,277 | INFO | finished experiment candidates_stat_cont_tb100full
+2019-04-02 03:41:00,319 | INFO | completed experiments so far: ['candidates_stat_cont_nico', 'candidates_stat_cont_tb100full']
+2019-04-02 03:41:00,320 | INFO | starting experiment candidates_dyn_cont_tb100full
+2019-04-02 05:29:00,266 | INFO | finished experiment candidates_dyn_cont_nico
+2019-04-02 05:29:00,328 | INFO | completed experiments so far: ['candidates_stat_cont_nico', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_nico']
+2019-04-02 05:29:00,328 | INFO | starting experiment candidates_stat_limited_nico
+2019-04-02 05:46:10,665 | INFO | finished experiment candidates_dyn_cont_tb100full
+2019-04-02 05:46:10,687 | INFO | completed experiments so far: ['candidates_stat_cont_nico', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_nico', 'candidates_dyn_cont_tb100full']
+2019-04-02 05:46:10,688 | INFO | starting experiment candidates_stat_limited_tb100full
+2019-04-02 07:21:49,598 | INFO | finished experiment candidates_stat_limited_nico
+2019-04-02 07:21:49,649 | INFO | completed experiments so far: ['candidates_stat_cont_nico', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_nico', 'candidates_dyn_cont_tb100full', 'candidates_stat_limited_nico']
+2019-04-02 07:21:49,662 | INFO | starting experiment candidates_dyn_limited_nico
+2019-04-02 07:46:06,163 | INFO | finished experiment candidates_stat_limited_tb100full
+2019-04-02 07:46:06,164 | INFO | completed experiments so far: ['candidates_stat_cont_nico', 'candidates_stat_cont_tb100full', 'candidates_dyn_cont_nico', 'candidates_dyn_cont_tb100full', 'candidates_stat_limited_nico', 'candidates_stat_limited_tb100full']
+2019-04-02 07:46:06,164 | INFO | starting experiment candidates_dyn_limited_tb100full
+2019-04-02 09:18:21,331 | INFO | finished experiment candidates_dyn_limited_nico
+2019-04-02 09:18:21,340 | WARNING | EXECUTED EACH EXPERIMENT ONCE
+2019-04-02 09:50:29,036 | INFO | finished experiment candidates_dyn_limited_tb100full
+2019-04-02 09:50:29,068 | WARNING | EXECUTED EACH EXPERIMENT ONCE
