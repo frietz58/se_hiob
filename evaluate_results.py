@@ -272,7 +272,7 @@ def get_all_rects(result_dir):
             for sequence in sequence_folders:
                 sequence_folder = os.path.join(hiob_execution, sequence)
                 sequence_name = os.path.basename(sequence_folder).split("-")[-1]
-                preds = get_pred_rects_from_sequence(os.path.join(result_dir, sequence_folder))
+                preds = get_pred_rects_from_sequence(sequence_folder)
                 if "tb100" in sequence:
                     gts = get_gt_rects_from_zip(sequence_name, tb100_gt_path)
                 elif "nicovision" in sequence:
