@@ -166,9 +166,21 @@ def create_multicolumn_csv_for_tab():
         if not is_hiob_exe(hiob_execution):
             raise IOError(str(hiob_execution) + " is not a hiob execution")
 
+        # get total hiob execution values for average row
+        with open(os.path.join(hiob_execution, "evaluation.txt"), "r") as overall_eval_txt:
+            lines = overall_eval_txt.readlines()
+            for line in lines:
+                line = line.replace("\n", "")
+                key_val = line.split("=")
+                if key_val[0] == "total_precision_rating":
+                    total_prec = float(key_val[1])
+                elif key_val[0] == "total_success_rating":
+                    total_succ = float(key_val[1])
+
         # get sequences
         sequences = get_sequences(hiob_execution)
         datasets = []
+        execution_sizes = []
         sequence_metrics = {}
         for sequence in sequences:
             # dataset determination
@@ -204,6 +216,11 @@ def create_multicolumn_csv_for_tab():
                 "attributes": sequence_attributes
             }
 
+            execution_sizes.append(sequence_size)
+
+        # get avg size score for hiob execution
+        avg_size = np.around(np.sum(execution_sizes) / len(execution_sizes), decimals=3)
+
         # determine overall tracking dataset
         if all("tb100" in tracking for tracking in datasets):
             dataset = "TB100"
@@ -219,6 +236,9 @@ def create_multicolumn_csv_for_tab():
         if hiob_execution not in hiob_executions_info_dict.keys():
             hiob_executions_info_dict[str(hiob_execution)] = {"algorithm": algorithm,
                                                               "dataset": dataset,
+                                                              "total_precision": total_prec,
+                                                              "total_success": total_succ,
+                                                              "avg_size": avg_size,
                                                               "sequences_scores": sequence_metrics}
 
     if all(unique_dataset == "TB100" for unique_dataset in unique_datasets):
@@ -232,7 +252,6 @@ def create_multicolumn_csv_for_tab():
 
     # csv setup
     df = pd.DataFrame(columns=[
-        "Algorithm",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]]["algorithm"]) + " Precision",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]]["algorithm"]) + " Success",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]]["algorithm"]) + " Size",
@@ -302,9 +321,6 @@ def create_multicolumn_csv_for_tab():
                     cell_precs.append(float(sequence["precision"]))
                     cell_succs.append(float(sequence["success"]))
                     cell_sizes.append(float(sequence["size"]))
-                    # cell_precs = [metrics["precision"] for metrics in list(hiob_execution["sequences_scores"].values())]
-                    # cell_succs = [metrics["success"] for metrics in list(hiob_execution["sequences_scores"].values())]
-                    # cell_sizes = [metrics["size"] for metrics in list(hiob_execution["sequences_scores"].values())]
 
             cell_avg_prec = np.around(np.sum(cell_precs) / len(cell_precs), decimals=3)
             cell_avg_succ = np.around(np.sum(cell_succs) / len(cell_succs), decimals=3)
@@ -315,6 +331,18 @@ def create_multicolumn_csv_for_tab():
             row_dict[hiob_execution["algorithm"] + " Size"] = cell_avg_size
 
         df = df.append(row_dict, ignore_index=True)
+
+    # summary row
+    summary_row_dict = {"Attribute": str(overall_datase)}
+    for hiob_execution in hiob_executions_info_dict.values():
+        summary_row_dict[str(hiob_execution["algorithm"]) + " Precision"] = np.around(hiob_execution["total_precision"],
+                                                                                      decimals=3)
+        summary_row_dict[str(hiob_execution["algorithm"]) + " Success"] = np.around(hiob_execution["total_success"],
+                                                                                      decimals=3)
+        summary_row_dict[str(hiob_execution["algorithm"]) + " Size"] = np.around(hiob_execution["avg_size"],
+                                                                                      decimals=3)
+
+    df = df.append(summary_row_dict, ignore_index=True)
 
     if not os.path.isdir(args.savepath):
         os.mkdir(args.savepath)
@@ -378,12 +406,10 @@ def create_tex_for_tab(csv_file, tex_name):
 
         # get the cell values by iterating over the row
         for column in row.keys():
-            if column == "Algorithm":
-                continue
-            elif column == "Attribute":
-                continue # attribute is already on row because it needs to be the first entry
+            if column == "Attribute":
+                continue  # attribute is already on row because it needs to be the first entry
             else:
-                attribute_row_str += row[column] + " & "
+                attribute_row_str += str(row[column]) + " & "
 
         # remove last & at end of row and append//
         attribute_row_str = attribute_row_str[0:-2] + "\\\\\n"

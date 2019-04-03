@@ -1374,13 +1374,14 @@ def create_multiple_graphs_tex_include(save_folder, path_in_src, tex_name, subfi
     with open(tex_path, "w") as tex_file:
         tex_file.writelines(
             [
-                "\\begin{figure}[H]\label{TODO}\n"
-                "\\begin{subfigure}[t]{0.5\\textwidth}\n",
+                "\\begin{figure}[H]\n"
+                "\\centering"
+                "\\begin{subfigure}[t]{0.8\\textwidth}\n",
                 "\\centering\\captionsetup{width=.9\\linewidth}\n",
                 "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, str(subfigures[0])) + "}\n",
                 "\\subcaption{The precision plot.}",
                 "\\end{subfigure}\n",
-                "\\begin{subfigure}[t]{0.5\\textwidth}\n",
+                "\\begin{subfigure}[t]{0.8\\textwidth}\n",
                 "\\centering\\captionsetup{width=.9\\linewidth}\n",
                 "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, str(subfigures[1])) + "}\n",
                 "\\subcaption{The success plot.}",
