@@ -1200,9 +1200,15 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.xlim(xmin=0, xmax=50)
         plt.ylim(ymin=0.0, ymax=1.0)
         if legend_by == "algorithm":
-            label = str(np.around(at20, decimals=3)) + " " + algorithm
+            value = str(np.around(at20, decimals=3))
+            if len(value) < 5:
+                value + "0"
+            label = value + " " + algorithm
         elif legend_by == "dataset":
-            label = str(np.around(at20, decimals=3)) + " on " + dataset
+            value = str(np.around(at20, decimals=3))
+            if len(value) < 5:
+                value + "0"
+            label = value + " on " + dataset
         line = plt.plot(x, y, label=label, linestyle=line_sytle)
         lines.append(line)
         labels.append(label)
@@ -1242,6 +1248,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         algorithm = get_approach_from_yaml(tracking_folder)
         dataset = get_dataset_from_name(tracking_folder)
         line_sytle = get_linestyle_for_algorithm(algorithm)
+        color = get_color_for_algorithm(algorithm)
 
         ofun = build_over_fun(overlap_scores)
         y = [ofun(a) for a in x]
@@ -1253,10 +1260,16 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         plt.xlim(xmin=0.0, xmax=1.0)
         plt.ylim(ymin=0.0, ymax=1.0)
         if legend_by == "algorithm":
-            label = str(np.around(auc, decimals=3)) + " " + algorithm
+            value = str(np.around(auc, decimals=3))
+            if len(value) < 5:
+                value + "0"
+            label = value + " " + algorithm
         elif legend_by == "dataset":
-            label = str(np.around(auc, decimals=3)) + " on " + dataset
-        line = plt.plot(x, y, label=label, linestyle=line_sytle)
+            value = str(np.around(auc, decimals=3))
+            if len(value) < 5:
+                value + "0"
+            label = value + " on " + dataset
+        line = plt.plot(x, y, label=label, linestyle=line_sytle, color=color)
         lines.append(line)
         labels.append(label)
 
@@ -1281,7 +1294,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     plt.close()
 
     create_multiple_graphs_tex_include(save_folder=eval_folder,
-                                       path_in_src="dsst_validation",
+                                       path_in_src="unconstrained_tb100_nico/" + os.path.basename(path_multi_figure),
                                        tex_name=tex_name,
                                        subfigures=["multiple_precision_plot", "multiple_success_plot"],)
 
@@ -1322,6 +1335,37 @@ def order_handles_labels(handles, labels):
 
     return new_order_handels, new_order_labels
 
+
+# return color based on algorithm name
+def get_color_for_algorithm(algorithm):
+    if "Candidates stat. Full" in algorithm:
+        return "#fe6100"  # orange
+
+    elif "Candidates stat. HGC" in algorithm:
+
+        return "#ffb000"  # gold
+    elif "Candidates dyn. Full" in algorithm:
+
+        return "#dc267f"  # magenta
+    elif "Candidates dyn. HGC" in algorithm:
+
+        return "#785ef0"  # indigo
+    elif "DSST stat. Full" in algorithm:
+
+        return "#321c4c"  # violet
+    elif "DSST stat. HGC" in algorithm:
+
+        return "#95d13c"  # lime
+    elif "DSST dyn. Full" in algorithm:
+
+        return "#777677"  # gray
+    elif "DSST dyn. HGC" in algorithm:
+
+        return "#e62325"  # red
+    elif "No SE" in algorithm:
+        return "#009bef"  # cerulean
+
+
 # create a tex figure inclue with the the precision and success graph of multiple trackings:
 def create_multiple_graphs_tex_include(save_folder, path_in_src, tex_name, subfigures):
     tex_path = os.path.join(save_folder, tex_name)
@@ -1340,7 +1384,7 @@ def create_multiple_graphs_tex_include(save_folder, path_in_src, tex_name, subfi
                 "\\includegraphics[width=\\textwidth]{" + os.path.join(path_in_src, str(subfigures[1])) + "}\n",
                 "\\subcaption{The success plot.}",
                 "\\end{subfigure}\n",
-                "\\caption{The plotted results of TODO. Generate from " + str(save_folder) + "}"
+                "\\caption{The plotted results of TODO. Generate from " + str(save_folder).replace("_", "\\_") + "}"
                 "\\end{figure}"
             ]
         )

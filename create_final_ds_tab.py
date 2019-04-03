@@ -64,55 +64,63 @@ def get_approach_from_yaml(tracking_dir):
         algorithm = None
 
         if not scale_estimator_conf["use_scale_estimation"]:
-            algorithm = "No se"
+            algorithm = "No SE"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST static continuous"
+            # algorithm = "DSST static continuous"
+            algorithm = "DSST stat. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST static limited"
+            # algorithm = "DSST static limited"
+            algorithm = "DSST stat. HGC"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST dynamic continuous"
+            # algorithm = "DSST dynamic continuous"
+            algorithm = "DSST dyn. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
-            algorithm = "DSST dynamic limited"
+            # algorithm = "DSST dynamic limited"
+            algorithm = "DSST dyn. HGC"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates dynamic continuous"
+            # algorithm = "Candidates dynamic continuous"
+            algorithm = "Candidates dyn. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates dynamic limited"
+            # algorithm = "Candidates dynamic limited"
+            algorithm = "Candidates dyn. HGC"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates static continuous"
+            # algorithm = "Candidates static continuous"
+            algorithm = "Candidates stat. Full"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
-            algorithm = "Candidates static limited"
+            # algorithm = "Candidates static limited"
+            algorithm = "Candidates stat. HGC"
 
         return algorithm
 
@@ -396,7 +404,6 @@ def create_tex_for_tab(csv_file, tex_name):
 
     with open(tex_path, "w") as tex_file:
         tex_file.writelines(lines)
-
 
 
 def main():
