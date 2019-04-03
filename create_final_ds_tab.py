@@ -404,13 +404,12 @@ def create_tex_for_tab(csv_file, tex_name):
 
         # get the cell values by iterating over the row
         for column in row.keys():
-
-            if column == "NICO" or column == "TB100":
-                lines.append("\\midrule\n")
-
             if column == "Attribute":
                 continue  # attribute is already on row because it needs to be the first entry
             else:
+                if row[column] == "NICO" or row[column] == "TB100":
+                    lines.append("\\midrule\n")
+
                 attribute_row_str += str(row[column]) + " & "
 
         # remove last & at end of row and append//
