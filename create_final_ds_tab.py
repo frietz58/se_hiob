@@ -126,7 +126,7 @@ def get_sequence_attributes(sequence):
             if sample["name"] == sequence_name:
                 sequence_attributes = sample["attributes"]
     elif any(values["name"] == sequence_name for values in tb100["samples"]):
-        for sample in nicovision["samples"]:
+        for sample in tb100["samples"]:
             if sample["name"] == sequence_name:
                 sequence_attributes = sample["attributes"]
 
