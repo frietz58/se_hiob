@@ -2293,7 +2293,7 @@ def main(results_path):
                                       legend_by="algorithm")
 
         elif only_item_in_list('hiob_tracking_folder', folder_types) or only_item_in_list('multiple_hiob_executions', folder_types):
-            if all(("tb100full" or "no_se") in tracking for tracking in results_path):
+            if all("tb100full" in tracking for tracking in results_path):
                 print("only tb100 trackings")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
@@ -2302,7 +2302,7 @@ def main(results_path):
                                           tex_name="tb100full_all_approaches_fig_include.tex",
                                           legend_by="algorithm")
 
-            elif all(("nico" or "no_se") in tracking for tracking in results_path):
+            elif all("nico" in tracking for tracking in results_path):
                 print("only nico trackings")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
@@ -2311,7 +2311,7 @@ def main(results_path):
                                           tex_name="nico_all_approaches_fig_include.tex",
                                           legend_by="algorithm")
 
-            elif all(("nico" or "tb100full" or "no_se") in tracking for tracking in results_path):
+            elif all("nico" or "tb100full" in tracking for tracking in results_path):
                 print("nico and tb100 trackings")
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
