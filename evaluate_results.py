@@ -2007,7 +2007,7 @@ def get_approach_from_yaml(tracking_dir):
         algorithm = None
 
         if not scale_estimator_conf["use_scale_estimation"]:
-            algorithm = "No se"
+            algorithm = "No SE"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
