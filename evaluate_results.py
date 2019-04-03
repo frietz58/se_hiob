@@ -92,6 +92,7 @@ parameter_names = {
     "c_change_aspect_ratio": "Change aspect ratio"
 }
 
+
 # ================================= GET FUNCTIONS =================================
 # get all workplace files
 def get_saved_workplaces(result_dir):
@@ -1170,9 +1171,26 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         os.mkdir(eval_folder)
     print("saving multiple graphs figs at: " + str(eval_folder))
 
+    # determine dataset of the different trackings
+    datasets = []
+    for tracking_folder in tracking_folders:
+        datasets.append(get_dataset_from_name(tracking_folder))
+    if all(unique_dataset == "TB100" for unique_dataset in datasets):
+        pass
+        overall_dataset = "TB100"
+    elif all(unique_dataset == "NICO" for unique_dataset in datasets):
+        pass
+        overall_dataset = "NICO"
+    else:
+        raise ValueError("Hiob executions are on different datasets")
+
     # precision plot
     f = plt.figure()
-    x = np.arange(0., 50.1, .1)
+    if overall_dataset == "TB100":
+        x = np.arange(0., 50.1, .1)
+    elif overall_dataset == "NICO":
+        x = x = np.arange(0., 100.1, .1)
+
     figure_file2 = os.path.join(eval_folder, 'multiple_precision_plot.svg')
     figure_file3 = os.path.join(eval_folder, 'multiple_precision_plot.pdf')
 
@@ -1194,22 +1212,34 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         dfun = build_dist_fun(center_distances)
         y = [dfun(a) for a in x]
         at20 = dfun(20)
-        tx = "prec(20) = %0.4f" % at20#
-        # plt.text(5.05, 0.05, tx)
+        at40 = dfun(40)
         plt.xlabel("center distance [pixels]")
         plt.ylabel("occurrence")
-        plt.xlim(xmin=0, xmax=50)
+        if overall_dataset == "TB100":
+            plt.xlim(xmin=0, xmax=50)
+        elif overall_dataset == "NICO":
+            plt.xlim(xmin=0, xmax=100)
         plt.ylim(ymin=0.0, ymax=1.0)
+
+        # legend entries depending on legend settings and dataset
         if legend_by == "algorithm":
-            value = str(np.around(at20, decimals=3))
+            if overall_dataset == "TB100":
+                value = str(np.around(at20, decimals=3))
+            elif overall_dataset == "NICO":
+                value = str(np.around(at40, decimals=3))
+            # so that charcters after number in legend line up
             if len(value) < 5:
                 value + "0"
             label = value + " " + algorithm
         elif legend_by == "dataset":
-            value = str(np.around(at20, decimals=3))
+            if overall_dataset == "TB100":
+                value = str(np.around(at20, decimals=3))
+            elif overall_dataset == "NICO":
+                value = str(np.around(at40, decimals=3))
             if len(value) < 5:
                 value + "0"
             label = value + " on " + dataset
+
         line = plt.plot(x, y, label=label, linestyle=line_sytle, color=color)
         lines.append(line)
         labels.append(label)
@@ -1281,14 +1311,9 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     if wide_legend:
         plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
         plt.subplots_adjust(bottom=0.4)
-        # plt.title(str(what_is_plotted))
     else:
         plt.legend(labels=ordered_labels, handles=ordered_handles, loc="lower left")
         plt.subplots_adjust(bottom=0.15)
-        # if legend_by == "dataset":
-        #     plt.title(str(algorithm + " success"))
-        # elif legend_by == "algorithm":
-        #     plt.title(str(what_is_plotted))
 
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
