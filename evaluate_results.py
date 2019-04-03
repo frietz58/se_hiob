@@ -1207,13 +1207,16 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         lines.append(line)
         labels.append(label)
 
+    handles, labels = plt.axes().get_legend_handles_labels()
+    ordered_handles, ordered_labels = order_handles_labels(handles=handles, labels=labels)
+
     plt.axvline(x=20, linestyle=':', color='k')
     if wide_legend:
-        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
+        plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
         plt.subplots_adjust(bottom=0.4)
         # plt.title(str(what_is_plotted))
     else:
-        plt.legend(loc="lower right")
+        plt.legend(labels=ordered_labels, handles=ordered_handles, loc="lower right")
         plt.subplots_adjust(bottom=0.15)
         # if legend_by == "dataset":
         #     plt.title(str(algorithm + " precision"))
@@ -1256,12 +1259,15 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         lines.append(line)
         labels.append(label)
 
+    handles, labels = plt.axes().get_legend_handles_labels()
+    ordered_handles, ordered_labels = order_handles_labels(handles=handles, labels=labels)
+
     if wide_legend:
-        plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
+        plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
         plt.subplots_adjust(bottom=0.4)
         # plt.title(str(what_is_plotted))
     else:
-        plt.legend(loc="lower left")
+        plt.legend(labels=ordered_labels, handles=ordered_handles, loc="lower left")
         plt.subplots_adjust(bottom=0.15)
         # if legend_by == "dataset":
         #     plt.title(str(algorithm + " success"))
@@ -1275,9 +1281,44 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     create_multiple_graphs_tex_include(save_folder=eval_folder,
                                        path_in_src="dsst_validation",
                                        tex_name=tex_name,
-                                       subfigures=["multiple_precision_plot", "multiple_success_plot"],
-                                       )
+                                       subfigures=["multiple_precision_plot", "multiple_success_plot"],)
 
+
+# order the handles and labels of a matplotlib legend
+def order_handles_labels(handles, labels):
+    # handles and labels should always be of same length
+    new_order_labels = [None] * len(labels)
+    new_order_handels = [None] * len(handles)
+    for label, handle in zip(labels, handles):
+        if "Candidates stat. Full" in label:
+            new_order_labels[0] = label
+            new_order_handels[0] = handle
+        elif "Candidates stat. HGC" in label:
+            new_order_labels[1] = label
+            new_order_handels[1] = handle
+        elif "Candidates dyn. Full" in label:
+            new_order_labels[2] = label
+            new_order_handels[2] = handle
+        elif "Candidates dyn. HGC" in label:
+            new_order_labels[3] = label
+            new_order_handels[3] = handle
+        elif "DSST stat. Full" in label:
+            new_order_labels[4] = label
+            new_order_handels[4] = handle
+        elif "DSST stat. HGC" in label:
+            new_order_labels[5] = label
+            new_order_handels[5] = handle
+        elif "DSST dyn. Full" in label:
+            new_order_labels[6] = label
+            new_order_handels[6] = handle
+        elif "DSST dyn. HGC" in label:
+            new_order_labels[7] = label
+            new_order_handels[7] = handle
+        elif "No SE" in label:
+            new_order_labels[8] = label
+            new_order_handels[8] = handle
+
+    return new_order_handels, new_order_labels
 
 # create a tex figure inclue with the the precision and success graph of multiple trackings:
 def create_multiple_graphs_tex_include(save_folder, path_in_src, tex_name, subfigures):
@@ -2022,7 +2063,7 @@ def get_approach_from_yaml(tracking_dir):
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
             # algorithm = "Candidates static limited"
-            algorithm = "Candidates stat. Full"
+            algorithm = "Candidates stat. HGC"
 
         return algorithm
 
@@ -2318,7 +2359,7 @@ def main(results_path):
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on TB100",
-                                          font={'font.size': 15},
+                                          font={'font.size': 12},
                                           tex_name="tb100full_all_approaches_fig_include.tex",
                                           legend_by="algorithm")
 
@@ -2327,7 +2368,7 @@ def main(results_path):
                 multiple_trackings_graphs(tracking_folders=results_path,
                                           eval_folder=path_multi_figure,
                                           what_is_plotted="Approaches on NICO",
-                                          font={'font.size': 15},
+                                          font={'font.size': 12},
                                           tex_name="nico_all_approaches_fig_include.tex",
                                           legend_by="algorithm")
 
