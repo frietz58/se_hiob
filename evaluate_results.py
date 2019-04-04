@@ -599,34 +599,87 @@ def create_attribute_tex_table_include(save_path, csv_file, tex_name):
         tex_file.writelines(lines)
 
 
-def create_framerate_tex_include(eval_folder, dict=None):
-    hard_values = {
-        "Candidats static cont.": [8.03, 5.52, 518.81, 587.09],
-        "Candidates static limited": [8.01, 5.68, 3092.23, 3237.78],
-        "Candidates dynamic cont.": [7.71, 5.7, 331.68, 330.09],
-        "Candidates dynamic limited": [7.8, 5.75, 2399.54, 2574.43],
-        "DSST static cont.": [7.82, 5.23, 80.19, 54.58],
-        "DSST staic limited": [7.82, 5.78, 949.44, 734.70],
-        "DSST dynamic cont.": [6.64, 4.37, 46.74, 17.49],
-        "DSST dynamic limited": [7.73, 5.64, 573.09, 280.75],
-        "No SE": [7.86, 5.84, "-", "-"]
-    }
+def create_framerate_csv_tex(experiment_folders, save_path):
+    # create csv
+    df = pd.DataFrame(columns=[
+        "Algorithm",
+        "Overall FPS",
+        "SE FPS",
+        "Success",
+        "Size score"])
 
+    for hiob_execution in experiment_folders:
+        execution_results = {}
+
+        tracking_folder = get_tracking_folders(hiob_execution)
+        if len(tracking_folder) != 1:
+            raise ValueError("multiple hiob, execution, needs implementation")
+
+        # get sequence results (size)
+        sequence_folders = get_sequences(tracking_folder[0])
+        sequence_results = []
+        for sequence in sequence_folders:
+            sequence_folder = os.path.join(hiob_execution, tracking_folder[0], sequence)
+            sequence_name = os.path.basename(sequence_folder)
+            with open(os.path.join(sequence_folder, "evaluation.txt"), "r") as evaltxt:
+                lines = evaltxt.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    key_val = line.split("=")
+                    if key_val[0] == "area_between_size_curves":
+                        size_score = float(key_val[1])
+                        sequence_results.append({"sequence": sequence_folder,
+                                                 "size_score": size_score})
+        avg_size_score = np.around(sum([result["size_score"] for result in sequence_results]) / len(sequence_results), decimals=3)
+
+        # get general execution results (fps, total succ etc )
+        with open(os.path.join(hiob_execution, tracking_folder[0], "evaluation.txt"), "r") as evaltxt:
+            lines = evaltxt.readlines()
+            for line in lines:
+                line = line.replace("\n", "")
+                key_val = line.split("=")
+                if key_val[0] == "total_success_rating":
+                    total_success = key_val[1]
+                elif key_val[0] == "frame_rate":
+                    overall_fps = key_val[1]
+                elif key_val[0] == "se_frame_rate":
+                    se_fps = key_val[1]
+
+        # get algorithm
+        algorithm = get_approach_from_yaml(os.path.join(hiob_execution, tracking_folder[0]))
+
+        row = {"Algorithm": algorithm,
+               "Overall FPS": overall_fps,
+               "SE FPS": se_fps,
+               "Success": total_success,
+               "Size score": avg_size_score}
+
+        df = df.append(row, ignore_index=True)
+
+    if not os.path.isdir(save_path):
+        os.mkdir(save_path)
+    print("saving framerate csv to " + str(os.path.join(save_path, "framerates_nico.csv")))
+    df.to_csv(os.path.join(save_path, "framerates_nico.csv"))
+
+    # create tex
     lines = [
-        #"\\begin{table}[]\label{tab:asdasd}\n",
+        "\\begin{table}\n",
         "\\centering",
         "\\resizebox{\\textwidth}{!}{\n",
         "\\begin{tabular}{@{}cccccc@{}}\n",
         "\\toprule\n",
     ]
 
-    header_line = "\\textbf{Approach} & \\textbf{Overall FPS TB100} & \\textbf{Overall FPS NICO} & \\textbf{SE FPS TB100} & \\textbf{SE FPS NICO} \\\\ \midrule \n"
+    header_line = "\\textbf{Algorithm} & \\textbf{Overall FPS} & \\textbf{SE FPS} & \\textbf{Success} & \\textbf{Size score} \\\\ \midrule \n"
     lines.append(header_line)
 
-    for key in hard_values.keys():
-        line = str(key.replace("_", "\_")) + " & "
-        for val in hard_values[key]:
-            line += str(val) + " & "
+    for index, row in df.iterrows():
+        line = ""
+        for key in df.keys():
+            if type(row[key]) == float:
+                line += str(np.around(row[key], decimals=3)) + " & "
+            else:
+                line += str(row[key]) + " & "
         # remove & at end of lline
         line = line[0:-2]
         line += "\\\\ \n"
@@ -637,12 +690,14 @@ def create_framerate_tex_include(eval_folder, dict=None):
     lines.append("\\end{tabular}\n")
     lines.append("}\n")
     lines.append("\\caption{Framerates of overall tracker and isolated SE module on both datasets}\n")
-    #lines.append("\\end{table}")
+    lines.append("\\label{tab:asdasd}")
+    lines.append("\\end{table}")
 
-    if not os.path.isdir(eval_folder):
-        os.mkdir(eval_folder)
+    if not os.path.isdir(save_path):
+        os.mkdir(save_path)
 
-    with open(os.path.join(eval_folder, "fps_vs_approach_tab_include.tex"), "w") as tex_file:
+    print("saving framerate tex to " + str(save_path))
+    with open(os.path.join(save_path, "fps_vs_approach_tab.tex"), "w") as tex_file:
         tex_file.writelines(lines)
 
 
@@ -935,7 +990,6 @@ def create_opt_csv(experiment_folder, eval_folder):
             ])
 
             # get the average values for the same parameter value for a row in the opt csv
-
             for i, value in enumerate(same_parameter_value_collection.values()):
                 avg_succs = []
                 avg_precs = []
@@ -1738,9 +1792,7 @@ def create_framerate_vs_approach_fig(trackings, eval_folder):
 
     # plot figures
     plot_candidates_framrate_fig(candidate_dicts, eval_folder)
-
     plot_dsst_framerate_fig(dsst_dicts, eval_folder)
-
 
 
 def create_final_tab_comp(tracking_folders):
@@ -2412,8 +2464,12 @@ def main(results_path):
         print(str(folder_types))
 
         if args.task == "framerate_vs_approach":
-            create_framerate_vs_approach_fig(trackings=results_path, eval_folder=path_multi_figure)
-            create_framerate_tex_include(eval_folder=path_multi_figure)
+            # am not using that one because huge difference in fps appraoches
+            # create_framerate_vs_approach_fig(trackings=results_path,
+            #                                  eval_folder=path_multi_figure)
+
+            create_framerate_csv_tex(experiment_folders=results_path,
+                                     save_path=path_multi_figure)
 
         elif args.task == "gen_final_comp_tab":
             create_final_tab_comp(tracking_folders=results_path)
