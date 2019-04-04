@@ -647,8 +647,14 @@ def create_framerate_csv_tex(experiment_folders, save_path):
 
         # get algorithm
         algorithm = get_approach_from_yaml(os.path.join(hiob_execution, tracking_folder[0]))
-
-        row = {"Algorithm": algorithm,
+        if algorithm == "No SE":
+            row = {"Algorithm": algorithm,
+                   "Overall FPS": overall_fps,
+                   "SE FPS": "-",
+                   "Success": total_success,
+                   "Size score": avg_size_score}
+        else:
+            row = {"Algorithm": algorithm,
                "Overall FPS": overall_fps,
                "SE FPS": se_fps,
                "Success": total_success,
