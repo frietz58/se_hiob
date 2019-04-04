@@ -662,6 +662,19 @@ def create_framerate_csv_tex(experiment_folders, save_path):
 
         df = df.append(row, ignore_index=True)
 
+    # create fps normalized row
+    all_fps = list(df["Overall FPS"])
+    max_fps = max(all_fps)
+    min_fps = 0
+
+    norm_fps = [0] * len(all_fps)
+    for i in range(len(all_fps)):
+        if max_fps - min_fps == 0:
+            norm_fps[i] = np.around((all_fps[i] - min_fps) / (max_fps - min_fps + 0.0000000000001), decimals=3)
+        norm_fps[i] = np.around((all_fps[i] - min_fps) / (max_fps - min_fps), decimals=3)
+
+    df.insert(loc=2, column="Norm. Overall FPS", value=norm_fps)
+
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     print("saving framerate csv to " + str(os.path.join(save_path, "framerates_nico.csv")))
