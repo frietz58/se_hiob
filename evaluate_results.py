@@ -639,11 +639,11 @@ def create_framerate_csv_tex(experiment_folders, save_path):
                 line = line.replace("\n", "")
                 key_val = line.split("=")
                 if key_val[0] == "total_success_rating":
-                    total_success = key_val[1]
+                    total_success = np.around(float(key_val[1]), decimals=3)
                 elif key_val[0] == "frame_rate":
-                    overall_fps = key_val[1]
+                    overall_fps = np.around(float(key_val[1]), decimals=3)
                 elif key_val[0] == "se_frame_rate":
-                    se_fps = key_val[1]
+                    se_fps = np.around(float(key_val[1]), decimals=3)
 
         # get algorithm
         algorithm = get_approach_from_yaml(os.path.join(hiob_execution, tracking_folder[0]))
