@@ -689,7 +689,7 @@ def create_framerate_csv_tex(experiment_folders, save_path):
         "\\toprule\n",
     ]
 
-    header_line = "\\textbf{Algorithm} & \\textbf{Overall FPS} & \\textbf{SE FPS} & \\textbf{Success} & \\textbf{Size score} \\\\ \midrule \n"
+    header_line = "\\textbf{Algorithm} & \\textbf{Overall FPS} & \\textbf{Norm. overall FPS} &  \\textbf{SE FPS} & \\textbf{Success} & \\textbf{Size score} \\\\ \midrule \n"
     lines.append(header_line)
 
     for index, row in df.iterrows():
