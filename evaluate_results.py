@@ -664,7 +664,7 @@ def create_framerate_csv_tex(experiment_folders, save_path):
 
     # create fps normalized row
     all_fps = list(df["Overall FPS"])
-    max_fps = max(all_fps)
+    max_fps = df.loc[df['Algorithm'] == "No SE"]["Overall FPS"][0]
     min_fps = 0
 
     norm_fps = [0] * len(all_fps)
