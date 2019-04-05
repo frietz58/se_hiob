@@ -65,8 +65,8 @@ def main():
         # "dsst_validation8",
         # "dsst_validation9",
         #
-        "candidates_stat_cont_tb100full",
-        "candidates_dyn_cont_tb100full",
+        # "candidates_stat_cont_tb100full",
+        # "candidates_dyn_cont_tb100full",
 
         "candidates_stat_limited_tb100full",
         "candidates_dyn_limited_tb100full",
@@ -82,8 +82,8 @@ def main():
         # "candidates_stat_cont_nico",
         # "candidates_dyn_cont_nico",
         #
-        # "candidates_stat_limited_nico",
-        # "candidates_dyn_limited_nico",
+        "candidates_stat_limited_nico",
+        "candidates_dyn_limited_nico",
         #
         # "dsst_stat_cont_nico",
         # "dsst_stat_limited_nico",
