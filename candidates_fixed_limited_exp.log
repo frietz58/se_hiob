@@ -1,0 +1,13 @@
+2019-04-05 09:10:20,653 | INFO | =========== NEW EXECUTION ===========
+2019-04-05 09:10:20,654 | INFO | specified GPU: 1, experiments: ['all']
+2019-04-05 09:10:20,654 | INFO | completed experiments so far: []
+2019-04-05 09:10:20,654 | INFO | starting experiment candidates_stat_limited_tb100full
+2019-04-05 11:14:51,534 | INFO | finished experiment candidates_stat_limited_tb100full
+2019-04-05 11:14:51,535 | INFO | completed experiments so far: ['candidates_stat_limited_tb100full']
+2019-04-05 11:14:51,535 | INFO | starting experiment candidates_dyn_limited_tb100full
+2019-04-05 13:17:21,811 | INFO | finished experiment candidates_dyn_limited_tb100full
+2019-04-05 13:17:21,811 | INFO | completed experiments so far: ['candidates_stat_limited_tb100full', 'candidates_dyn_limited_tb100full']
+2019-04-05 13:17:21,811 | INFO | starting experiment candidates_stat_limited_nico
+2019-04-05 15:13:27,082 | INFO | finished experiment candidates_stat_limited_nico
+2019-04-05 15:13:27,100 | INFO | completed experiments so far: ['candidates_stat_limited_tb100full', 'candidates_dyn_limited_tb100full', 'candidates_stat_limited_nico']
+2019-04-05 15:13:27,100 | INFO | starting experiment candidates_dyn_limited_nico
