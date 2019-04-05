@@ -2,10 +2,10 @@ import argparse
 from subprocess import Popen, PIPE
 import logging
 
-logger = logging.getLogger('candidates_io_exp')
+logger = logging.getLogger('candidates_fixed_limited_exp')
 logger.setLevel(logging.DEBUG)
 
-fh = logging.FileHandler('candidates_io_exp.log')
+fh = logging.FileHandler('candidates_fixed_limited_exp.log')
 fh.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler()
