@@ -1568,7 +1568,7 @@ def create_graphs_from_rects(result_folder, eval_folder):
     plt.plot(dim, normalized_gt_size_scores, color='#785ef0', label='Groundtruth size', alpha=1)
     plt.plot(dim, normalized_size_score, color='#fe6100', label='Predicted size', alpha=1)
     plt.axhline(y=normalized_size_score[0], color='k', linestyle=':', label='Initial size')
-    plt.legend(ncol=2, mode="expand", loc='upper center', bbox_to_anchor=(0.5, -0.2))
+    plt.legend(ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
     plt.subplots_adjust(bottom=0.3)
     plt.xlim(1, len(normalized_size_score))
     plt.savefig(figure_file2)
