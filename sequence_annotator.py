@@ -1,6 +1,6 @@
 import argparse
 import PIL
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import os
 import numpy as np
 
@@ -12,7 +12,7 @@ parser.add_argument('-gt', '--groundtruths')
 parser.add_argument('-sp', '--save_path')
 
 args = parser.parse_args()
-args.sequence_dir = "/media/finn/linux-ssd/candidates_stat_cont_tb100full/hiob-execution-wtmgws11-2019-03-25-18.00.00.141037/tracking-0048-tb100-Freeman3"
+args.sequence_dir = "/media/finn/linux-ssd/paper_dsst_dyn_cont_tb100full/hiob-execution-wtmgws11-2019-03-30-05.32.11.810807/tracking-0041-tb100-FaceOcc1"
 
 sequence_name = os.path.basename(args.sequence_dir).split("-")[-1]
 main_dir = os.path.dirname(args.sequence_dir)
@@ -32,8 +32,10 @@ def main():
     with open(args.predictions, "r") as predicitions_txt:
         predictions = predicitions_txt.readlines()
 
+    qualities = [None] * len(predictions)
     for i, prediction in enumerate(predictions):
         str_pred = prediction.replace("\n", "").split(",")[1:5]
+        qualities[i] = float(prediction.replace("\n", "").split(",")[5])
         int_pred = [int(number) for number in str_pred]
 
         predictions[i] = int_pred
@@ -49,9 +51,10 @@ def main():
         if "NaN" in ground_truth:
             # go back to find the last valid prediction
             j = 1
-            while "NaN" in ground_truths[i-j]:
+            while "NaN" in ground_truths[i - j]:
                 j += 1
-            int_gt = ground_truths[i-j]  # past valid positions have already been converted and saved in list, just use them
+            int_gt = ground_truths[
+                i - j]  # past valid positions have already been converted and saved in list, just use them
         else:
             str_gt = ground_truth.replace("\n", "")
             if "," in str_gt:
@@ -78,14 +81,30 @@ def main():
             pil_im = pil_im.convert("RGB")
 
         draw = ImageDraw.Draw(pil_im)
-        gt_rep = [ground_truths[i][0], ground_truths[i][1], ground_truths[i][0] + ground_truths[i][2], ground_truths[i][1] + ground_truths[i][3]]
-        draw.rectangle(gt_rep, fill=None, outline="green")
-        # draw.text((10, pil_im.height - 20), "Sample Text", color="red")
-        pred_rep = [predictions[i][0], predictions[i][1], predictions[i][0] + predictions[i][2], predictions[i][1] + predictions[i][3]]
-        draw.rectangle(pred_rep, fill=None, outline="red")
+        gt_rep = [ground_truths[i][0], ground_truths[i][1], ground_truths[i][0] + ground_truths[i][2],
+                  ground_truths[i][1] + ground_truths[i][3]]
+        gt_line_points = (
+        (gt_rep[0], gt_rep[1]) , (gt_rep[2], gt_rep[1]), (gt_rep[2], gt_rep[2]), (gt_rep[0], gt_rep[2]), (gt_rep[0], gt_rep[1]))
+        # draw.rectangle(gt_rep, fill=None, outline="green")
+        draw.line(gt_line_points, fill="gold", width=4)
+
+        if "cont" in args.sequence_dir:
+            draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " Update allowed", fill="lime")
+        else:
+            if qualities[i] >= 0.4 and qualities[i] <= 0.6:
+                draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " Update allowed", fill="lime")
+            elif qualities[i] < 0.4 or qualities[i] > 0.6:
+                draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " Update forbidden", fill="red")
+
+        pred_rep = [predictions[i][0], predictions[i][1], predictions[i][0] + predictions[i][2],
+                    predictions[i][1] + predictions[i][3]]
+        pred_line_points = (
+            (pred_rep[0], pred_rep[1]), (pred_rep[2], pred_rep[1]), (pred_rep[2], pred_rep[2]), (pred_rep[0], pred_rep[2]), (pred_rep[0], pred_rep[1]))
+        # draw.rectangle(pred_rep, fill=None, outline="red")
+        draw.line(pred_line_points, fill="magenta", width=4)
+
         pil_im.save(os.path.join(args.save_path, str(images_files[i])))
 
 
 if __name__ == "__main__":
     main()
-
