@@ -263,7 +263,7 @@ def create_multicolumn_csv_for_tab():
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[2]]["algorithm"]) + " Size"])
 
     second_header_row = {
-        "Attribute": "Metric",
+        "Attribute": "Attribute",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]][
                 "algorithm"]) + " Precision": "Precision",
         str(hiob_executions_info_dict[list(hiob_executions_info_dict.keys())[0]]["algorithm"]) + " Success": "Success",
@@ -397,7 +397,7 @@ def create_tex_for_tab(csv_file, tex_name):
     for index, row in df.iterrows():
         attribute_row_str = ""
         # skip the pre succ size... row
-        if row["Attribute"] == "Metric":
+        if row["Attribute"] == "Attribute":
             continue
 
         attribute_row_str += row["Attribute"] + " & "
