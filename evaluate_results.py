@@ -30,7 +30,7 @@ parser.add_argument("-m", "--mode", help="To differentiate between an opt folder
 parser.add_argument("-p_mfig", "--path_multi_figure", help="Path where the figure with multiple graphs shall be saved")
 
 parser.add_argument("-t", "--task", help="Which task the shall be executed? Vals: "
-                                         "framerate_vs_approach, gen_final_comp_tab, multi_ds_graph")
+                                         "framerate_vs_approach, gen_final_comp_tab")
 
 args = parser.parse_args()
 

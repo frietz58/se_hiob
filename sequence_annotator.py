@@ -12,7 +12,7 @@ parser.add_argument('-gt', '--groundtruths')
 parser.add_argument('-sp', '--save_path')
 
 args = parser.parse_args()
-args.sequence_dir = "/media/finn/linux-ssd/paper_dsst_dyn_cont_tb100full/hiob-execution-wtmgws11-2019-03-30-05.32.11.810807/tracking-0041-tb100-FaceOcc1"
+args.sequence_dir = "/media/finn/linux-ssd/paper_dsst_dyn_cont_tb100full/hiob-execution-wtmgws11-2019-03-30-05.32.11.810807/tracking-0057-tb100-Human6"
 
 sequence_name = os.path.basename(args.sequence_dir).split("-")[-1]
 main_dir = os.path.dirname(args.sequence_dir)
@@ -84,22 +84,25 @@ def main():
         gt_rep = [ground_truths[i][0], ground_truths[i][1], ground_truths[i][0] + ground_truths[i][2],
                   ground_truths[i][1] + ground_truths[i][3]]
         gt_line_points = (
-        (gt_rep[0], gt_rep[1]) , (gt_rep[2], gt_rep[1]), (gt_rep[2], gt_rep[2]), (gt_rep[0], gt_rep[2]), (gt_rep[0], gt_rep[1]))
+        (gt_rep[0], gt_rep[1]) , (gt_rep[2], gt_rep[1]), (gt_rep[2], gt_rep[3]), (gt_rep[0], gt_rep[3]), (gt_rep[0], gt_rep[1]))
         # draw.rectangle(gt_rep, fill=None, outline="green")
         draw.line(gt_line_points, fill="gold", width=4)
 
         if "cont" in args.sequence_dir:
-            draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " Update allowed", fill="lime")
+            draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " SE executed", fill="lime")
+        elif "no_se" in args.sequence_dir:
+            draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " SE skipped",
+                      fill="red")
         else:
             if qualities[i] >= 0.4 and qualities[i] <= 0.6:
-                draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " Update allowed", fill="lime")
+                draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " SE executed", fill="lime")
             elif qualities[i] < 0.4 or qualities[i] > 0.6:
-                draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " Update forbidden", fill="red")
+                draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " SE skipped", fill="red")
 
         pred_rep = [predictions[i][0], predictions[i][1], predictions[i][0] + predictions[i][2],
                     predictions[i][1] + predictions[i][3]]
         pred_line_points = (
-            (pred_rep[0], pred_rep[1]), (pred_rep[2], pred_rep[1]), (pred_rep[2], pred_rep[2]), (pred_rep[0], pred_rep[2]), (pred_rep[0], pred_rep[1]))
+            (pred_rep[0], pred_rep[1]), (pred_rep[2], pred_rep[1]), (pred_rep[2], pred_rep[3]), (pred_rep[0], pred_rep[3]), (pred_rep[0], pred_rep[1]))
         # draw.rectangle(pred_rep, fill=None, outline="red")
         draw.line(pred_line_points, fill="magenta", width=4)
 
