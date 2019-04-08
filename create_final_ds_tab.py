@@ -387,7 +387,7 @@ def create_tex_for_tab(csv_file, tex_name):
     lines.append("\\midrule\n")
 
     # second row with metrics and precision success size repeating three times
-    pre_succ_size_row_str = "\\multicolumn{1}{c}{Metric} & Precision & Success & Size & Precision & Success & Size & Precision & Success & Size \\\\\n"
+    pre_succ_size_row_str = "\\multicolumn{1}{c}{Attribute} & Precision & Success & Size & Precision & Success & Size & Precision & Success & Size \\\\\n"
     print(pre_succ_size_row_str)
     lines.append(pre_succ_size_row_str)
 
