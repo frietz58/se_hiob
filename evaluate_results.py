@@ -1502,31 +1502,31 @@ def order_handles_labels(handles, labels):
     new_order_labels = [None] * len(labels)
     new_order_handels = [None] * len(handles)
     for label, handle in zip(labels, handles):
-        if "Candidates stat. Full" in label:
+        if "Candidates stat. max" in label:
             new_order_labels[0] = label
             new_order_handels[0] = handle
-        elif "Candidates stat. HGC" in label:
+        elif "Candidates stat. CWS" in label:
             new_order_labels[1] = label
             new_order_handels[1] = handle
-        elif "Candidates dyn. Full" in label:
+        elif "Candidates dyn. max" in label:
             new_order_labels[2] = label
             new_order_handels[2] = handle
-        elif "Candidates dyn. HGC" in label:
+        elif "Candidates dyn. CWS" in label:
             new_order_labels[3] = label
             new_order_handels[3] = handle
-        elif "DSST stat. Full" in label:
+        elif "DSST stat. max" in label:
             new_order_labels[5] = label
             new_order_handels[5] = handle
-        elif "DSST stat. HGC" in label:
+        elif "DSST stat. CWS" in label:
             new_order_labels[6] = label
             new_order_handels[6] = handle
-        elif "DSST dyn. Full" in label:
+        elif "DSST dyn. max" in label:
             new_order_labels[7] = label
             new_order_handels[7] = handle
-        elif "DSST dyn. HGC" in label:
+        elif "DSST dyn. CWS" in label:
             new_order_labels[8] = label
             new_order_handels[8] = handle
-        elif "No SE" in label:
+        elif "No SE (HGC)" in label:
             new_order_labels[4] = label
             new_order_handels[4] = handle
 
@@ -1736,6 +1736,7 @@ def create_graphs_from_opt_csv(obt_folder, fps_lim=None, succ_min=None, succ_max
             succ_min = 0
         if succ_max is None:
             succ_max = 1
+
         ax.set_ylim(succ_min, succ_max)
 
         # plt.show()
