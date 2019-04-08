@@ -2574,7 +2574,7 @@ def main(results_path):
                 print("creating opt csv")
                 create_opt_csv(results_path, "opt")
                 print("creating graphs for parameter results")
-                create_graphs_from_opt_csv(results_path, fps_lim=args.fps_lim, succ_min=args.succ_min, succ_max=args.succ_max)
+                create_graphs_from_opt_csv(results_path, fps_lim=args.fps_lim, succ_min=args.min_succ, succ_max=args.top_succ)
             elif mode == "exp":
                 # print("creating sequence boxplots")
                 # sequence_boxplots(tracking_folder=results_path)
