@@ -1167,6 +1167,99 @@ def create_opt_csv(experiment_folder, eval_folder):
                     avg_se_fps_sd
                 ]
 
+    else:
+        # find dirs with same parameter value
+        same_parameter_value_collection = get_same_parameter_values(trackings)
+        changing_parameter = same_parameter_value_collection[list(same_parameter_value_collection.keys())[0]][0][
+            "parameter"]
+
+        print("parameter: " + str(changing_parameter))
+
+        with open(csv_name, "w", newline='') as outcsv:
+            fieldnames = [csv_avg_success,
+                          csv_avg_precision,
+                          csv_avg_fps,
+                          csv_avg_se_fps,
+                          changing_parameter]
+
+            writer = csv.DictWriter(outcsv, fieldnames=fieldnames)
+            writer.writeheader()
+
+            sd_df = pd.DataFrame(columns=[
+                changing_parameter,
+                "avg_succ",
+                "avg_prec",
+                "avg_fps",
+                "avg_se_fps",
+                "succ_sd",
+                "prec_sd",
+                "avg_fps_sd",
+                "avg_se_fps_sd"
+            ])
+
+            # get the average values for the same parameter value for a row in the opt csv
+            for i, value in enumerate(same_parameter_value_collection.values()):
+                avg_succs = []
+                avg_precs = []
+                se_framerates = []
+                framerates = []
+
+                # get value for one row
+                for single_tracking in value:
+                    with open(single_tracking["tracking"] + "/evaluation.txt", "r") as evaltxt:
+                        lines = evaltxt.readlines()
+                        for line in lines:
+                            line = line.replace("\n", "")
+                            key_val = line.split("=")
+                            if key_val[0] == "average_precision_rating":
+                                avg_precs.append(float(key_val[1]))
+                            elif key_val[0] == "average_success_rating":
+                                avg_succs.append(float(key_val[1]))
+                            elif key_val[0] == "frame_rate":
+                                framerates.append(float(key_val[1]))
+                            elif key_val[0] == "se_frame_rate":
+                                se_framerates.append(float(key_val[1]))
+
+                final_avg_succ = np.around(sum(avg_succs) / len(avg_succs), decimals=3)
+                final_avg_precc = np.around(sum(avg_precs) / len(avg_precs), decimals=3)
+                final_framerate = np.around(sum(framerates) / len(framerates), decimals=3)
+                final_se_framerate = np.around(sum(se_framerates) / len(se_framerates), decimals=3)
+                print("succs: " + str(avg_succs))
+                print("precs: " + str(avg_precs))
+                print("framerates: " + str(framerates))
+                print("se_framerates: " + str(se_framerates))
+
+                writer.writerow({csv_avg_success: final_avg_succ,
+                                 csv_avg_precision: final_avg_precc,
+                                 csv_avg_fps: final_framerate,
+                                 csv_avg_se_fps: final_se_framerate,
+                                 changing_parameter: value[0]["value"]})
+
+                # calc sds
+                succ_sd_helper = [x - final_avg_succ for x in avg_succs]
+                succ_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in succ_sd_helper]), len(avg_succs) - 1))
+
+                prec_sd_helper = [x - final_avg_precc for x in avg_precs]
+                prec_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in prec_sd_helper]), len(avg_precs) - 1))
+
+                avg_fps_helper = [x - final_framerate for x in framerates]
+                avg_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_fps_helper]), len(framerates) - 1))
+
+                avg_se_fps_helper = [x - final_se_framerate for x in se_framerates]
+                avg_se_fps_sd = np.sqrt(np.divide(np.sum([x ** 2 for x in avg_se_fps_helper]), len(se_framerates) - 1))
+
+                sd_df.loc[i] = [
+                    value[0]["value"],
+                    final_avg_succ,
+                    final_avg_precc,
+                    final_framerate,
+                    final_se_framerate,
+                    succ_sd,
+                    prec_sd,
+                    avg_fps_sd,
+                    avg_se_fps_sd
+                ]
+
     # sort created csv by parameter and override old
     df = pd.read_csv(csv_name)
     cols = list(df)
