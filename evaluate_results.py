@@ -1736,7 +1736,8 @@ def create_graphs_from_opt_csv(obt_folder, fps_lim=None, succ_min=None, succ_max
             succ_min = 0
         if succ_max is None:
             succ_max = 1
-        ax.set_ylim(succ_min, succ_max)
+        print("success lims: " + succ_min + " " + succ_max)
+        ax.set_ylim(float(succ_min), float(succ_max))
 
         # plt.show()
         figure_file1 = os.path.join(obt_folder, 'parameter_vs_metrics.pdf')
@@ -1760,7 +1761,8 @@ def create_graphs_from_opt_csv(obt_folder, fps_lim=None, succ_min=None, succ_max
 
             if fps_lim is None:
                 fps_lim = 60
-            ax.set_ylim(0, fps_lim)
+            print("fps lim " + fps_lim)
+            ax.set_ylim(0, float(fps_lim))
             ax.set_ylabel('Frame rate')
             fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
             ax.set_xticks(ind)
