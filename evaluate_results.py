@@ -1535,31 +1535,31 @@ def order_handles_labels(handles, labels):
 
 # return color based on algorithm name
 def get_color_for_algorithm(algorithm):
-    if "Candidates stat. Full" in algorithm:
+    if "Candidates stat. max" in algorithm:
         return "#fe6100"  # orange
 
-    elif "Candidates stat. HGC" in algorithm:
+    elif "Candidates stat. CWS" in algorithm:
         return "#321c4c"  # violet
 
-    elif "Candidates dyn. Full" in algorithm:
+    elif "Candidates dyn. max" in algorithm:
         return "#dc267f"  # magenta
 
-    elif "Candidates dyn. HGC" in algorithm:
+    elif "Candidates dyn. CWS" in algorithm:
         return "#34bc6e"  # green
 
-    elif "DSST stat. Full" in algorithm:
+    elif "DSST stat. max" in algorithm:
         return "#ffb000"  # gold
 
-    elif "DSST stat. HGC" in algorithm:
+    elif "DSST stat. CWS" in algorithm:
         return "#95d13c"  # lime
 
-    elif "DSST dyn. Full" in algorithm:
+    elif "DSST dyn. max" in algorithm:
         return "#777677"  # gray
 
-    elif "DSST dyn. HGC" in algorithm:
+    elif "DSST dyn. CWS" in algorithm:
         return "#e62325"  # red
 
-    elif "No SE" in algorithm:
+    elif "No SE (HGC)" in algorithm:
         return "#009bef"  # cerulean
 
 
@@ -2261,63 +2261,63 @@ def get_approach_from_yaml(tracking_dir):
         algorithm = None
 
         if not scale_estimator_conf["use_scale_estimation"]:
-            algorithm = "No SE"
+            algorithm = "No SE (HGC)"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
             # algorithm = "DSST static continuous"
-            algorithm = "DSST stat. Full"
+            algorithm = "DSST stat. max"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and not scale_estimator_conf["d_change_aspect_ratio"]:
             # algorithm = "DSST static limited"
-            algorithm = "DSST stat. HGC"
+            algorithm = "DSST stat. CWS"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
             # algorithm = "DSST dynamic continuous"
-            algorithm = "DSST dyn. Full"
+            algorithm = "DSST dyn. max"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "custom_dsst" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and scale_estimator_conf["d_change_aspect_ratio"]:
             # algorithm = "DSST dynamic limited"
-            algorithm = "DSST dyn. HGC"
+            algorithm = "DSST dyn. CWS"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
             # algorithm = "Candidates dynamic continuous"
-            algorithm = "Candidates dyn. Full"
+            algorithm = "Candidates dyn. max"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and scale_estimator_conf["c_change_aspect_ratio"]:
             # algorithm = "Candidates dynamic limited"
-            algorithm = "Candidates dyn. HGC"
+            algorithm = "Candidates dyn. CWS"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "cont" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
             # algorithm = "Candidates static continuous"
-            algorithm = "Candidates stat. Full"
+            algorithm = "Candidates stat. max"
 
         elif scale_estimator_conf["use_scale_estimation"] \
                 and scale_estimator_conf["approach"] == "candidates" \
                 and scale_estimator_conf["update_strategy"] == "limited" \
                 and not scale_estimator_conf["c_change_aspect_ratio"]:
             # algorithm = "Candidates static limited"
-            algorithm = "Candidates stat. HGC"
+            algorithm = "Candidates stat. CWS"
 
         return algorithm
 
