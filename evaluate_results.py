@@ -32,6 +32,10 @@ parser.add_argument("-p_mfig", "--path_multi_figure", help="Path where the figur
 parser.add_argument("-t", "--task", help="Which task the shall be executed? Vals: "
                                          "framerate_vs_approach, gen_final_comp_tab")
 
+parser.add_argument("-fps", "--fps_lim", help="limit for fps in opt figures")
+parser.add_argument("-ms", "--min_succ", help="min limit for fps success in opt figures")
+parser.add_argument("-ts", "--top_succ", help="max limit for fps success in opt figures")
+
 args = parser.parse_args()
 
 
@@ -1516,11 +1520,11 @@ def create_graphs_from_rects(result_folder, eval_folder):
     f = plt.figure()
     x = np.arange(0., 50.1, .1)
     y = [dfun(a) for a in x]
-    at20 = dfun(20)
-    tx = "Precision(20) = %0.4f" % at20
+    at20 = np.around(dfun(20), decimals=3)
+    tx = "Precision(20) = {0}".format(at20)
     # plt.text(5.05, 0.05, tx)
-    plt.xlabel("center distance [pixels]")
-    plt.ylabel("occurrence")
+    plt.xlabel("Center distance [pixels]")
+    plt.ylabel("Occurrence")
     plt.xlim(xmin=0, xmax=50)
     plt.ylim(ymin=0.0, ymax=1.0)
     plt.plot(x, y, color="#ffb000", label=tx)
@@ -1539,11 +1543,11 @@ def create_graphs_from_rects(result_folder, eval_folder):
     f = plt.figure()
     x = np.arange(0., 1.001, 0.001)
     y = [ofun(a) for a in x]
-    auc = np.trapz(y, x)
-    tx = "AUC = %0.4f" % auc
+    auc = np.around(np.trapz(y, x), decimals=3)
+    tx = "AUC = {0}".format(auc)
     # plt.text(0.05, 0.05, tx)
-    plt.xlabel("overlap score")
-    plt.ylabel("occurrence")
+    plt.xlabel("Overlap score")
+    plt.ylabel("Occurrence")
     plt.xlim(xmin=0.0, xmax=1.0)
     plt.ylim(ymin=0.0, ymax=1.0)
     plt.plot(x, y, color='#648fff', label=tx)
@@ -1563,7 +1567,7 @@ def create_graphs_from_rects(result_folder, eval_folder):
     plt.xlabel("Frame")
     plt.ylabel("Size")
     # plt.text(x=10, y=10, s="abc={0}".format(abc))
-    size_label = "Size score = {0}".format(abc)
+    size_label = "Size error = {0}".format(abc)
     plt.fill_between(dim, normalized_size_score, normalized_gt_size_scores, color="#ffb000", alpha=0.7, label=size_label)
     plt.plot(dim, normalized_gt_size_scores, color='#785ef0', label='Groundtruth size', alpha=1)
     plt.plot(dim, normalized_size_score, color='#fe6100', label='Predicted size', alpha=1)
@@ -1588,7 +1592,7 @@ def create_graphs_metrics_for_set(set_of_results, set_name):
 
 
 # create the graphs for the opt plotting parameter value vs x
-def create_graphs_from_opt_csv(obt_folder):
+def create_graphs_from_opt_csv(obt_folder, fps_lim=None, succ_min=None, succ_max=None):
     # set font size for graphs that are generated
     plt.rcParams.update({'font.size': 15})
 
@@ -1635,10 +1639,15 @@ def create_graphs_from_opt_csv(obt_folder):
             plt.subplots_adjust(bottom=0.15)
 
         ax.legend((success_graph[0], precision_graph[0]), (csv_avg_success, csv_avg_precision))
-        ax.set_ylim(0, 1)
+        if succ_min is None:
+            succ_min = 0
+        if succ_max is None:
+            succ_max = 1
+        ax.set_ylim(succ_min, succ_max)
 
         # plt.show()
         figure_file1 = os.path.join(obt_folder, 'parameter_vs_metrics.pdf')
+        print("saved" + str(figure_file1))
         plt.savefig(figure_file1)
 
         # ================ PARAMETER vs FRAMERATE ================
@@ -1656,24 +1665,28 @@ def create_graphs_from_opt_csv(obt_folder):
             se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
             framerate_graph = ax.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
 
-            ax.set_ylim(0, 60)
-            ax.set_ylabel('Frame-rate')
+            if fps_lim is None:
+                fps_lim = 60
+            ax.set_ylim(0, fps_lim)
+            ax.set_ylabel('Frame rate')
             fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
             ax.set_xticks(ind)
             ax.set_xticklabels(sorted_df[parameter_name])
-            ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
+            ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE frame rate', 'Avg. frame rate'))
             if len(ind) > 5:
                 plt.xticks(rotation=45)
                 plt.subplots_adjust(bottom=0.2)
             else:
                 plt.subplots_adjust(bottom=0.15)
 
+
+
         else:
             fig, (ax, ax2) = plt.subplots(2, 1, sharex=True)
 
             se_framerate_graph = ax.errorbar(ind, se_framerate, yerr=se_framerate_sd, color='#785ef0', capsize=3)
             ax.set_ylim((min(se_framerate) - max(se_framerate_sd) * 5), (max(se_framerate) + max(se_framerate_sd) * 5))
-            ax.set_ylabel('SE Frame-rate')
+            ax.set_ylabel('SE frame rate')
             fig.text(0.5, 0.04, parameter_names[str(parameter_name)], ha='center')
             ax.set_xticks(ind)
             ax.set_xticklabels(sorted_df[parameter_name])
@@ -1685,11 +1698,11 @@ def create_graphs_from_opt_csv(obt_folder):
 
             framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
             ax2.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(framerate) + max(framerate_sd) * 5))
-            ax2.set_ylabel('Frame-rate')
+            ax2.set_ylabel('Frame rate')
             ax2.set_xticks(ind)
             ax2.set_xticklabels(sorted_df[parameter_name])
 
-            ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE Frame-rate', 'Avg. Frame-rate'))
+            ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE frame rate', 'Avg. frame rate'))
 
             # hide the spines between ax and ax2
             ax.spines['bottom'].set_visible(False)
@@ -1709,6 +1722,7 @@ def create_graphs_from_opt_csv(obt_folder):
 
         # plt.show()
         figure_file2 = os.path.join(obt_folder, 'parameter_vs_framerate.pdf')
+        print("saved " + str(figure_file2))
         plt.savefig(figure_file2)
 
     create_obt_fig_tex_include(dataframe=sorted_df,
