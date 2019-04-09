@@ -169,7 +169,7 @@ class CandidateApproach:
                 scaled_predictions[1].append(scaled_height_box)
 
         # for creating images...
-        if False:
+        if True:
             self.create_image_with_generated_candidates(scaled_predictions, tracking, frame)
 
         return scaled_predictions
@@ -508,6 +508,9 @@ class CandidateApproach:
         conolidator_img1 = tracking.get_frame_consolidation_images(decorations=False)['single']
         conolidator_img2 = tracking.get_frame_consolidation_images(decorations=False)['single']
 
+        if self.frame.number != 1:
+            selmask = tracking.get_frame_selection_mask_images()
+
         sroi_img1 = tracking.get_frame_sroi_image(decorations=False)
         sroi_img2 = tracking.get_frame_sroi_image(decorations=False)
 
@@ -529,20 +532,20 @@ class CandidateApproach:
             for i, rect in enumerate(scaled_predictions):
                 if i % 5 == 0 or i == 0 or i == 32:
                     sroi_pos = tracking.capture_to_sroi(rect, frame.roi).inner
-                    sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
+                    #sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
 
                     cap_pos = rect.inner
-                    capture_draw1.rectangle(cap_pos, None, tracking.colours['candidate'])
+                    #capture_draw1.rectangle(cap_pos, None, tracking.colours['candidate'])
 
                 if i == 0:
                     cons_pos = tracking.capture_to_mask(
                         rect, frame.roi).inner
-                    consolidator_draw1.rectangle(cons_pos, None, tracking.colours['roi'])
+                    #consolidator_draw1.rectangle(cons_pos, None, tracking.colours['roi'])
 
                 if i == 32:
                     cons_pos = tracking.capture_to_mask(
                         rect, frame.roi).inner
-                    consolidator_draw2.rectangle(cons_pos, None, tracking.colours['roi'])
+                    #consolidator_draw2.rectangle(cons_pos, None, tracking.colours['roi'])
 
             conolidator_img1.save(os.path.join(image_dir, "{}-consolidator_0th_cand.png".format(tracking.get_current_frame_number())))
             conolidator_img2.save(os.path.join(image_dir, "{}-consolidator_32th_cand.png".format(tracking.get_current_frame_number())))

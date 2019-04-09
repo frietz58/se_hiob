@@ -825,7 +825,7 @@ class Tracking(object):
 
         images = OrderedDict()
 
-        for n, f in self.module_states.feature_selector['forwards'].items():
+        for n, f in self.module_states.feature_selector['feature_orders'].items():
             im = Image.fromarray(
                 self.cmap(
                     f.reshape(self.mask_size), bytes=True)
