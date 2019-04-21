@@ -1421,13 +1421,13 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     print("legend order: " + str(ordered_labels))
 
     if wide_legend:
-        # plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
-        # plt.subplots_adjust(bottom=0.4)
+        plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
+        plt.subplots_adjust(bottom=0.4)
         # plt.title(str(what_is_plotted))
-        print("wide legend")
-        plt.legend(labels=ordered_labels, handles=ordered_handles, loc=2,
-                   bbox_to_anchor=(1.05, 1))
-        plt.subplots_adjust(right=0.5)
+        #print("wide legend")
+        #plt.legend(labels=ordered_labels, handles=ordered_handles, loc=2,
+                   # bbox_to_anchor=(1.05, 1))
+        #plt.subplots_adjust(right=0.5)
     else:
         plt.legend(labels=ordered_labels, handles=ordered_handles, loc="lower right")
         plt.subplots_adjust(bottom=0.15)
@@ -1435,7 +1435,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         #     plt.title(str(algorithm + " precision"))
         # elif legend_by == "algorithm":
         #     plt.title(str(what_is_plotted))
-
+    plt.set_size_inches(10, 18)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
@@ -2354,7 +2354,15 @@ def get_dataset_from_name(tracking_name):
                 else:
                     raise ValueError("No datase for sequence")
     else:
-        print("here")
+        # only one sequence/tracking
+        sequence = get_sequences(os.path.join(tracking_name))[0]
+        datasets = []
+        if "tb100" in sequence:
+            datasets.append("tb100")
+        elif "nicovision" in sequence:
+            datasets.append("nicovision")
+        else:
+            raise ValueError("No datase for sequence")
 
     if all("tb100" in tracking for tracking in datasets):
         return "TB100"
