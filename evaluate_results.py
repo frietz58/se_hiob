@@ -1422,7 +1422,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
 
     if wide_legend:
         plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
-        plt.subplots_adjust(bottom=0.4)
+        plt.subplots_adjust(bottom=0.2)
         # plt.title(str(what_is_plotted))
         #print("wide legend")
         #plt.legend(labels=ordered_labels, handles=ordered_handles, loc=2,
@@ -1484,12 +1484,14 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     print("legend order: " + str(ordered_labels))
 
     if wide_legend:
-        plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
+        plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center',
+                   bbox_to_anchor=(0.5, -0.2))
         plt.subplots_adjust(bottom=0.2)
     else:
         plt.legend(labels=ordered_labels, handles=ordered_handles, loc="lower left")
         plt.subplots_adjust(bottom=0.15)
 
+    f.set_figheight(f.get_figheight() * 2)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
