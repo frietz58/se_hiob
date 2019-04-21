@@ -12,7 +12,7 @@ parser.add_argument('-gt', '--groundtruths')
 parser.add_argument('-sp', '--save_path')
 
 args = parser.parse_args()
-args.sequence_dir = "/media/finn/linux-ssd/paper_dsst_dyn_cont_nico/hiob-execution-wtmgws11-2019-03-30-14.41.21.600499/tracking-0009-nicovision-lift_red_car_02"
+args.sequence_dir = "/media/finn/linux-ssd/paper_dsst_dyn_cont_tb100full/hiob-execution-wtmgws11-2019-03-30-05.32.11.810807/tracking-0002-tb100-Biker"
 
 sequence_name = os.path.basename(args.sequence_dir).split("-")[-1]
 main_dir = os.path.dirname(args.sequence_dir)
@@ -86,7 +86,7 @@ def main():
         gt_line_points = (
         (gt_rep[0], gt_rep[1]) , (gt_rep[2], gt_rep[1]), (gt_rep[2], gt_rep[3]), (gt_rep[0], gt_rep[3]), (gt_rep[0], gt_rep[1]))
         # draw.rectangle(gt_rep, fill=None, outline="green")
-        draw.line(gt_line_points, fill="gold", width=4)
+        draw.line(gt_line_points, fill="magenta", width=4)
 
         # if "cont" in args.sequence_dir:
         #     draw.text((10, pil_im.height - 20), str(np.around(qualities[i], decimals=3)) + " SE executed", fill="lime")
@@ -104,7 +104,7 @@ def main():
         pred_line_points = (
             (pred_rep[0], pred_rep[1]), (pred_rep[2], pred_rep[1]), (pred_rep[2], pred_rep[3]), (pred_rep[0], pred_rep[3]), (pred_rep[0], pred_rep[1]))
         draw.rectangle(pred_rep, fill=None, outline="red")
-        draw.line(pred_line_points, fill="magenta", width=4)
+        draw.line(pred_line_points, fill="orange", width=4)
 
         pil_im.save(os.path.join(args.save_path, str(images_files[i])))
 

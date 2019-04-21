@@ -1658,25 +1658,32 @@ def create_graphs_from_rects(result_folder, eval_folder):
 
     # Size Plot:
     normalized_size_score, normalized_gt_size_scores = normalize_size_datapoints(size_scores, gt_size_scores)
-    abc = area_between_curves(normalized_size_score, normalized_gt_size_scores)
-    dim = np.arange(1, len(normalized_size_score) + 1)
-    figure_file2 = os.path.join(eval_path, 'size_over_time.svg')
-    figure_file3 = os.path.join(eval_path, 'size_over_time.pdf')
-    f = plt.figure()
-    plt.xlabel("Frame")
-    plt.ylabel("Size")
-    # plt.text(x=10, y=10, s="abc={0}".format(abc))
-    size_label = "Size error = {0}".format(abc)
-    plt.fill_between(dim, normalized_size_score, normalized_gt_size_scores, color="#ffb000", alpha=0.7, label=size_label)
-    plt.plot(dim, normalized_gt_size_scores, color='#785ef0', label='Groundtruth size', alpha=1)
-    plt.plot(dim, normalized_size_score, color='#fe6100', label='Predicted size', alpha=1)
-    plt.axhline(y=normalized_size_score[0], color='k', linestyle=':', label='Initial size')
-    plt.legend(ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
-    plt.subplots_adjust(bottom=0.3)
-    plt.xlim(1, len(normalized_size_score))
-    plt.savefig(figure_file2)
-    plt.savefig(figure_file3)
-    plt.close()
+
+    for i in range(len(normalized_size_score)):
+        abc = area_between_curves(normalized_size_score, normalized_gt_size_scores)
+        dim = np.arange(1, len(normalized_size_score) + 1)
+        figure_file2 = os.path.join(eval_path, 'size_graphs', 'size{}.svg'.format(i))
+        figure_file3 = os.path.join(eval_path, 'size_graphs', 'size{}.png'.format(i))
+        figure_file3 = os.path.join(eval_path, 'size_graphs', 'size{}.pdf'.format(i))
+
+        if not os.path.exists(os.path.join(eval_path, "size_graphs")):
+            os.mkdir(os.path.join(eval_path, "size_graphs"))
+        f = plt.figure()
+        plt.xlabel("Frame")
+        plt.ylabel("Size")
+        # plt.text(x=10, y=10, s="abc={0}".format(abc))
+        size_label = "Size error = {0}".format(abc)
+        plt.fill_between(dim, normalized_size_score, normalized_gt_size_scores, color="#ffb000", alpha=0.7, label=size_label)
+        plt.plot(dim, normalized_gt_size_scores, color='#785ef0', label='Groundtruth size', alpha=1)
+        plt.plot(dim, normalized_size_score, color='#fe6100', label='Predicted size', alpha=1)
+        plt.axhline(y=normalized_size_score[0], color='k', linestyle=':', label='Initial size')
+        plt.axvline(x=i, color='k', linestyle=':')
+        plt.legend(ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
+        plt.subplots_adjust(bottom=0.3)
+        plt.xlim(1, len(normalized_size_score))
+        plt.savefig(figure_file2)
+        plt.savefig(figure_file3)
+        plt.close()
 
     create_multiple_graphs_tex_include(save_folder=eval_path,
                                        path_in_src=eval_path,
