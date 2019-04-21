@@ -1435,7 +1435,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         #     plt.title(str(algorithm + " precision"))
         # elif legend_by == "algorithm":
         #     plt.title(str(what_is_plotted))
-    plt.set_size_inches(10, 18)
+    f.set_figheight(f.get_figheight() * 2)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
