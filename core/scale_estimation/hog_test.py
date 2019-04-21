@@ -8,7 +8,7 @@ from skimage import io
 
 # img = cv2.imread('biker0001.jpg')
 #
-# resized_img = cv2.resize(img, (24, 16))
+# resized_img = cv2.resize(img, (, 16))
 #
 # winSize = (24, 16)
 # blockSize = (4, 4)
@@ -33,9 +33,9 @@ from skimage import io
 
 
 
-image = io.imread("/home/finn/PycharmProjects/code-git/HIOB/data/nicovision/lift_blue_tissue_01/img/00417.png")
+image = io.imread("/home/finn/PycharmProjects/code-git/HIOB/images/Singer1/1-32_patch.png")
 
-fd, hog_image = hog(image, orientations=8, pixels_per_cell=(1, 1),
+fd, hog_image = hog(image, orientations=8, pixels_per_cell=(4, 4),
                     cells_per_block=(1, 1), visualize=True, multichannel=True)
 
 #fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)

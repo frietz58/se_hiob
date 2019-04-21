@@ -313,8 +313,8 @@ class CandidateApproach:
         old_x = self.frame.predicted_position.center[0]
         old_y = self.frame.predicted_position.center[1]
 
-        new_x = int(old_x - np.rint(new_w/2))
-        new_y = int(old_y - np.rint(new_h/2))
+        new_x = int(old_x - np.rint(new_w / 2))
+        new_y = int(old_y - np.rint(new_h / 2))
 
         return Rect(new_x, new_y, new_w, new_h)
 
@@ -331,7 +331,7 @@ class CandidateApproach:
         # (its possible that every prediction value is smaller than value for the inner threshold, in which case every
         # rating becomes 0, when everything in the quality output is 0, np.argmax will return 0 aswell, thus the
         # scale prediction fails
-        #TODO also make this use the max of base candidate not entire feature mask...
+        # TODO also make this use the max of base candidate not entire feature mask...
         max_val = np.amax(feature_mask)
         if max_val < self.inner_punish_threshold:
             raise ValueError('Highest probability is smaller than threshold')
@@ -339,10 +339,10 @@ class CandidateApproach:
         # punish candidate for containing values smaller than threshold
         # get the candidate on representation on the feature mask
         candidate_on_mask = feature_mask[
-                        round(candidate.top / mask_scale_factor[1]):
-                        round((candidate.bottom - 1) / mask_scale_factor[1]),
-                        round(candidate.left / mask_scale_factor[0]):
-                        round((candidate.right - 1) / mask_scale_factor[0])]
+                            round(candidate.top / mask_scale_factor[1]):
+                            round((candidate.bottom - 1) / mask_scale_factor[1]),
+                            round(candidate.left / mask_scale_factor[0]):
+                            round((candidate.right - 1) / mask_scale_factor[0])]
 
         # get the filter that checks where the condition applies
         mask_filter = candidate_on_mask < self.inner_punish_threshold
@@ -372,6 +372,8 @@ class CandidateApproach:
 
         # Evaluate the candidate
         quality_of_candidate = inner_punish_sum + outer_punish_sum
+
+        print(str(inner_punish_sum), str(outer_punish_sum))
 
         return quality_of_candidate
 
@@ -461,7 +463,6 @@ class CandidateApproach:
 
         # calculate the curve
         for i in range(1, int((len(curve) - 1) / 2) + 1):
-
             val = np.around(1 + (step_size * i), decimals=3)
 
             pos_loc = center + i
@@ -507,9 +508,7 @@ class CandidateApproach:
 
         conolidator_img1 = tracking.get_frame_consolidation_images(decorations=False)['single']
         conolidator_img2 = tracking.get_frame_consolidation_images(decorations=False)['single']
-
-        if self.frame.number != 1:
-            selmask = tracking.get_frame_selection_mask_images()
+        conolidator_img3 = tracking.get_frame_consolidation_images(decorations=False)['single']
 
         sroi_img1 = tracking.get_frame_sroi_image(decorations=False)
         sroi_img2 = tracking.get_frame_sroi_image(decorations=False)
@@ -517,10 +516,9 @@ class CandidateApproach:
         capture_img1 = tracking.get_frame_capture_image(decorations=False)
         capture_img2 = tracking.get_frame_capture_image(decorations=False)
 
-        # selection_mask_images = tracking.get_frame_selection_mask_images(decorations=True)
-
         consolidator_draw1 = ImageDraw.Draw(conolidator_img1)
         consolidator_draw2 = ImageDraw.Draw(conolidator_img2)
+        consolidator_draw3 = ImageDraw.Draw(conolidator_img3)
 
         sroi_draw1 = ImageDraw.Draw(sroi_img1)
         sroi_draw2 = ImageDraw.Draw(sroi_img2)
@@ -528,30 +526,89 @@ class CandidateApproach:
         capture_draw1 = ImageDraw.Draw(capture_img1)
         capture_draw2 = ImageDraw.Draw(capture_img2)
 
+
         if not self.change_aspect_ration:
             for i, rect in enumerate(scaled_predictions):
-                if i % 5 == 0 or i == 0 or i == 32:
+
+                resize = (scaled_predictions[int((len(scaled_predictions) - 1) / 2 + 1)]._w, scaled_predictions[
+                    int((len(scaled_predictions) - 1) / 2 + 1)]._h)
+
+                # if i % 5 == 0 or i == 0 or i == 32:
+                if i == (len(scaled_predictions) - 1) / 2 + 1:
+                    # sroi image
                     sroi_pos = tracking.capture_to_sroi(rect, frame.roi).inner
-                    #sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
+                    sroi_gt = tracking.capture_to_sroi(frame.ground_truth, frame.roi).inner
+                    # sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
+                    # sroi_draw1.rectangle(sroi_gt, None, tracking.colours['ground_truth'])
 
+                    # capture image
                     cap_pos = rect.inner
-                    #capture_draw1.rectangle(cap_pos, None, tracking.colours['candidate'])
+                    # capture_draw1.rectangle(cap_pos, None, tracking.colours['candidate'])
 
-                if i == 0:
+                    # consolidator image
+                    cons_pos = tracking.capture_to_mask(rect, frame.roi).inner
+                    consolidator_draw3.rectangle(cons_pos, None, tracking.colours['roi'])
+
+                    # scaled_patch
+                    img_patch = capture_img1.crop((rect._x, rect._y, rect._x + rect._w, rect._y + rect._h))
+                    img_patch.save(
+                        os.path.join(image_dir,
+                                     "{}-17_patch.png".format(tracking.get_current_frame_number())))
+
+
+                elif i == 0:
+                    # consolidator image
                     cons_pos = tracking.capture_to_mask(
                         rect, frame.roi).inner
-                    #consolidator_draw1.rectangle(cons_pos, None, tracking.colours['roi'])
+                    consolidator_draw1.rectangle(cons_pos, None, tracking.colours['roi'])
 
-                if i == 32:
+                    # sroi image
+                    sroi_pos = tracking.capture_to_sroi(rect, frame.roi).inner
+                    # sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
+
+                    # scaled_patch
+                    img_patch = capture_img1.crop((rect._x, rect._y, rect._x + rect._w, rect._y +  rect._h))
+                    img_patch = img_patch.resize(resize)
+                    img_patch.save(
+                        os.path.join(image_dir,
+                                     "{}-0_patch.png".format(tracking.get_current_frame_number())))
+
+                elif i == 32:
+                    # consolidator image
                     cons_pos = tracking.capture_to_mask(
                         rect, frame.roi).inner
-                    #consolidator_draw2.rectangle(cons_pos, None, tracking.colours['roi'])
+                    consolidator_draw2.rectangle(cons_pos, None, tracking.colours['roi'])
 
-            conolidator_img1.save(os.path.join(image_dir, "{}-consolidator_0th_cand.png".format(tracking.get_current_frame_number())))
-            conolidator_img2.save(os.path.join(image_dir, "{}-consolidator_32th_cand.png".format(tracking.get_current_frame_number())))
+                    # sroi image
+                    sroi_pos = tracking.capture_to_sroi(rect, frame.roi).inner
+                    # sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
 
-            sroi_img1.save(os.path.join(image_dir, "{}-sroi_candidates.png".format(tracking.get_current_frame_number())))
-            capture_img1.save(os.path.join(image_dir, "{}-capture_candidates.png".format(tracking.get_current_frame_number())))
+                    # scaled_patch
+                    img_patch = capture_img1.crop((rect._x, rect._y, rect._x + rect._w, rect._y + rect._h))
+                    img_patch = img_patch.resize(resize)
+                    img_patch.save(
+                        os.path.join(image_dir,
+                                     "{}-32_patch.png".format(tracking.get_current_frame_number())))
+
+                else:
+                    # sroi image
+                    sroi_pos = tracking.capture_to_sroi(rect, frame.roi).inner
+                    # sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
+
+            conolidator_img1.save(
+                os.path.join(image_dir, "{}-consolidator_0th_cand.png".format(tracking.get_current_frame_number())))
+            conolidator_img2.save(
+                os.path.join(image_dir, "{}-consolidator_32th_cand.png".format(tracking.get_current_frame_number())))
+            conolidator_img3.save(
+                os.path.join(image_dir, "{}-consolidator_17th_cand.png".format(tracking.get_current_frame_number())))
+
+            sroi_img1.save(
+                os.path.join(image_dir, "{}-sroi_candidates.png".format(tracking.get_current_frame_number())))
+            capture_img1.save(
+                os.path.join(image_dir, "{}-capture_candidates.png".format(tracking.get_current_frame_number())))
+
+            # if tracking.get_current_frame_number() != 1:
+            #     target_mask_img.save(os.path.join(image_dir, "{}-target_mask.png".format(tracking.get_current_frame_number())))
 
         elif self.change_aspect_ration:
             for i in range(0, np.shape(scaled_predictions)[1]):
@@ -568,11 +625,12 @@ class CandidateApproach:
                     sroi_pos_width = tracking.capture_to_sroi(scaled_predictions[1][i], frame.roi).inner
                     sroi_draw2.rectangle(sroi_pos_width, None, tracking.colours['candidate'])
 
-            capture_img1.save(os.path.join(image_dir, "{}-capture_width_candidates.png".format(tracking.get_current_frame_number())))
-            capture_img2.save(os.path.join(image_dir, "{}-capture_height_candidates.png".format(tracking.get_current_frame_number())))
+            capture_img1.save(
+                os.path.join(image_dir, "{}-capture_width_candidates.png".format(tracking.get_current_frame_number())))
+            capture_img2.save(
+                os.path.join(image_dir, "{}-capture_height_candidates.png".format(tracking.get_current_frame_number())))
 
-            sroi_img1.save(os.path.join(image_dir, "{}-sroi_width_candidates.png".format(tracking.get_current_frame_number())))
-            sroi_img2.save(os.path.join(image_dir, "{}-sroi_height_candidates.png".format(tracking.get_current_frame_number())))
-
-
-
+            sroi_img1.save(
+                os.path.join(image_dir, "{}-sroi_width_candidates.png".format(tracking.get_current_frame_number())))
+            sroi_img2.save(
+                os.path.join(image_dir, "{}-sroi_height_candidates.png".format(tracking.get_current_frame_number())))
