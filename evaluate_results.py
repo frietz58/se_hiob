@@ -1485,7 +1485,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
 
     if wide_legend:
         plt.legend(labels=ordered_labels, handles=ordered_handles, ncol=2, loc='upper center', bbox_to_anchor=(0.5, -0.2))
-        plt.subplots_adjust(bottom=0.4)
+        plt.subplots_adjust(bottom=0.2)
     else:
         plt.legend(labels=ordered_labels, handles=ordered_handles, loc="lower left")
         plt.subplots_adjust(bottom=0.15)
