@@ -1359,7 +1359,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
     if overall_dataset == "TB100":
         x = np.arange(0., 50.1, .1)
     elif overall_dataset == "NICO":
-        x = x = np.arange(0., 100.1, .1)
+        x = np.arange(0., 100.1, .1)
 
     figure_file2 = os.path.join(eval_folder, 'multiple_precision_plot.svg')
     figure_file3 = os.path.join(eval_folder, 'multiple_precision_plot.pdf')
@@ -1435,7 +1435,7 @@ def multiple_trackings_graphs(tracking_folders, eval_folder, what_is_plotted, fo
         #     plt.title(str(algorithm + " precision"))
         # elif legend_by == "algorithm":
         #     plt.title(str(what_is_plotted))
-    plt.set_size_inches(10, 18)
+    f.set_size_inches(10, 18)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
     plt.close()
@@ -1798,7 +1798,8 @@ def create_graphs_from_opt_csv(obt_folder, fps_lim=None, succ_min=None, succ_max
             framerate_graph = ax2.errorbar(ind, framerate, yerr=framerate_sd, color='#fe6100', capsize=3)
             ax2.set_ylim((min(framerate) - max(framerate_sd) * 5), (max(framerate) + max(framerate_sd) * 5))
             ax2.set_ylabel('Frame rate')
-            ax2.set_xticks(ind)
+            ax2.set_xticks(python evaluate_results.py -m exp -p_mfig ../new_legend_tb100_multifig -ptr ../no_se_tb100full/ ../candidates_dyn_cont_tb100full/ ../candidates_dyn_fixed_limited_tb100full/ ../candidates_stat_cont_tb100full/ ../candidates_stat_fixed_limited_tb100full/ ../paper_dsst_dyn_cont_tb100full/ ../paper_dsst_dyn_limited_tb100full/ ../paper_dsst_stat_cont_tb100full/ ../paper_dsst_stat_limited_tb100full/
+ind)
             ax2.set_xticklabels(sorted_df[parameter_name])
 
             ax.legend((se_framerate_graph[0], framerate_graph[0]), ('Avg. SE frame rate', 'Avg. frame rate'))
