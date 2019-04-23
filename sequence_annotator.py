@@ -12,7 +12,7 @@ parser.add_argument('-gt', '--groundtruths')
 parser.add_argument('-sp', '--save_path')
 
 args = parser.parse_args()
-args.sequence_dir = "/media/finn/linux-ssd/paper_dsst_dyn_cont_tb100full/hiob-execution-wtmgws11-2019-03-30-05.32.11.810807/tracking-0002-tb100-Biker"
+args.sequence_dir = "/home/finn/PycharmProjects/code-git/HIOB/hiob_logs/hiob-execution-finn-ubuntu-2019-04-22-19.54.08.490551/tracking-0001-nicovision-lift_sponge_03"
 
 sequence_name = os.path.basename(args.sequence_dir).split("-")[-1]
 main_dir = os.path.dirname(args.sequence_dir)

@@ -1662,9 +1662,17 @@ def create_graphs_from_rects(result_folder, eval_folder):
     for i in range(len(normalized_size_score)):
         abc = area_between_curves(normalized_size_score, normalized_gt_size_scores)
         dim = np.arange(1, len(normalized_size_score) + 1)
-        figure_file2 = os.path.join(eval_path, 'size_graphs', 'size{}.svg'.format(i))
-        figure_file3 = os.path.join(eval_path, 'size_graphs', 'size{}.png'.format(i))
-        figure_file3 = os.path.join(eval_path, 'size_graphs', 'size{}.pdf'.format(i))
+        if i < 10:
+            name = "000" + str(i)
+        elif i < 100:
+            name = "00" + str(i)
+        elif i < 1000:
+            name = "0" + str(i)
+        elif i < 10000:
+            name = str(i)
+
+        figure_file2 = os.path.join(eval_path, "size_graphs", name + '.png')
+        figure_file3 = os.path.join(eval_path, "size_graphs", name + '.png')
 
         if not os.path.exists(os.path.join(eval_path, "size_graphs")):
             os.mkdir(os.path.join(eval_path, "size_graphs"))
