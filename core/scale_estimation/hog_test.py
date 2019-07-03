@@ -30,10 +30,7 @@ from skimage import io
 #
 # print("here")
 
-
-
-
-image = io.imread("/home/finn/PycharmProjects/code-git/HIOB/images/Singer1/1-32_patch.png")
+image = io.imread("/home/finn/latex/wtm-scale-estimation-tex/Template4StudentTalks/nico results/471-17_patch.png")
 
 fd, hog_image = hog(image, orientations=8, pixels_per_cell=(4, 4),
                     cells_per_block=(1, 1), visualize=True, multichannel=True)

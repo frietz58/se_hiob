@@ -162,19 +162,37 @@ def create_3d_surf(csv_path):
     plt.show()
 
 
-def main():
-    inner_outer_csv = create_inner_outer_csv()
-    create_3d_scatter(csv_path=inner_outer_csv,
-                      z_axis="Total success",
-                      filename="inner_outer_success",
-                      z_lim_max=1.0)
+def create_mesh(csv_path):
+    fig = plt.figure()
 
-    create_3d_scatter(csv_path=inner_outer_csv,
-                      z_axis="Average size score",
-                      filename="inner_outer_size",
-                      z_lim_max=100)
+    df = pd.read_csv(csv_path)
+
+    x = list(df["Inner punish threshold"])
+    y = list(df["Outer punish threshold"])
+    z = list(df["Total success"])
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(z)
+
+    plt.savefig(os.path.join(os.path.dirname(csv_path), "3d_inner_outer_surf"))
+    plt.show()
+
+
+def main():
+    # inner_outer_csv = create_inner_outer_csv()
+    # create_3d_scatter(csv_path=inner_outer_csv,
+    #                   z_axis="Total success",
+    #                   filename="inner_outer_success",
+    #                   z_lim_max=1.0)
+    #
+    # create_3d_scatter(csv_path=inner_outer_csv,
+    #                   z_axis="Average size score",
+    #                   filename="inner_outer_size",
+    #                   z_lim_max=100)
 
     # create_3d_surf(csv_path=inner_outer_csv)
+
+    create_mesh(csv_path="/home/finn/inner_outer_opt/inner_outer_opt.csv")
 
 
 if __name__ == "__main__":
