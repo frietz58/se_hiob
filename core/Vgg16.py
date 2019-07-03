@@ -51,7 +51,7 @@ class Vgg16(object):
         assert bgr.get_shape().as_list()[1:] == [
             self.input_size[0], self.input_size[1], 3]
 
-        self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
+        self.data_dict = np.load(vgg16_npy_path, encoding='latin1', allow_pickle=True).item()
         logger.info("npy file loaded")
 
         self.build()
