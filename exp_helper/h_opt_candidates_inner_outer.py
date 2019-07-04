@@ -83,14 +83,14 @@ def main():
     if args.test_run is None:
         args.test_run = True
 
-    for i in np.arange(0.1, 0.6, 0.1):
+    for i in np.arange(0.1, 1.1, 0.1):
         for j in np.arange(0.1, 1.1, 0.1):
             change_list = [
                 ["inner_punish_threshold", float(np.around(i, decimals=1))],
                 ["outer_punish_threshold", float(np.around(j, decimals=1))]
             ]
 
-            set_keyval(key_val_list=change_list, load_from="config/tracker_candidates_nachtrag.yaml", save_to="config/" + args.tracker)
+            set_keyval(key_val_list=change_list, load_from="../config/" + args.tracker, save_to="../config/" + args.tracker)
 
             exp_key = "inner" + str(np.around(i, decimals=1)) + "_outer" + str(np.around(j, decimals=1))
 
@@ -101,7 +101,7 @@ def main():
             if exp_key not in progress["finished"]:
                 logger.info("starting experiment " + exp_key)
 
-                call = "python hiob_cli.py -e config/" + args.environment + " -t config/" + args.tracker + " -g " + args.gpu
+                call = "python ../hiob_cli.py -e ../config/" + args.environment + " -t ../config/" + args.tracker + " -g " + args.gpu
                 logger.info(call)
                 if args.test_run == "False":
                     p = Popen(call, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)

@@ -37,6 +37,79 @@ def set_keyval(key_val_list, load_from, save_to):
         yaml.dump(yaml_file, f)
 
 
+def change_c_number_scales_old():
+    print("Parameter: c_number_scales")
+    c_number_scales_start = 33
+    c_number_scales_step = 2
+    c_number_scales_times = 5
+
+    # make val bigger,
+    for i in range(1, c_number_scales_times + 1):
+
+        c_number_scales_val = c_number_scales_start + c_number_scales_step ** i
+        print(c_number_scales_val)
+        c_number_scales_change = [
+            ["c_number_scales", c_number_scales_val],
+            ["use_scale_estimation", True],
+            ["use_update_strategies", False],
+            ["approach", "custom_dsst"],
+            ["c_change_aspect_ratio", False]
+            ]
+
+        set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml", save_to=args.tracker)
+
+        environment_change = [["environment_name", "candidates"], ["log_dir", "../candidates_opt/c_number_scales"]]
+        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+
+        if args.gpu is None:
+            args.gpu = 0
+
+        subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
+        gc.collect()
+        print()
+
+    # original val
+    print(c_number_scales_start)
+    c_number_scales_change = [
+            ["c_number_scales", c_number_scales_start],
+            ["use_scale_estimation", True],
+            ["use_update_strategies", False],
+            ["approach", "custom_dsst"],
+            ["c_change_aspect_ratio", False]
+            ]
+    print()
+
+    set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml",  save_to=args.tracker)
+
+    if args.gpu is None:
+        args.gpu = 0
+
+    subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
+    gc.collect()
+
+    # make val smaller,
+    for i in range(1, c_number_scales_times + 1):
+
+        c_number_scales_val = c_number_scales_start - c_number_scales_step ** i
+        print(c_number_scales_val)
+        c_number_scales_change = [
+            ["c_number_scales", c_number_scales_val],
+            ["use_scale_estimation", True],
+            ["use_update_strategies", False],
+            ["approach", "custom_dsst"],
+            ["c_change_aspect_ratio", False]
+            ]
+
+        set_keyval(key_val_list=c_number_scales_change, load_from="config/backup_tracker.yaml",  save_to=args.tracker)
+
+        if args.gpu is None:
+            args.gpu = 0
+
+        subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
+        gc.collect()
+        print()
+
+
 def change_parameter(parameter_name, additional_parameters, start, step, times, change_function, test, only_one_dir):
     parameter_name = str(parameter_name)
     print("Parameter: " + parameter_name)
@@ -51,15 +124,14 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
 
         val_changes_bigger = additional_parameters
         val_changes_bigger.append([str(parameter_name), val_change])
-
-        set_keyval(key_val_list=val_changes_bigger, load_from="config/backup_tracker.yaml",
-                   save_to=args.tracker)
-
-        environment_change = [["environment_name", "candidates"],
-                              ["log_dir", "../candidates_opt/" + str(parameter_name)]]
-        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
-
         if not test:
+            set_keyval(key_val_list=val_changes_bigger, load_from="config/backup_tracker.yaml",
+                       save_to=args.tracker)
+
+            environment_change = [["environment_name", "candidates"],
+                                  ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+            set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+
             subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
         gc.collect()
     print()
@@ -72,14 +144,13 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
     start_val.append([str(parameter_name), start])
 
     print()
-
-    set_keyval(key_val_list=start_val, load_from="config/backup_tracker.yaml", save_to=args.tracker)
-
-    environment_change = [["environment_name", "candidates"],
-                          ["log_dir", "../candidates_opt/" + str(parameter_name)]]
-    set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
-
     if not test:
+        set_keyval(key_val_list=start_val, load_from="config/backup_tracker.yaml", save_to=args.tracker)
+
+        environment_change = [["environment_name", "candidates"],
+                              ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+
         subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
     gc.collect()
 
@@ -97,15 +168,14 @@ def change_parameter(parameter_name, additional_parameters, start, step, times, 
 
         val_changes_smaller = additional_parameters
         val_changes_smaller.append([str(parameter_name), val_change])
-
-        set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
-                   save_to=args.tracker)
-
-        environment_change = [["environment_name", "candidates"],
-                              ["log_dir", "../candidates_opt/" + str(parameter_name)]]
-        set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
-
         if not test:
+            set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
+                       save_to=args.tracker)
+
+            environment_change = [["environment_name", "candidates"],
+                                  ["log_dir", "../candidates_opt/" + str(parameter_name)]]
+            set_keyval(key_val_list=environment_change, load_from="config/environment.yaml", save_to=args.environment)
+
             subprocess.call(['python', 'hiob_cli.py', '-e', args.environment, '-t', args.tracker, '-g', str(args.gpu)])
         gc.collect()
     print()
@@ -155,7 +225,7 @@ if __name__ == '__main__':
     if args.gpu is None:
         args.gpu = 0
 
-    test = False
+    test = True
 
     change_parameter(parameter_name='c_number_scales', additional_parameters=[
         ["use_scale_estimation", True],

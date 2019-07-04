@@ -1,8 +1,7 @@
 import argparse
 import PIL
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 import os
-import numpy as np
 
 parser = argparse.ArgumentParser(description='Execute hiob experiments')
 parser.add_argument('-sd', '--sequence_dir')

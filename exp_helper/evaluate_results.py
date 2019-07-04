@@ -5,15 +5,11 @@ import scipy.io
 import matplotlib
 
 matplotlib.use('Agg')  # for plot when display is undefined
-import matplotlib.pyplot as plt
-import numpy as np
 import csv
 import zipfile36
 import yaml
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
 
 parser = argparse.ArgumentParser(description="Evaluates tracking results. Can be used on either a matlab result folder,"

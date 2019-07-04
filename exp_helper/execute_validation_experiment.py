@@ -1,8 +1,6 @@
 import subprocess
-import ruamel.yaml
-import gc
+
 import argparse
-import numpy as np
 
 parser = argparse.ArgumentParser(description='Execute Parameter Optimization')
 parser.add_argument('-g', '--gpu')
