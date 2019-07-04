@@ -387,6 +387,7 @@ class CandidateApproach:
         :return: if factors out of threshold, threshold factor, otherwise normal factor
         """
 
+        # if we use limited, we dont know how many frame can have passed on limiting doesnt make any sense
         if self.update_strategy == "limited":
             return new
 

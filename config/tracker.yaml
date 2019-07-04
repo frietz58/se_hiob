@@ -97,7 +97,7 @@ tracking_conf:
 
 scale_estimator:
   use_scale_estimation: true   # Enable or disable scale estimation
-  update_strategy: limited
+  update_strategy: cont
   dyn_min_se_treshold: 0.2
   dyn_max_se_treshold: 0.4
   static_update_val: 20
@@ -139,12 +139,12 @@ scale_estimator:
 tracking:
 # = Short Test Set = #
 #  - nicovision/pull_green_car_01
-#- tb100/Deer
-#- tb100/DragonBaby
-#- tb100/CarScale
-#- tb100/Walking
+- tb100/Deer
+- tb100/DragonBaby
+- tb100/CarScale
+- tb100/Walking
 #- tb100/Skating2
-- nicovision/lift_sponge_03
+#- nicovision/lift_sponge_03
 #- nicovision/lift_red_car_01
 
 # = Training Set = #
