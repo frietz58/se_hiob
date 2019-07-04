@@ -54,7 +54,7 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
         val_changes_bigger.append([str(parameter_name), val_change])
 
         if not test:
-            set_keyval(key_val_list=val_changes_bigger, load_from="config/backup_tracker.yaml",
+            set_keyval(key_val_list=val_changes_bigger, load_from="config/tracker_backup.yaml",
                    save_to=args.tracker)
 
         environment_change = [["environment_name", "dsst"],
@@ -76,7 +76,7 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
 
     print()
     if not test:
-        set_keyval(key_val_list=start_val, load_from="config/backup_tracker.yaml", save_to=args.tracker)
+        set_keyval(key_val_list=start_val, load_from="config/tracker_backup.yaml", save_to=args.tracker)
 
     environment_change = [["environment_name", "dsst"],
                           ["log_dir", "../dsst_opt/" + str(parameter_name)]]
@@ -106,7 +106,7 @@ def change_parameter(parameter_name, additional_parameters, start, step, times_p
             val_changes_smaller.append([str(parameter_name), val_change])
 
             if not test:
-                set_keyval(key_val_list=val_changes_smaller, load_from="config/backup_tracker.yaml",
+                set_keyval(key_val_list=val_changes_smaller, load_from="config/tracker_backup.yaml",
                        save_to=args.tracker)
 
             environment_change = [["environment_name", "dsst"],

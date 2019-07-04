@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="20a18998-cbbc-45a5-af2e-3a76481a2554" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_dyn_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_dyn_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_dyn_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_dyn_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_stat_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_stat_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_stat_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_candidates_stat_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_dyn_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_dyn_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_dyn_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_dyn_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_stat_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_stat_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_stat_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_stat_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_dsst_validation.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_no_se_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/env_no_se_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/environment_candidates.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/environment_candidates_nachtrag.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/environment_dsst_nachtrag.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/environment_dsst_validation.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/environment_experiments_candidates.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/environment_experiments_dsst.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_cand_io2.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_dyn_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_dyn_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_dyn_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_dyn_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_nachtrag.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_stat_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_stat_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_stat_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_candidates_stat_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_dyn_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_dyn_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_dyn_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_dyn_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_nachtrag.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_stat_cont_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_stat_cont_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_stat_limited_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_stat_limited_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_dsst_validation.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_no_se_nico.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/tracker_no_se_tb100full.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exp_helper/h_opt_dsst.py" beforeDir="false" afterPath="$PROJECT_DIR$/exp_helper/h_opt_dsst.py" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/config/env_cand_stat_cont_io.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="28" selection-start-line="7" selection-start-column="28" selection-end-line="7" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/core/scale_estimation/candidates.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="566">
+              <caret line="636" selection-start-line="636" selection-end-line="636" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+                <element signature="e#8356#11128#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/exp_helper/h_opt_dsst.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="228">
+              <caret line="108" column="93" selection-start-line="108" selection-start-column="93" selection-end-line="108" selection-end-column="93" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/config/tracker_cand_io.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="124" column="29" selection-start-line="124" selection-start-column="29" selection-end-line="124" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/core/Tracker.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="42" selection-start-line="42" selection-end-line="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>scale_model_size</find>
+      <find>print(</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/core/scale_estimation/hog_test.py" />
+        <option value="$PROJECT_DIR$/core/scale_estimation/candidates.py" />
+        <option value="$PROJECT_DIR$/config/environment_candidates.yaml" />
+        <option value="$PROJECT_DIR$/config/environment_dsst.yaml" />
+        <option value="$PROJECT_DIR$/config/env_cand_stat_cont_io.yaml" />
+        <option value="$PROJECT_DIR$/config/tracker_cand_io.yaml" />
+        <option value="$PROJECT_DIR$/exp_helper/h_opt_dsst.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectConfigurationFiles">
+    <option name="files">
+      <list>
+        <option value="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
+        <option value="$PROJECT_DIR$/.idea/other.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="571" />
+    <option name="y" value="-4" />
+    <option name="width" value="1211" />
+    <option name="height" value="983" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="wtm-scale-estimation" type="b2602c69:ProjectViewProjectNode" />
+              <item name="wtm-scale-estimation" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="wtm-scale-estimation" type="b2602c69:ProjectViewProjectNode" />
+              <item name="wtm-scale-estimation" type="462c0819:PsiDirectoryNode" />
+              <item name="config" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="wtm-scale-estimation" type="b2602c69:ProjectViewProjectNode" />
+              <item name="wtm-scale-estimation" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="wtm-scale-estimation" type="b2602c69:ProjectViewProjectNode" />
+              <item name="wtm-scale-estimation" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
+              <item name="scale_estimation" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="wtm-scale-estimation" type="b2602c69:ProjectViewProjectNode" />
+              <item name="wtm-scale-estimation" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/config" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/config" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="wtm-scale-estimation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="hiob_gui" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="wtm-scale-estimation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/hiob_gui.py" />
+      <option name="PARAMETERS" value="-e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.hiob_gui" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="20a18998-cbbc-45a5-af2e-3a76481a2554" name="Default Changelist" comment="" />
+      <created>1556010267089</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1556010267089</updated>
+      <workItem from="1562238744863" duration="79000" />
+      <workItem from="1562242464072" duration="7649000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="7728000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="65" y="-4" width="1855" height="1204" extended-state="6" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23935877" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.32970026" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3298872" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3996367" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.14713897" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.39327884" />
+      <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="12" />
+      <window_info anchor="right" x="0" y="0" width="413" height="1004" id="Documentation" side_tool="true" weight="0.24267551" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+      <window_info anchor="right" id="SciView" order="4" visible="true" weight="0.19071311" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/core/scale_estimation/candidates.py</url>
+          <line>354</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/wtm_scale_estimation$hiob_gui.coverage" NAME="hiob_gui Coverage Results" MODIFIED="1562248482432" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/core/scale_estimation/hog_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="48" column="29" lean-forward="true" selection-start-line="48" selection-start-column="29" selection-end-line="48" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/tracker_dsst_validation.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4860" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/backup_tracker.yaml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/tracker_candidates.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1035" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/tracker_dsst.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-540" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/sample_provider/Sample.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="73" selection-start-line="73" selection-end-line="73" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/environment_candidates.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/environment_dsst.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/tracker_template.yaml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/env_cand_stat_cont_io.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="28" selection-start-line="7" selection-start-column="28" selection-end-line="7" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/tracker_cand_io.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="124" column="29" selection-start-line="124" selection-start-column="29" selection-end-line="124" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/Tracker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/scale_estimation/candidates.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="566">
+          <caret line="636" selection-start-line="636" selection-end-line="636" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+            <element signature="e#8356#11128#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/exp_helper/h_opt_dsst.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="108" column="93" selection-start-line="108" selection-start-column="93" selection-end-line="108" selection-end-column="93" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
