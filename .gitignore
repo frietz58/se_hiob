@@ -14,5 +14,5 @@ transitions
 *.mat
 core/*_dsst_results
 core/scale_estimation/mats
-./idea*
+/.idea*
 
