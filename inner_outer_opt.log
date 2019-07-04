@@ -1,0 +1,100 @@
+2019-07-04 18:28:55,665 | INFO | completed experiments so far: []
+2019-07-04 18:28:55,665 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.1]]
+2019-07-04 18:28:55,665 | INFO | starting experiment inner0.1_outer0.1
+2019-07-04 18:28:55,665 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:55,700 | ERROR | EXPERIMENT inner0.1_outer0.1 FAILED!
+2019-07-04 18:28:55,700 | ERROR | Log:
+2019-07-04 18:28:55,700 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:55,793 | INFO | completed experiments so far: []
+2019-07-04 18:28:55,793 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.2]]
+2019-07-04 18:28:55,793 | INFO | starting experiment inner0.1_outer0.2
+2019-07-04 18:28:55,794 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:55,831 | ERROR | EXPERIMENT inner0.1_outer0.2 FAILED!
+2019-07-04 18:28:55,832 | ERROR | Log:
+2019-07-04 18:28:55,832 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:55,937 | INFO | completed experiments so far: []
+2019-07-04 18:28:55,937 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.3]]
+2019-07-04 18:28:55,937 | INFO | starting experiment inner0.1_outer0.3
+2019-07-04 18:28:55,937 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:55,973 | ERROR | EXPERIMENT inner0.1_outer0.3 FAILED!
+2019-07-04 18:28:55,974 | ERROR | Log:
+2019-07-04 18:28:55,974 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,071 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,071 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.4]]
+2019-07-04 18:28:56,071 | INFO | starting experiment inner0.1_outer0.4
+2019-07-04 18:28:56,071 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:56,108 | ERROR | EXPERIMENT inner0.1_outer0.4 FAILED!
+2019-07-04 18:28:56,108 | ERROR | Log:
+2019-07-04 18:28:56,108 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,183 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,183 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.5]]
+2019-07-04 18:28:56,183 | INFO | starting experiment inner0.1_outer0.5
+2019-07-04 18:28:56,183 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:56,221 | ERROR | EXPERIMENT inner0.1_outer0.5 FAILED!
+2019-07-04 18:28:56,222 | ERROR | Log:
+2019-07-04 18:28:56,222 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,321 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,321 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.6]]
+2019-07-04 18:28:56,321 | INFO | starting experiment inner0.1_outer0.6
+2019-07-04 18:28:56,321 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:56,357 | ERROR | EXPERIMENT inner0.1_outer0.6 FAILED!
+2019-07-04 18:28:56,357 | ERROR | Log:
+2019-07-04 18:28:56,358 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,450 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,451 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.7]]
+2019-07-04 18:28:56,451 | INFO | starting experiment inner0.1_outer0.7
+2019-07-04 18:28:56,451 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:56,485 | ERROR | EXPERIMENT inner0.1_outer0.7 FAILED!
+2019-07-04 18:28:56,485 | ERROR | Log:
+2019-07-04 18:28:56,486 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,580 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,580 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.8]]
+2019-07-04 18:28:56,580 | INFO | starting experiment inner0.1_outer0.8
+2019-07-04 18:28:56,581 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:56,618 | ERROR | EXPERIMENT inner0.1_outer0.8 FAILED!
+2019-07-04 18:28:56,619 | ERROR | Log:
+2019-07-04 18:28:56,619 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,712 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,712 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.9]]
+2019-07-04 18:28:56,712 | INFO | starting experiment inner0.1_outer0.9
+2019-07-04 18:28:56,712 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:56,745 | ERROR | EXPERIMENT inner0.1_outer0.9 FAILED!
+2019-07-04 18:28:56,745 | ERROR | Log:
+2019-07-04 18:28:56,745 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,840 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,840 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 1.0]]
+2019-07-04 18:28:56,840 | INFO | starting experiment inner0.1_outer1.0
+2019-07-04 18:28:56,840 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:56,873 | ERROR | EXPERIMENT inner0.1_outer1.0 FAILED!
+2019-07-04 18:28:56,873 | ERROR | Log:
+2019-07-04 18:28:56,874 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:56,967 | INFO | completed experiments so far: []
+2019-07-04 18:28:56,967 | INFO | curr change: [['inner_punish_threshold', 0.2], ['outer_punish_threshold', 0.1]]
+2019-07-04 18:28:56,967 | INFO | starting experiment inner0.2_outer0.1
+2019-07-04 18:28:56,967 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:57,000 | ERROR | EXPERIMENT inner0.2_outer0.1 FAILED!
+2019-07-04 18:28:57,000 | ERROR | Log:
+2019-07-04 18:28:57,000 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:28:57,095 | INFO | completed experiments so far: []
+2019-07-04 18:28:57,095 | INFO | curr change: [['inner_punish_threshold', 0.2], ['outer_punish_threshold', 0.2]]
+2019-07-04 18:28:57,095 | INFO | starting experiment inner0.2_outer0.2
+2019-07-04 18:28:57,096 | INFO | python ../hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
+2019-07-04 18:28:57,128 | ERROR | EXPERIMENT inner0.2_outer0.2 FAILED!
+2019-07-04 18:28:57,129 | ERROR | Log:
+2019-07-04 18:28:57,129 | ERROR | python: can't open file '../hiob_cli.py': [Errno 2] No such file or directory
+
+2019-07-04 18:30:35,360 | INFO | completed experiments so far: []
+2019-07-04 18:30:35,361 | INFO | curr change: [['inner_punish_threshold', 0.1], ['outer_punish_threshold', 0.1]]
+2019-07-04 18:30:35,361 | INFO | starting experiment inner0.1_outer0.1
+2019-07-04 18:30:35,361 | INFO | python hiob_cli.py -e config/env_cand_stat_cont_io.yaml -t config/tracker_cand_io.yaml -g 3
