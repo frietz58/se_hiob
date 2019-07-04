@@ -5,13 +5,13 @@
 # Can be fed to program via command line argument --environment [path]
 
 # name describing this environment (for log purposes):
-environment_name: io_candidates_stat_cont
+environment_name: new_formula_test
 
 # directory to which execution logs are written:
-log_dir: ../io_candidates_stat_cont/
+log_dir: ../new_inner_punish_formula/
 
 # directory in which data samples are kept:
-data_dir: /informatik2/students/home/5rietz/BA/wtm-scale-estimation/data
+data_dir: ./data
 
 # directory in which net weight files are kept:
 net_dir: ./net

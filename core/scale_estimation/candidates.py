@@ -353,6 +353,7 @@ class CandidateApproach:
         # sum values up to get inner punish score
         # TODO use 1 - value for inner sum?
         inner_punish_sum = np.sum(feature_values)
+        # inner_punish_sum = np.sum([1-feature_val for feature_val in feature_values])
 
         # calculate a score that punishes the candidate for not containing values bigger than threshold
         # filter for all values that are bigger than threshold
