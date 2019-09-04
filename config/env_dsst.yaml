@@ -5,10 +5,10 @@
 # Can be fed to program via command line argument --environment [path]
 
 # name describing this environment (for log purposes):
-environment_name: new_formula_opt
+environment_name: dsst
 
 # directory to which execution logs are written:
-log_dir: ../new_formula_opt/
+log_dir: ../dsst_logs/
 
 # directory in which data samples are kept:
 data_dir: /informatik2/students/home/5rietz/BA/wtm-scale-estimation/data
