@@ -351,9 +351,11 @@ class CandidateApproach:
         feature_values = candidate_on_mask[mask_filter]
 
         # sum values up to get inner punish score
-        # TODO use 1 - value for inner sum?
-        inner_punish_sum = np.sum(feature_values)
-        # inner_punish_sum = np.sum([1-feature_val for feature_val in feature_values])
+        # inner_punish_sum = np.sum(feature_values)  # old calc, had been used in thesis
+
+        # this has shown to work better, we use 1-val, because these values are SMALLER than threshold, thus wont
+        # produce a big sum and have a small impact if we just sum those up...
+        inner_punish_sum = np.sum([1-feature_val for feature_val in feature_values])
 
         # calculate a score that punishes the candidate for not containing values bigger than threshold
         # filter for all values that are bigger than threshold
