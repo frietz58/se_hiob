@@ -101,8 +101,7 @@ def main():
                 logger.info("curr change: " + str(change_list))
                 logger.info("starting experiment " + exp_key)
 
-                call = ("python hiob_cli.py -e config/" + args.environment + " -t config/" + args.tracker +
-                        " -g " + args.gpu)
+                call = "python hiob_cli.py -e config/" + args.environment + " -t config/" + args.tracker + " -g " + args.gpu
                 logger.info(call)
                 if args.test_run == "False":
                     p = Popen(call, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
