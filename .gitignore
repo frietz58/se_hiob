@@ -7,3 +7,5 @@ asyncio
 logging
 transitions
 **/.*.swp
+.idea/
+images
