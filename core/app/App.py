@@ -239,25 +239,39 @@ class App:
             }
             self.feed_queue(entry)
             if "save_images" in self.conf and self.conf["save_images"]:
+            # if True:
                 self.save_images(tracking)
         tracking.finish_tracking()
 
         return tracking
 
     def save_images(self, tracking):
-        heatmap = tracking.get_frame_consolidation_images(decorations=False)['single']
+        heatmap = tracking.get_frame_consolidation_images(decorations=True)['single']
         sroi = tracking.get_frame_sroi_image(decorations=False)
-        capture_image = tracking.get_frame_capture_image(decorations=False)
+        capture_image = tracking.get_frame_capture_image(decorations=True)
         result = tracking.get_frame_sroi_image()
 
         image_dir = os.path.join("images", tracking.sample.name)
         if not os.path.exists(image_dir):
             os.makedirs(image_dir)
 
-        heatmap.save(os.path.join(image_dir, "{}-heatmap.png".format(tracking.get_current_frame_number())))
-        sroi.save(os.path.join(image_dir, "{}-sroi.png".format(tracking.get_current_frame_number())))
-        capture_image.save(os.path.join(image_dir, "{}-frame.png".format(tracking.get_current_frame_number())))
-        result.save(os.path.join(image_dir, "{}-tracked.png".format(tracking.get_current_frame_number())))
+        # scale heatmap up for better resolution
+        heatmap = heatmap.resize((200, 200))
+
+        # add zeros as prefix to number, for correct OS iteration
+        curr_frame = tracking.get_current_frame_number()
+        frame_str = str(curr_frame)
+        if len(frame_str) == 1:
+            frame_str = "000" + frame_str
+        elif len(frame_str) == 2:
+            frame_str = "00" + frame_str
+        elif len(frame_str) == 3:
+            frame_str = "0" + frame_str
+
+        heatmap.save(os.path.join(image_dir, "{}-heatmap.png".format(frame_str)))
+        sroi.save(os.path.join(image_dir, "{}-sroi.png".format(frame_str)))
+        capture_image.save(os.path.join(image_dir, "{}-frame.png".format(frame_str)))
+        result.save(os.path.join(image_dir, "{}-tracked.png".format(frame_str)))
 
     def tracker_fun(self):
         if self.tracker is None:
