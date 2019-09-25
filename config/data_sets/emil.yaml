@@ -1,0 +1,16 @@
+description: Recordings from the Emil camera
+format: tb100zip
+name: emil_recordings
+samples:
+    - name: lift_soft-banana_id-1-100_video
+      attributes: []
+      actual_frames: 656
+    - name: pull_yellow-car_id-1-73_video
+      attributes: []
+      actual_frames: 342
+    - name: push_soft-red-ball_id-1-45_video
+      attributes: []
+      actual_frames: 219
+    - name: scoot_heavy-green-car_id-0-17_video
+      attributes: []
+      actual_frames: 656
