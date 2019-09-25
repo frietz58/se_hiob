@@ -39,7 +39,7 @@ class CandidateApproach:
     def configure(self, configuration):
         """
         reads the values from the configuration
-        :param configuration: the configuration file
+        :param configuration: the configuration dict
         """
 
         self.number_scales = configuration['c_number_scales']
@@ -59,6 +59,12 @@ class CandidateApproach:
         self.hanning_scale_window = np.hanning(self.number_scales)
 
     def handle_initial_frame(self, frame):
+        """
+        Special case where we set some additional values that are not available at the time when we load the
+        configuration. Those values must be set so that we can actually process the oth frame like any other frame.
+        :param frame:
+        :return:
+        """
 
         # reset values from previous sequence
         self.frame = None
@@ -154,23 +160,22 @@ class CandidateApproach:
                 # handle out of bounds
                 new_x, new_y, new_w, new_h = self.check_oob(new_x, new_y, new_w, new_h)
 
-                scaled_width_box = Rect(
-                    new_x,
-                    self.frame.predicted_position.y,
-                    new_w,
-                    self.frame.predicted_position.h)
+                scaled_width_box = Rect(new_x,
+                                        self.frame.predicted_position.y,
+                                        new_w,
+                                        self.frame.predicted_position.h)
+
                 scaled_predictions[0].append(scaled_width_box)
 
-                scaled_height_box = Rect(
-                    self.frame.predicted_position.x,
-                    new_y,
-                    self.frame.predicted_position.w,
-                    new_h)
+                scaled_height_box = Rect(self.frame.predicted_position.x,
+                                         new_y,
+                                         self.frame.predicted_position.w,
+                                         new_h)
+
                 scaled_predictions[1].append(scaled_height_box)
 
         # for creating images...
-        if True:
-            self.create_image_with_generated_candidates(scaled_predictions, tracking, frame)
+        # self.create_image_with_generated_candidates(scaled_predictions, tracking, frame)
 
         return scaled_predictions
 
@@ -189,78 +194,31 @@ class CandidateApproach:
         """
         # if changes aspect ration
         if self.change_aspect_ration:
-
-            # Evaluate each candidate based on its size
             evaluated_candidates = [[], []]
 
-            # get pixel value of candidates at scaled lvl 1
-            # base_candidate_rect = scaled_candidates[0][16]
-            # base_candidate_val = np.sum([feature_mask[
-            #                              round(base_candidate_rect.top / mask_scale_factor[1]):
-            #                              round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
-            #                              round(base_candidate_rect.left / mask_scale_factor[0]):
-            #                              round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
-
+            # candidates that have only scaled width
             for width_candidate in scaled_candidates[0]:
-                # TODO dont have this code block three times...
-                try:
-                    evaluated_candidates[0].append(self.rate_scaled_candidate(
-                        candidate=width_candidate,
-                        feature_mask=feature_mask,
-                        mask_scale_factor=mask_scale_factor))
-                # should not happen because when only get here when the quality of the frame is higher than threshold
-                except ValueError:
-                    # handcraft the results, so that the scale will not change when the prediction is bad
-                    # number scales is always odd, therefor we now that factor 1 is in the middle
-                    if evaluated_candidates[0].__len__() == (self.number_scales - 1) / 2:
-                        evaluated_candidates[0].append(0)
-                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
-                    else:
-                        evaluated_candidates[0].append(1)
+                evaluated_candidates[0].append(self.evaluation_helper(candidate=width_candidate,
+                                                                      feature_mask=feature_mask,
+                                                                      mask_scale_factor=mask_scale_factor,
+                                                                      prev_list=evaluated_candidates[0]))
 
+            # candidates that have only scaled height
             for height_candidate in scaled_candidates[1]:
-                try:
-                    evaluated_candidates[1].append(self.rate_scaled_candidate(
-                        candidate=height_candidate,
-                        feature_mask=feature_mask,
-                        mask_scale_factor=mask_scale_factor))
-                # should not happen because when only get here when the quality of the frame is higher than threshold
-                except ValueError:
-                    # handcraft the results, so that the scale will not change when the prediction is bad
-                    # number scales is always odd, therefor we now that factor 1 is in the middle
-                    if evaluated_candidates[1].__len__() == (self.number_scales - 1) / 2:
-                        evaluated_candidates[1].append(0)
-                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
-                    else:
-                        evaluated_candidates[1].append(1)
+                evaluated_candidates[1].append(self.evaluation_helper(candidate=height_candidate,
+                                                                      feature_mask=feature_mask,
+                                                                      mask_scale_factor=mask_scale_factor,
+                                                                      prev_list=evaluated_candidates[1]))
 
         # if keep aspect ration the same
         else:
-            # base_candidate_rect = scaled_candidates[16]
-            # base_candidate_val = np.sum([feature_mask[
-            #                       round(base_candidate_rect.top / mask_scale_factor[1]):
-            #                       round((base_candidate_rect.bottom - 1) / mask_scale_factor[1]),
-            #                       round(base_candidate_rect.left / mask_scale_factor[0]):
-            #                       round((base_candidate_rect.right - 1) / mask_scale_factor[0])]])
-
-            # Evaluate each candidate based on its size
             evaluated_candidates = []
 
             for candidate in scaled_candidates:
-                try:
-                    evaluated_candidates.append(self.rate_scaled_candidate(
-                        candidate=candidate,
-                        mask_scale_factor=mask_scale_factor,
-                        feature_mask=feature_mask))
-                # should not happen because when only get here when the quality of the frame is higher than threshold
-                except ValueError:
-                    # handcraft the results, so that the scale will not change when the prediction is bad
-                    # number scales is always odd, therefor we now that factor 1 is in the middle
-                    if evaluated_candidates.__len__() == (self.number_scales - 1) / 2:
-                        evaluated_candidates.append(0)
-                        logger.info("Probability Values on Heatmap too low, returning unchanged size")
-                    else:
-                        evaluated_candidates.append(1)
+                evaluated_candidates.append(self.evaluation_helper(candidate=candidate,
+                                                                   feature_mask=feature_mask,
+                                                                   mask_scale_factor=mask_scale_factor,
+                                                                   prev_list=evaluated_candidates))
 
         # use either hanning or manual scale window to punish the candidates depending of their factor
         # IMPORTANT also makes them unique, which is import for the np.argmax later
@@ -291,7 +249,6 @@ class CandidateApproach:
             new_h = round(self.base_target_size[1] * self.current_height_factor)
 
         else:
-
             punished_candidates = np.multiply(evaluated_candidates, self.manual_scale_window)
 
             # correct scale factor if it changed too much
@@ -318,6 +275,35 @@ class CandidateApproach:
 
         return Rect(new_x, new_y, new_w, new_h)
 
+    def evaluation_helper(self, candidate, feature_mask, mask_scale_factor, prev_list):
+        """
+        Only used so that we don't have to reuse the code in the body of this method multiply times --> DRY!
+        :param candidate: the candidate to evaluate
+        :param feature_mask: the CNN feature mask
+        :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
+            size, the cnn output is configurable
+        :param prev_list: The list of the previously obtained ratings, needed for the case where we handcraft the
+            results
+        :return: a rating for the candidate
+        """
+        try:
+            evaluated_candidate = self.rate_scaled_candidate(
+                candidate=candidate,
+                feature_mask=feature_mask,
+                mask_scale_factor=mask_scale_factor)
+
+        # it can happen that all values on the feature map are < than the punish thresholds, in which case the
+        # calculation fails (for every candidate). Thus, we dont want to change the scale. Thus, every candidate gets
+        # a punishment score of 2, except the candidate at scale 1, which gets a score of 1 and as a consequence, scale
+        # factor 1 will be selected. Theoretically, this shouldn't even be needed anymore, because of the scale window.
+        except ValueError:
+            if len(prev_list) == (self.number_scales - 1) / 2:
+                evaluated_candidate = 1
+            else:
+                evaluated_candidate = 2
+
+        return evaluated_candidate
+
     def rate_scaled_candidate(self, candidate, mask_scale_factor, feature_mask):
         """
         :param candidate: the current candidate
@@ -331,7 +317,7 @@ class CandidateApproach:
         # (its possible that every prediction value is smaller than value for the inner threshold, in which case every
         # rating becomes 0, when everything in the quality output is 0, np.argmax will return 0 aswell, thus the
         # scale prediction fails
-        # TODO also make this use the max of base candidate not entire feature mask...
+
         max_val = np.amax(feature_mask)
         if max_val < self.inner_punish_threshold:
             raise ValueError('Highest probability is smaller than threshold')
@@ -355,7 +341,7 @@ class CandidateApproach:
 
         # this has shown to work better, we use 1-val, because these values are SMALLER than threshold, thus wont
         # produce a big sum and have a small impact if we just sum those up...
-        inner_punish_sum = np.sum([1-feature_val for feature_val in feature_values])
+        inner_punish_sum = np.sum([1 - feature_val for feature_val in feature_values])
 
         # calculate a score that punishes the candidate for not containing values bigger than threshold
         # filter for all values that are bigger than threshold
@@ -375,8 +361,6 @@ class CandidateApproach:
 
         # Evaluate the candidate
         quality_of_candidate = inner_punish_sum + outer_punish_sum
-
-        print(str(inner_punish_sum), str(outer_punish_sum))
 
         return quality_of_candidate
 
@@ -478,7 +462,16 @@ class CandidateApproach:
         self.manual_scale_window = curve
 
     def check_oob(self, new_x, new_y, new_w, new_h):
-        # handle out of bounds
+        """
+        Checks whether the generate scale of the object is bigger than the frame, in which case it is set to be as big
+        as possible without.
+        :param new_x: scaled x valuue
+        :param new_y: scaled y valuue
+        :param new_w: scaled w valuue
+        :param new_h: scaled h valuue
+        :return: The if necessary adjusted values
+        """
+
         if new_x <= 1:
             new_x = 1
 
@@ -506,6 +499,12 @@ class CandidateApproach:
         return new_x, new_y, new_w, new_h
 
     def create_image_with_generated_candidates(self, scaled_predictions, tracking, frame):
+        """
+        Incredibly ugly code but idc, used this to generate some images for my thesis
+        :param scaled_predictions: the scaled candidates
+        :param tracking: the tracking object
+        :param frame: the current frame
+        """
         image_dir = os.path.join("images", tracking.sample.name)
         if not os.path.exists(image_dir):
             os.makedirs(image_dir)
@@ -529,7 +528,6 @@ class CandidateApproach:
 
         capture_draw1 = ImageDraw.Draw(capture_img1)
         capture_draw2 = ImageDraw.Draw(capture_img2)
-
 
         if not self.change_aspect_ration:
             for i, rect in enumerate(scaled_predictions):
@@ -559,7 +557,6 @@ class CandidateApproach:
                         os.path.join(image_dir,
                                      "{}-17_patch.png".format(tracking.get_current_frame_number())))
 
-
                 elif i == 0:
                     # consolidator image
                     cons_pos = tracking.capture_to_mask(
@@ -571,7 +568,7 @@ class CandidateApproach:
                     # sroi_draw1.rectangle(sroi_pos, None, tracking.colours['candidate'])
 
                     # scaled_patch
-                    img_patch = capture_img1.crop((rect._x, rect._y, rect._x + rect._w, rect._y +  rect._h))
+                    img_patch = capture_img1.crop((rect._x, rect._y, rect._x + rect._w, rect._y + rect._h))
                     img_patch = img_patch.resize(resize)
                     img_patch.save(
                         os.path.join(image_dir,
