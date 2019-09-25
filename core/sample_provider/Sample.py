@@ -140,6 +140,11 @@ class Sample(object):
     def load_tb100_image(self, img_path):
         data = self.zip_file.read(img_path)
         stream = io.BytesIO(data)
+        im = Image.open(stream)
+        if im.mode != "RGB":
+            # convert s/w to colour:
+            im = np.array(im.convert("RGB"))
+            return im
         im = np.array(Image.open(stream))
         return im
 
