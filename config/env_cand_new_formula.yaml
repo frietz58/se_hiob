@@ -11,7 +11,7 @@ environment_name: new_formula_opt
 log_dir: ../new_formula_opt/
 
 # directory in which data samples are kept:
-data_dir: /informatik2/students/home/5rietz/BA/wtm-scale-estimation/data
+data_dir: /informatik2/students/home/5rietz/BA/
 
 # directory in which net weight files are kept:
 net_dir: ./net

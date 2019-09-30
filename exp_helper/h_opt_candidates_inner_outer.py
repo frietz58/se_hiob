@@ -97,13 +97,19 @@ def main():
             progress = get_progress_from_log()
 
             if exp_key not in progress["finished"]:
-                logger.info("completed experiments so far: " + str(progress["finished"]))
+                logger.info("completed experiments so far: " + str("\n".join(progress["finished"])))
                 logger.info("curr change: " + str(change_list))
                 logger.info("starting experiment " + exp_key)
 
                 call = "python hiob_cli.py -e config/" + args.environment + " -t config/" + args.tracker + " -g " + args.gpu
                 logger.info(call)
+                krenew = "krenew"
                 if args.test_run == "False":
+
+                    p = Popen(krenew, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+                    krenew_out, krenew_err = p.communicate()
+                    krenew_rc = p.returncode
+
                     p = Popen(call, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
                     output, err = p.communicate()
                     rc = p.returncode

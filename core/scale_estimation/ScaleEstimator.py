@@ -1,56 +1,29 @@
-"""
-Created on 2018-11-17
-
-@author: Finn Rietz
-"""
-
-
-import numpy as np
-from PIL import Image
 import logging
-import scipy.stats as st
-import cv2
 from .matlab_dsst import DsstEstimator
 from .custom_dsst import CustomDsst
-from ..Rect import Rect
 from .candidates import CandidateApproach
 
-from matplotlib import pyplot as plt
-from multiprocessing import Pool
-import concurrent
 
 logger = logging.getLogger(__name__)
 
 
 class ScaleEstimator:
-
-    #TODO make it a state machine
+    """
+    This is the main Coordinator, which makes calls to the specefic algorithm (Candidates or DSST) to update the
+    scale on each frame.
+    """
 
     def __init__(self):
-
         self.configuration = None
         self.econf = None
-        self.dsst = DsstEstimator()
         self.custom_dsst = CustomDsst()
         self.candidate_approach = CandidateApproach()
-
         self.frame = None
         self.tracker = None
-        self.initial_size = None
         self.sample = None
-        self.conj_G = None
-        self.executor = None
-        self.worker_count = None
-        self.sample = None
-        self.filter_history = []
-        self.scaled_filters = []
-        self.box_history = []
-        self.dsst_numerator_a = []
-        self.dsst_denominator_b = []
-        self.se_time = 0.0
         self.passed_since_last_se = 0
 
-        #configuration
+        # configuration values
         self.use_scale_estimation = None
         self.number_scales = None
         self.inner_punish_threshold = None
@@ -72,13 +45,22 @@ class ScaleEstimator:
         self.static_update_val = None
 
     def setup(self, tracker=None, sample=None):
+        """
+        Sets tracker, configuration and sample on main ScaleEstimator
+        :param tracker: the tracker object
+        :param sample: the current sample
+        """
         self.tracker = tracker
         self.configuration = tracker.configuration
         self.sample = sample
-
         self.set_up_modules()
 
     def configure(self, configuration):
+        """
+        Sets values from configuration faile on main ScaleEstimator
+        :param configuration:
+        :return:
+        """
         self.econf = configuration['scale_estimator']
         self.use_scale_estimation = self.econf['use_scale_estimation']
         self.approach = self.econf['approach']
@@ -102,25 +84,21 @@ class ScaleEstimator:
             print("Scale Estimator has been configured")
 
     def set_up_modules(self):
-        self.dsst.setup(n_scales=self.number_scales,
-                        scale_step=self.scale_factor,
-                        scale_sigma_factor=self.scale_sigma_factor,
-                        img_files=self.sample.cv2_img_cache,
-                        scale_model_max=self.scale_model_max,
-                        learning_rate=self.learning_rate)
-
+        """
+        Sets values from configuration on both se algorithms
+        """
         self.custom_dsst.configure(self.econf, img_files=self.sample.cv2_img_cache)
-
         self.candidate_approach.configure(self.econf)
 
-    def estimate_scale(self, frame, feature_mask, mask_scale_factor, prediction_quality, tracking):
+    def estimate_scale(self, frame, feature_mask, mask_scale_factor, tracking):
         """
+        This is called on every frame (if scale estimation is enabled) and depending on the configuration uses one of
+        implemented approaches to estimate the scale of the object on the current frame.
         :param frame: the current frame in which the best position has already been calculated
         :param feature_mask: he consolidated feature mask containing pixel values for how likely they belong to the
         object
-        :param mask_scale_factor: the factor with which the feature mask has been scaled to correspond to the actual ROI
-        size, the cnn output is 48x48
-        :param prediction_quality: the quality of the prediction for the current frame.
+        :param mask_scale_factor: the factor with which the feature mask has been scaled to fit to the actual ROI
+        size, the cnn output is configurable
         :return: the best rated candidate
         """
 
@@ -132,10 +110,8 @@ class ScaleEstimator:
             logger.info("Scale Estimation is disabled, returning unchanged prediction")
             return frame.predicted_position
 
-        # update strategies:
         # continuous, update on every frame
         if self.update_strategy == "cont":
-            logger.info("cont execution SE")
             final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
 
         # high_gain / limited combined
@@ -144,12 +120,19 @@ class ScaleEstimator:
                 logger.info("20 frames passed without updating the scale, enforcing execution of SE")
                 final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
                 self.passed_since_last_se = 0
-            elif frame.prediction_quality >= self.dyn_min_se_treshold and frame.prediction_quality <= self.dyn_max_se_treshold:
-                logger.info("frame.prediciotn_quality = {0}, lies within window, executing SE".format(frame.prediction_quality))
+
+            elif (frame.prediction_quality >= self.dyn_min_se_treshold) \
+                    and (frame.prediction_quality <= self.dyn_max_se_treshold):
+                logger.info(("frame.prediction_quality = {0},"
+                             " lies within window, executing SE").format(frame.prediction_quality))
+
                 final_candidate = self.execute_se_algorithm(frame, feature_mask, mask_scale_factor, tracking)
                 self.passed_since_last_se = 0
+
             else:
-                logger.info("not executing SE")
+                logger.info(("frame.prediction_quality  = {0},"
+                             " not within window, not executing se").format(frame.prediction_quality))
+
                 final_candidate = frame.predicted_position
                 self.passed_since_last_se += 1
 
@@ -157,9 +140,9 @@ class ScaleEstimator:
 
     def handle_initial_frame(self, frame, sample):
         """
+        The initial frame is a special case, hence both the candidates algorithm have dedicated methods
         :param sample: the current tracking sequence
         :param frame: the 0th frame
-        :return:
         """
         if not self.use_scale_estimation:
             return None
@@ -171,30 +154,33 @@ class ScaleEstimator:
             self.custom_dsst.handle_initial_frame(frame=frame)
 
         elif self.approach == 'candidates':
-            # nothing needs to be done
             self.candidate_approach.handle_initial_frame(frame)
 
     def execute_se_algorithm(self, frame, feature_mask, mask_scale_factor, tracking):
+        """
+        Executes the actual scale estimation algorithm of one of the implemented algorithms
+        :param frame: the current frame
+        :param feature_mask: the CNN feature mask, used by the Candidates approach
+        :param mask_scale_factor: the factor with which the feature mask has been scaled to fit to the actual ROI
+        size, the cnn output is configurable
+        :param tracking: the tracking object
+        :return:
+        """
         if self.approach == 'candidates':
             logger.info("starting scale estimation. Approach: Candidate Generation")
-
             scaled_candidates = self.candidate_approach.generate_scaled_candidates(frame, tracking)
             final_candidate = self.candidate_approach.evaluate_scaled_candidates(scaled_candidates,
                                                                                  feature_mask,
-                                                                                 mask_scale_factor,
-)
-
-            logger.info("finished scale estimation")
+                                                                                 mask_scale_factor)
 
         elif self.approach == "custom_dsst":
             logger.info("starting scale estimation. Approach: DSST")
-
             final_candidate = self.custom_dsst.dsst(frame, tracking)
-
-            logger.info("finished scale estimation")
 
         else:
             logger.critical("No implementation for approach in configuration")
             final_candidate = None
+
+        logger.info("finished scale estimation")
 
         return final_candidate

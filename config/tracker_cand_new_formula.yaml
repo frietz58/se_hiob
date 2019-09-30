@@ -100,29 +100,41 @@ scale_estimator:
   update_strategy: cont
   dyn_min_se_treshold: 0.2
   dyn_max_se_treshold: 0.4
-  static_update_val: 20
+  static_update_val: 100
 
   # Determines which approach to use for scale estimation. candidates or custom_dsst
   approach: candidates
 
   #dsst params:
-  # values form avg opt
-  scale_factor: 1.01  # scale factor between scale lvls
-  scale_sigma_factor: 0.75 # changes the deviation/sharpness of the output gaussian
-  learning_rate: 0.01
+#  # values form avg opt
+#  scale_factor: 1.01  # scale factor between scale lvls
+#  scale_sigma_factor: 0.75 # changes the deviation/sharpness of the output gaussian
+#  learning_rate: 0.01
+#  reg: 0.01
+#  scale_model_max: 373 # max area of the scale model on the image
+#  scale_model_size: 16 #irrelevant TODO remove
+#  padding: 1.0
+#  dsst_number_scales: 17 # number of scaled candidates to generate
+#  d_change_aspect_ratio: false
+#  hog_cell_size: 4
+#  hog_block_norm_size: 8
+  # paper vals
+  scale_factor: 1.02  # scale factor between scale lvls
+  scale_sigma_factor: 0.25 # changes the deviation/sharpness of the output gaussian
+  learning_rate: 0.025
   reg: 0.01
-  scale_model_max: 373 # max area of the scale model on the image
+  scale_model_max: 512 # max area of the scale model on the image
   scale_model_size: 16 #irrelevant TODO remove
   padding: 1.0
-  dsst_number_scales: 17 # number of scaled candidates to generate
+  dsst_number_scales: 33 # number of scaled candidates to generate
   d_change_aspect_ratio: false
   hog_cell_size: 4
   hog_block_norm_size: 8
 
   # candidate params:
   c_scale_factor: 1.02 # scale factor between candidates
-  inner_punish_threshold: 0.6 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
-  outer_punish_threshold: 1.0 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
+  inner_punish_threshold: 0.8 # the threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
+  outer_punish_threshold: 0.5 # the threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
   c_number_scales: 17 # number of scaled candidates to generate
   max_scale_difference: 0.02 # max value the scale may change between two frames
   scale_window_step_size: 0.005 # the deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
@@ -139,29 +151,47 @@ tracking:
 #- tb100/Deer
 #- tb100/DragonBaby
 #- tb100/CarScale
+- tb100/Walking
+- tb100/David
+- tb100/Biker
+- tb100/Car4
+- tb100/CarScale
+- tb100/Lemming
 #- tb100/Walking
+#- tb100/Walking2
+#- tb100/Panda
+- nicovision/push_blue_ball_01
+- nicovision/scoot_blue_car_02
+- nicovision/pull_small_tomato_01
+- nicovision/push_green_car_02
+
+# = EMIL = #
+- emil/lift_soft-banana_id-1-100_video
+- emil/pull_yellow-car_id-1-73_video
+- emil/push_soft-red-ball_id-1-45_video
+- emil/scoot_heavy-green-car_id-0-17_video
 
 # = Training Set = #
-- tb100/Basketball
-- tb100/Biker
-- tb100/Bird2
-- tb100/Box
-- tb100/Freeman3
-- tb100/Panda
-- tb100/ClifBar
-- tb100/Crowds
-- tb100/RedTeam
-- tb100/BlurFace
-- tb100/Singer2
-- tb100/Soccer
-- tb100/Car1
-- tb100/Liquor
-- tb100/Bird1
-- tb100/DragonBaby
-- tb100/Deer
-- tb100/Diving
-- tb100/Dudek
-- tb100/David
+#- tb100/Basketball
+#- tb100/Biker
+#- tb100/Bird2
+#- tb100/Box
+#- tb100/Freeman3
+#- tb100/Panda
+#- tb100/ClifBar
+#- tb100/Crowds
+#- tb100/RedTeam
+#- tb100/BlurFace
+#- tb100/Singer2
+#- tb100/Soccer
+#- tb100/Car1
+#- tb100/Liquor
+#- tb100/Bird1
+#- tb100/DragonBaby
+#- tb100/Deer
+#- tb100/Diving
+#- tb100/Dudek
+#- tb100/David
 
 # = TB100 = #
 #- tb100/Basketball

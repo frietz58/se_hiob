@@ -219,6 +219,9 @@ def create_inner_outer_csv():
 
         df = df.append(row, ignore_index=True)
 
+        # if inner == 0.6 and outer == 1.0:
+        #     print()
+
         print("inner: {}, outer {}, success: {}".format(inner, outer, total_succ))
 
     csv_path = os.path.join(args.pathresults, "inner_outer_opt.csv")

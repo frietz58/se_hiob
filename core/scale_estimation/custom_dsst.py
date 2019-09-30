@@ -110,7 +110,7 @@ class CustomDsst:
         self.init_target_size = [frame.ground_truth.w, frame.ground_truth.h]
         self.base_target_size = [frame.ground_truth.w, frame.ground_truth.h]
 
-        # TODO used for what?
+        # padding used for what?
         self.sz = np.floor(np.multiply(self.base_target_size, int(1 + self.padding)))
 
         # desired scale filter output (gaussian shaped), bandwidth proportional to number of scales
