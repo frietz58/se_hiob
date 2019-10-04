@@ -2,11 +2,6 @@ import numpy as np
 import cv2
 import logging
 from ..Rect import Rect
-import os
-import scipy.io
-from math import gcd
-from PIL import Image
-import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +102,13 @@ class CustomDsst:
         self.hog_block_norm_size = hog_block_norm_tuple
 
     def handle_initial_frame(self, frame):
+        """
+        Does typicall task that we need to do when  process the first frame of a tracking sequence, Like preparing the
+        scale filter, calculating the punishment scale window, calculating the baseline scale factors that are adapted
+        during tracking and preparing the scale model size considering the configurable hog parameters.
+        :param frame: the current (first) frame
+        :return: nothing, but sets the values on the dsst class object.
+        """
         self.init_target_size = [frame.ground_truth.w, frame.ground_truth.h]
         self.base_target_size = [frame.ground_truth.w, frame.ground_truth.h]
 
@@ -157,18 +159,21 @@ class CustomDsst:
         self.max_scale_factor = np.power(self.scale_step, np.floor(np.log(min(np.divide(
             (np.shape(frame.capture_image)[0], np.shape(frame.capture_image)[1]), self.base_target_size)))
                                                               / np.log(self.scale_step)))
-        #self.min_scale_factor = 0.15
-        #self.max_scale_factor = 13.6528
 
-    def dsst(self, frame, tracking):
-
+    def dsst(self, frame):
+        """
+        The core dsst algorithm. This calculates the best scale for a given frame, given the predicted position and the
+        scale model, which contains information about the past scale development of the object.
+        :param frame: the current frame
+        :return: a rectangle that corresponds to the best predicted size of the object
+        """
         self.frame = frame
 
         # all frames except initial
         if self.initialized_model:
 
             # extract the test sample for the feature map for the scale filter
-            sample = self.extract_scale_sample(self.frame, tracking)
+            sample = self.extract_scale_sample(self.frame)
             # print(sample.sum(axis=0))
             # print(np.argmax(sample.sum(axis=0)))
 
@@ -221,7 +226,7 @@ class CustomDsst:
                     self.y_scale_factors[y_recovered_scale]
 
         # extract training sample for current frame, with updated scale
-        sample = self.extract_scale_sample(self.frame, tracking)
+        sample = self.extract_scale_sample(self.frame)
 
         # calculate scale filter update
         # for static aspect ratio
@@ -311,12 +316,19 @@ class CustomDsst:
 
         return Rect(new_x, new_y, new_target_size[0], new_target_size[1])
 
-    def extract_scale_sample(self, frame, tracking):
+    def extract_scale_sample(self, frame):
+        """
+        This method generates a scale sample for a given frame. One scale sample contains representations of the object
+        (the predicted object location to be precise) at every scale level.
+        :param frame: the current frame
+        :return: a resized image patch for every scale level
+        """
         global out
         self.frame = frame
         im = self.img_files[frame.number]
 
-        # calculate the current scale factors
+        # calculate the current scale factors, this depends on the current scale level and the base scale factors that
+        # have been defined
         if not self.d_change_aspect_ratio:
             scale_factors = self.scale_factors * self.current_scale_factor
 
@@ -422,9 +434,6 @@ class CustomDsst:
                 img_patch_resized = cv2.resize(img_patch,
                                                (int(self.scale_model_size[0]), int(self.scale_model_size[1])))
 
-                if i == 0 or i == 16 or i == 32:
-                    self.save_image_patch(tracking, img_patch_resized, i)
-
                 # extract the hog features
                 temp_hog = self.hog_vector(img_patch_resized)
 
@@ -458,20 +467,20 @@ class CustomDsst:
                     out = {'x': np.zeros((np.size(x_hog), self.number_scales)),
                            'y': np.zeros((np.size(y_hog), self.number_scales))}
 
-                # print(str(i) + " unpunished x: " + str(out['x'].sum()))
-                # print(str(i) + " unpunished y: " + str(out['y'].sum()))
-
                 # punish each candidate based on its divergence to 1
                 out['x'][:, i] = np.multiply(x_hog.flatten(), self.scale_window[i])
-                #out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])(self.hog_cell_size[0], self.hog_cell_size[1])
                 out['y'][:, i] = np.multiply(y_hog.flatten(), self.scale_window[i])
-
-                # print(str(i) + " punished x: " + str(out['x'].sum()))
-                # print(str(i) + " punished y: " + str(out['y'].sum()))
 
         return out
 
     def hog_vector(self, img_patch_resized):
+        """
+        This method calculates the hog feature vector to describe a given image patch. Specifically, this method is used
+        to generate the hog feature representation for all the extracted scale samples, after they have all been resized
+        to one size
+        :param img_patch_resized: the resized patch for which we which to obtain the hog feature vector
+        :return: the hog feature vector
+        """
         winSize = (int(self.scale_model_size[0]), int(self.scale_model_size[1]))
         blockSize = self.hog_block_norm_size  # for illumination: large block = local changes less significant
         blockStride = (int(self.hog_block_norm_size[0]/2), int(self.hog_block_norm_size[1]/2))  # overlap between blocks, typically 50% blocksize
@@ -494,6 +503,15 @@ class CustomDsst:
 
     @staticmethod
     def get_closest_match(base, val):
+        """
+        This method is used for finding the closest match we can obtain by multiplying a base value with a factor to a
+        second value val. We need to this to compute the size of the scale model, which must be compatible to the hog
+        block normalization size
+        :param base: the base value to which we try to find a close match with the second value by multiplying with a
+        factor
+        :param val: the second value
+        :return: the value with the smallest absolute difference
+        """
         # create a list of multiples
         multiples = []
         for i in range(1, 100):
@@ -501,11 +519,4 @@ class CustomDsst:
 
         return min(multiples, key=lambda x: abs(x - val))
 
-    def save_image_patch(self, tracking, img_patch_resized, i):
-
-        image_dir = os.path.join("images", tracking.sample.name)
-        if not os.path.exists(image_dir):
-            os.makedirs(image_dir)
-
-        cv2.imwrite(os.path.join(image_dir, "{0}_resized_patch_{1}.png".format(tracking.get_current_frame_number(), i)), img_patch_resized)
 

@@ -16,8 +16,6 @@ from .Rect import Rect
 from .gauss import gen_gauss_mask
 from .graph import figure_to_image
 from . import evaluation
-from . import scale_estimation
-
 
 logger = logging.getLogger(__name__)
 

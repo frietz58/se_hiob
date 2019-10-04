@@ -108,6 +108,7 @@ class Sample(object):
             images.append(im)
 
         # self.capture_size = tuple(reversed(images[0].shape[:-1]))
+        # since we also convert gray images into rgb format, this ensures that the capture size is always a 3 tuple
         self.capture_size = tuple(reversed(images[0].shape))
 
         if self.last_frame is None:
@@ -256,11 +257,11 @@ class Sample(object):
     def unload(self):
         """
         Free most data.
-
         Delete the images in the sample to free most of the memory taken by sample.
         """
         if self.loaded:
             self.image_cache = []
+            self.cv2_img_cache = []
             self.loaded = False
 
     def get_image(self, img_id):

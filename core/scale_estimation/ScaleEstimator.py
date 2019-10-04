@@ -175,7 +175,7 @@ class ScaleEstimator:
 
         elif self.approach == "custom_dsst":
             logger.info("starting scale estimation. Approach: DSST")
-            final_candidate = self.custom_dsst.dsst(frame, tracking)
+            final_candidate = self.custom_dsst.dsst(frame)
 
         else:
             logger.critical("No implementation for approach in configuration")

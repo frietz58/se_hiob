@@ -158,7 +158,7 @@ tracking:
 #- tb100/Liquor
 #- tb100/Bird1
 #- tb100/DragonBaby
-- tb100/Deer
+#- tb100/Deer
 #- tb100/Diving
 #- tb100/Dudek
 #- tb100/David
@@ -199,7 +199,7 @@ tracking:
 #- tb100/David3
 #- tb100/Deer
 #- tb100/Diving
-#- tb100/Dog
+- tb100/Dog
 #- tb100/Dog1
 #- tb100/Doll
 #- tb100/DragonBaby
@@ -261,7 +261,7 @@ tracking:
 #- tb100/Trellis
 #- tb100/Twinnings
 #- tb100/Vase
-#- tb100/Walking
+- tb100/Walking
 #- tb100/Walking2
 #- tb100/Woman
 
