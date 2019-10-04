@@ -96,6 +96,8 @@ def gen_gauss_mask(mask_size, gauss_pos, sigf=0.5):
 
     # this happens when y2 is bigger than mask size[1]. if mask.shape[1] == 25 and y2 = 27,
     # mask[x1:x2, y1:y2] ends up being smaller than m_pos, which causes the broadcast in else to fail
+    # TODO this is now handled for the candidates algorithm, make sure its also taken care of for dsst, then
+    #  its no longer needed here
     if x2 > mask_size[0]:
         diff = abs(mask_size[0] - x2)
         try:

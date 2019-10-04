@@ -1,6 +1,6 @@
-description: Recordings from the Nico camera
+description: Recordings from the Emil camera
 format: tb100zip
-name: nico_recordings
+name: emil_recordings
 samples:
     - name: lift_soft-banana_id-1-100_video
       attributes: []

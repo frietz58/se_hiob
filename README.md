@@ -5,6 +5,7 @@ HIOB is modular hierarchical object tracking framework written in python and ten
 HIOB was created for a diploma thesis on CNNs at the Department of Informatics of the [Universität Hamburg](https://www.uni-hamburg.de/) in the research group [Knowledge Technology (WTM)](https://www.inf.uni-hamburg.de/en/inst/ab/wtm/). During a bachelor thesis the performance has been further improved and it has been adapted to run inside of [ROS](http://www.ros.org/).
 
 The ROS integration of HIOB lives in a separate repository: https://github.com/theCalcaholic/hiob_ros
+The ROS integration of HIOB lives in a separate repository: https://git.informatik.uni-hamburg.de/wtm/hierarchical-object-tracking-ros
 TODO: add link to the docker image of hiob_ros.
 
 The algorithm in HIOB is inspired by the [FCNT](https://github.com/scott89/FCNT) by *Wang et al* presented in their [ICCV 2015 paper](http://202.118.75.4/lu/Paper/ICCV2015/iccv15_lijun.pdf). The program code of HIOB is completely independet from the FCNT and has been written by us.
@@ -102,7 +103,6 @@ This installs a tensorflow build that requires a NVIDIA GPU and the CUDA machine
     # alternatively for using your CPU only:
     (hiob_env) $ cd HIOB
     (hiob_env) $ pip install -r requirements_cpu.txt
-    
 
 # Run the demo
 HIOB comes with a simple demo script, that downloads a tracking sequence (~4.3MB) and starts the tracker on it. Inside your virtual environment and inside the HIOB directory, just run:

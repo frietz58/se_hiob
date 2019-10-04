@@ -35,6 +35,9 @@ def main():
         ros_config=ros_config
     )
 
+    # enable or disable se, depending on arg given
+    conf.tracker["scale_estimator"]["use_scale_estimation"] = args.use_se
+
     # execute app app and run tracking
     logger.info("Initiate tracking process in app app")
     app = App(logger, conf)

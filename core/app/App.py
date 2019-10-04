@@ -21,7 +21,7 @@ class App:
         self.conf = conf
 
         self.root = tk.Tk()
-        self.root.title("Hiob with Scale Estimation")
+        self.root.title("Hiob")
 
         self.dead = False
         self.queue = queue.Queue()
@@ -62,11 +62,6 @@ class App:
         self.sroi_image.pack(side=tk.RIGHT)
         self.images['sroi_image'] = self.sroi_image
 
-        #self.fourier_image = ImageLabel(
-        #    self.capture_frame, text="Fourier", compound=tk.BOTTOM)
-        #self.fourier_image.pack(side=tk.RIGHT)
-        #self.images['fourier_image'] = self.fourier_image
-
         self.consolidation_image = ImageLabel(self.root)
         self.consolidation_image.pack()
         self.images['consolidation_image'] = self.consolidation_image
@@ -93,10 +88,6 @@ class App:
         self.lost_figure = ImageLabel(self.figure_frame)
         self.lost_figure.pack(side=tk.RIGHT)
         self.images['lost_figure'] = self.lost_figure
-
-        self.size_figure = ImageLabel(self.figure_frame)
-        self.size_figure.pack(side=tk.RIGHT)
-        self.images['size_figure'] = self.size_figure
 
         self.confidence_plotter = SGraph(length=100)
         self.confidence_plot = ImageLabel(self.figure_frame)
@@ -147,13 +138,6 @@ class App:
         self.lost_plot.pack(side=tk.LEFT)
         self.images['lost_plot'] = self.lost_plot
 
-        self.size_plotter = SGraph(
-            min_y=0.0, max_y=200, length=100, height=100)
-        self.size_plot = ImageLabel(
-            self.figure_frame, text="Size", compound=tk.BOTTOM, )
-        self.size_plot.pack(side=tk.LEFT)
-        self.images['size_plot'] = self.size_plot
-
     def consume_entry(self, entry):
         for k, v in entry.items():
             if k in self.images:
@@ -193,7 +177,7 @@ class App:
              'capture_image': tracking.get_frame_capture_image(),
              'sample_text': "Sample %s/%s, Attributes: %s" % (
                 sample.set_name, sample.name, ', '.join(sample.attributes)),
-             'video_text': "Frame #%04d/%04d" % (sample.current_frame_id, sample.get_actual_frames())
+             'video_text': "Frame #%04d/%04d" % (sample.current_frame_id, sample.get_actual_frames()),
              })
         while not tracking.feature_selection_done() and not threading.current_thread().terminating:
             self.verify_running()
@@ -236,7 +220,6 @@ class App:
             self.overlap_plotter.append(fr['overlap_score'])
             self.adjusted_overlap_plotter.append(fr['adjusted_overlap_score'])
             self.lost_plotter.append(fr['lost'])
-            self.size_plotter.append(fr['size_score'])
             consolidation_image = tracking.get_frame_consolidation_images()['single']
             entry = {
                 'capture_image': tracking.get_frame_capture_image(),
@@ -253,11 +236,10 @@ class App:
                 'overlap_plot': self.overlap_plotter.get_image(),
                 'adjusted_overlap_plot': self.adjusted_overlap_plotter.get_image(),
                 'lost_plot': self.lost_plotter.get_image(),
-                'size_plot': self.size_plotter.get_image()
             }
             self.feed_queue(entry)
-            # if "save_images" in self.conf and self.conf["save_images"]:
-            if True:
+            if "save_images" in self.conf and self.conf["save_images"]:
+            # if True:
                 self.save_images(tracking)
         tracking.finish_tracking()
 
@@ -265,7 +247,7 @@ class App:
 
     def save_images(self, tracking):
         heatmap = tracking.get_frame_consolidation_images(decorations=True)['single']
-        sroi = tracking.get_frame_sroi_image(decorations=True)
+        sroi = tracking.get_frame_sroi_image(decorations=False)
         capture_image = tracking.get_frame_capture_image(decorations=True)
         result = tracking.get_frame_sroi_image()
 

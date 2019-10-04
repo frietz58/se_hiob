@@ -115,9 +115,7 @@ class Sample(object):
             self.last_frame = len(self.img_paths) + 1
         if self.first_frame != 1:
             # truncate everything before first frame:
-            # this doesnt make sense. your cutting values from the gt even though your sequence might start at frame 20
-            # gt = gt[self.frame_offset:]
-            pass
+            gt = gt[self.frame_offset:]
             #images = images[self.frame_offset:]
         if len(images) < len(gt):
             # raise DataSetException(

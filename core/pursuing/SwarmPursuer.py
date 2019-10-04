@@ -12,12 +12,9 @@ from matplotlib import pyplot as plt
 from .util import loc2xgeo, xgeo2loc
 from .Pursuer import Pursuer
 from ..Rect import Rect
-
 from concurrent import futures
 import time
 import multiprocessing
-
-#from ..subpackage2.moduleZ import eggs
 
 avgs = []
 
@@ -29,7 +26,6 @@ logger = logging.getLogger(__name__)
 class SwarmPursuer(Pursuer):
 
     def __init__(self):
-
         self.dtype = tf.float32
         #self.thread_executor = futures.ProcessPoolExecutor(max_workers=workers)
         self.thread_executor = None
@@ -64,7 +60,6 @@ class SwarmPursuer(Pursuer):
 
     def setup(self, tracker):
         self.tracker = tracker
-        logger.info("swarm setup")
 
     def generate_geo_particles(self, geo, img_size, lost):
         if lost == 0:
@@ -205,21 +200,12 @@ class SwarmPursuer(Pursuer):
 
         locs = self.generate_particles(
             frame.previous_position, frame.size, lost)
-
-
-        logger.info("previous position: %s", frame.previous_position)
-
         #total = np.sum(img_mask)
         #total_max = np.sum(img_mask[img_mask > 0])
 #        total_max = np.sum(np.abs(img_mask))
 
         #ps.append(time.time())  # 4
-
-        #img_mask is ndarray
         img_mask_sum = img_mask.sum()
-
-
-
         #ps.append(time.time())  # 5
         total_max = 1
         """func = partial(position_quality_helper, img_mask, frame.roi, total_max, img_mask_sum)
@@ -227,7 +213,6 @@ class SwarmPursuer(Pursuer):
         quals = list(self.thread_executor.map(func, locs))"""
 
         if False and self.particle_scale_factor != 1.0:
-            logger.info("Particle Scale factor is %s", self.particle_scale_factor)
             scaled_locs = []
             for loc in locs:
                 width_difference = int(loc.width * self.particle_scale_factor)
@@ -257,7 +242,6 @@ class SwarmPursuer(Pursuer):
 
         # if scaling is enabled, punish pixels with low feature rating
         punish_low = self.particle_scale_factor != 1.0
-
         slices = [img_mask[round(pos.top / scale_factor[1]):round((pos.bottom - 1) / scale_factor[1]),
                   round(pos.left / scale_factor[0]):round((pos.right - 1) / scale_factor[0])] for pos in locs]
 
@@ -297,6 +281,7 @@ class SwarmPursuer(Pursuer):
         #print(log[2:])
 
         return frame.predicted_position
+
 
     @staticmethod
     def calculate_sum(mat, punish_low=False):

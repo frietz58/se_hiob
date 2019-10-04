@@ -17,6 +17,7 @@ from .gauss import gen_gauss_mask
 from .graph import figure_to_image
 from . import evaluation
 
+
 logger = logging.getLogger(__name__)
 
 loop = asyncio.get_event_loop()
@@ -358,7 +359,6 @@ class Tracking(object):
             self.enter_no_more_frames()
 
     def tracking_track_frame(self):
-
         self.commence_tracking_frame()
         frame = self.current_frame
         # process frame:
@@ -743,30 +743,53 @@ class Tracking(object):
     def get_current_frame_number(self):
         return self.sample.current_frame_id
 
-    def get_frame_capture_image(self, frame=None, decorations=True):
+    def get_frame_capture_image(self, frame=None, decorations=True, width=1):
         if frame is None:
             frame = self.current_frame
         #im = frame.capture_image.copy()
         im = Image.fromarray(np.asarray(frame.capture_image, dtype=np.uint8))
+
         if decorations:
             draw = ImageDraw.Draw(im)
             if frame.roi:
                 pos = frame.roi.inner
-                draw.rectangle(pos, None, self.colours['roi'])
+
+                gt_rep = [pos[0], pos[1], pos[2], pos[3]]
+                gt_line_points = ((gt_rep[0], gt_rep[1]),
+                                  (gt_rep[2], gt_rep[1]),
+                                  (gt_rep[2], gt_rep[3]),
+                                  (gt_rep[0], gt_rep[3]),
+                                  (gt_rep[0], gt_rep[1]))
+                draw.line(gt_line_points, self.colours['roi'], width=width)
+
             if frame.ground_truth:
                 pos = frame.ground_truth.inner
-                draw.rectangle(pos, None, self.colours['ground_truth'])
+
+                gt_rep = [pos[0], pos[1], pos[2], pos[3]]
+                gt_line_points = ((gt_rep[0], gt_rep[1]),
+                                  (gt_rep[2], gt_rep[1]),
+                                  (gt_rep[2], gt_rep[3]),
+                                  (gt_rep[0], gt_rep[3]),
+                                  (gt_rep[0], gt_rep[1]))
+                draw.line(gt_line_points, self.colours['ground_truth'], width=width)
+
             if frame.predicted_position:
                 pos = frame.predicted_position.inner
-                draw.rectangle(pos, None, self.colours['prediction'])
+
+                gt_rep = [pos[0], pos[1], pos[2], pos[3]]
+                gt_line_points = ((gt_rep[0], gt_rep[1]),
+                                  (gt_rep[2], gt_rep[1]),
+                                  (gt_rep[2], gt_rep[3]),
+                                  (gt_rep[0], gt_rep[3]),
+                                  (gt_rep[0], gt_rep[1]))
+                draw.line(gt_line_points, self.colours['prediction'], width=width)
 
         return im
 
     def get_frame_sroi_image(self, frame=None, decorations=True):
         if frame is None:
             frame = self.current_frame
-        arr = np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)
-        im = Image.fromarray(arr[0])
+        im = Image.fromarray(np.asarray(self.tracker.sroi_generator.generated_sroi.read_value().eval(), dtype=np.uint8)[0])
         if decorations:
             draw = ImageDraw.Draw(im)
             if frame.ground_truth and frame.roi:
@@ -783,9 +806,6 @@ class Tracking(object):
             frame = self.current_frame
         images = OrderedDict()
         for name, f in frame.consolidated_features.items():
-
-            #logger.info("condolidated features items: %s ", frame.consolidated_features.items())
-
             im = Image.fromarray(
                 self.cmap(f.reshape(self.mask_size), bytes=True)
             )
@@ -822,7 +842,7 @@ class Tracking(object):
 
         images = OrderedDict()
 
-        for n, f in self.module_states.feature_selector['feature_orders'].items():
+        for n, f in self.module_states.feature_selector['forwards'].items():
             im = Image.fromarray(
                 self.cmap(
                     f.reshape(self.mask_size), bytes=True)
@@ -873,6 +893,3 @@ class Tracking(object):
             'center_distance': cd_im,
             'overlap_score': ov_im,
         }
-
-
-

@@ -22,7 +22,7 @@ transitions.logger.setLevel(logging.WARN)
 logger = logging.getLogger(__name__)
 
 
-def track(environment_path=None, tracker_path=None, ros_config=None, silent=False):
+def track(environment_path=None, tracker_path=None, ros_config=None, silent=False, use_se=None):
 
     # create Configurator
     logger.info("Creating configurator object")
@@ -34,6 +34,8 @@ def track(environment_path=None, tracker_path=None, ros_config=None, silent=Fals
         silent=silent
     )
 
+    # enable or disable se, depending on arg given
+    conf.tracker["scale_estimator"]["use_scale_estimation"] = use_se
 
     # create the tracker instance
     logger.info("Creating tracker object")
@@ -71,7 +73,9 @@ def main():
     ev = track(environment_path=args.environment, tracker_path=args.tracker,
                ros_config=None if args.ros_subscribe is None and args.ros_publish is None
                else {'subscribe': args.ros_subscribe, 'publish': args.ros_publish},
-               silent=args.silent)
+               silent=args.silent,
+               use_se=args.use_se)
+
     logger.info("Tracking finished!")
     ev_lines = "\n  - ".join(["{}={}".format(k, v) for k, v in ev.items()])
     logger.info("Evaluation:\n  - %s", ev_lines)

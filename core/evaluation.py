@@ -127,10 +127,8 @@ def do_tracking_evaluation(tracking):
             line = "{},{},{},{}".format(
                 pos.left, pos.top, pos.right, pos.bottom)
         princeton_lines.append(line)
-        # normalize size data to so that the area between the size curves is consisted
-
         # my own log line:
-        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
+        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
             n + 1,
             pos.left, pos.top, pos.width, pos.height,
             r['prediction_quality'],

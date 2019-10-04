@@ -39,36 +39,6 @@ DlTb100File () {
 	fi
 }
 
-DlTb100TestSet () {
-    	echo "\n"
-	echo "Downloading tb100 online tracking benchmark data set"
-	echo "BE WARNED! The server is slow. This might take hours!\n"
-	while read p; do
-		DlTb100File "$p"
-	done <<final
-Basketball
-Biker
-Freeman3
-Panda
-Bird2
-Box
-ClifBar
-Crowds
-RedTeam
-BlurFace
-Singer2
-Soccer
-Car1
-Liquor
-Bird1
-DragonBaby
-Deer
-Diving
-Dudek
-David
-final
-}
-
 DlTb100Set () {
 	echo "\n"
 	echo "Downloading tb100 online tracking benchmark data set"
@@ -189,9 +159,6 @@ case $1 in
 		;;
 	vgg16)
 		DlVgg16
-		;;
-	testset)
-		DlTb100TestSet
 		;;
 	*)
 		usage

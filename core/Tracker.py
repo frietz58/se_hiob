@@ -96,8 +96,6 @@ class Tracker:
         self.total_adjusted_overlap_scores = np.empty(0)
         self.tracking_evaluations = []
 
-        logger.info("test")
-
         # samples to track
         self.data_directory = DataDirectory(data_dir=self.data_dir)
         self.samples = []
