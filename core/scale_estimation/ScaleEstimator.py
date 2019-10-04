@@ -32,12 +32,10 @@ class ScaleEstimator:
         self.scale_factor_range = None
         self.scale_factor = None
         self.learning_rate = None
-        self.regularization = None
         self.scale_sigma_factor = None
         self.lam = None
         self.scale_model_max = None
         self.approach = None
-        self.scale_model_size = None
         self.padding = None
         self.dyn_min_se_treshold = None
         self.dyn_max_se_treshold = None
@@ -68,10 +66,8 @@ class ScaleEstimator:
         self.outer_punish_threshold = self.econf['outer_punish_threshold']
         self.scale_factor = self.econf['scale_factor']
         self.learning_rate = self.econf['learning_rate']
-        self.regularization = self.econf['reg']
         self.scale_sigma_factor = self.econf['scale_sigma_factor']
         self.scale_model_max = self.econf['scale_model_max']
-        self.scale_model_size = self.econf['scale_model_size']
         self.padding = self.econf['padding']
         self.dyn_min_se_treshold = self.econf['dyn_min_se_treshold']
         self.dyn_max_se_treshold = self.econf['dyn_max_se_treshold']

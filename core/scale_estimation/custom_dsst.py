@@ -18,7 +18,6 @@ class CustomDsst:
         self.learning_rate = None
         self.scale_model_size = None
         self.padding = None
-        self.static_model_size = None
         self.d_change_aspect_ratio = None
         self.hog_cell_size = None
         self.hog_block_norm_size = None
@@ -90,7 +89,6 @@ class CustomDsst:
         self.img_files = img_files
         self.lam = 1e-2
         self.learning_rate = conf['learning_rate']
-        self.static_model_size = conf['scale_model_size']
         self.padding = conf['padding']
         self.scale_model_max_area = conf['scale_model_max']
         self.d_change_aspect_ratio = conf['d_change_aspect_ratio']
