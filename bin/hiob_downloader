@@ -19,6 +19,15 @@ DlDeerSample () {
 	fi
 }
 
+DlWalkingSample () {
+	echo "Downloading Walking sample from tb100 tracking benchmark data set"
+	if [ ! -f Walking.zip ]; then
+		wget http://cvlab.hanyang.ac.kr/tracker_benchmark/seq/Walking.zip
+	else
+		echo "File 'Walking.zip' exists, skipping"
+	fi
+}
+
 DlVgg16 () {
 	echo "Downloading pre-trained weights of VGG16 for hiob"
 	echo "Based on work by K. Simonyan and A. Zisserman, "
@@ -151,6 +160,9 @@ final
 
 # --
 case $1 in
+    walking)
+	    DlWalkingSample
+	    ;;
 	deer)
 		DlDeerSample
 		;;

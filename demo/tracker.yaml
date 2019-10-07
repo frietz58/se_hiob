@@ -95,9 +95,42 @@ tracking_conf:
   skip_frames: 0
   shuffle: false
 
+scale_estimator:
+  use_scale_estimation: null  # Enable or disable scale estimation (set via arg, default false)
+  update_strategy: cont       # Which update strategy to use: cont or limited
+  dyn_min_se_treshold: 0.2    # Lower confidence bound for limited strategy
+  dyn_max_se_treshold: 0.4    # Upper confidence bound for limited strategy
+  static_update_val: 20       # Static frame count after which limited strategy updates representation
+
+  # Determines which approach to use for scale estimation: candidates or custom_dsst
+  approach: candidates
+
+  # DSST params (parameter values from paper):
+  scale_factor: 1.02           # Scale factor between scale candidates / levels
+  scale_sigma_factor: 0.25     # Changes the deviation/sharpness of the output gaussian
+  learning_rate: 0.025         # Learning rate of scale model
+  scale_model_max: 512         # Max area of scale model, to keep calculation time short
+  padding: 1.0                 # Padding used in object scale calculation
+  dsst_number_scales: 33       # Number of scaled candidates to generate
+  d_change_aspect_ratio: true  # Adapt aspect ration during tracking
+  hog_cell_size: 4             # Hog cell size
+  hog_block_norm_size: 8       # Hog block normalization size
+
+  # Candidate params:
+  c_scale_factor: 1.02            # Scale factor between candidates
+  inner_punish_threshold: 0.1     # The threshold at which a bounding box gets punish for containing pixels scores smaller than the threshold
+  outer_punish_threshold: 0.6     # The threshold at which a bounding box gets punished for not containing pixels scores bigger than the threshold
+  c_number_scales: 17             # Number of scaled candidates to generate
+  max_scale_difference: 0.01      # Max value by which scale may change during two frames (not used in limited strategy)
+  scale_window_step_size: 0.0005  # The deviation value for the manual scale window calculation which punishes the candidates based on the divergence to one
+  adjust_max_scale_diff: false    # EXPERIMENTAL: Adjust the max_scale_difference value if the factor has been limited n time sin a row, necessary for extreme scale changes that exceed the max_scale_difference between frames
+  adjust_max_scale_diff_after: 10 # The number after how many times of the scale factor being limited the max scale_difference gets adjusted
+  c_change_aspect_ratio: true     # Adapt aspect ration during tracking
+
 # = tracking = 
 # which samples shall be tracked? Accepts samples, data sets, and data collections
 # examples: ['tb100/MotorRolling', 'SET/tb100', 'COLLECTION/tb100_probe']
 tracking:
-  - tb100/Deer
+  #- tb100/Deer
+  - tb100/Walking
 

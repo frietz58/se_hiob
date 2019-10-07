@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # make sure we have the demo sample:
-if [ ! -f demo/data/tb100/Deer.zip ]; then
+if [ ! -f demo/data/tb100/Walking.zip ]; then
 	mkdir -p demo/data/tb100
 	cd demo/data/tb100
-	../../../bin/hiob_downloader deer
+	../../../bin/hiob_downloader walking
 	cd ../../..
 else
 	echo "Demo sample seems to be at place."
@@ -12,5 +12,5 @@ else
 fi
 
 # run the tracking
-python hiob_gui.py -e demo/environment.yaml -t demo/tracker.yaml
+python hiob_gui.py -e demo/environment.yaml -t demo/tracker.yaml -se
 
