@@ -113,6 +113,7 @@ class Tracking(object):
             'roi': 'cyan',
             'ground_truth': 'green',
             'prediction': 'yellow',
+            'candidate': 'magenta'
         }
 
         # size of capture image (determined on sample loading)
@@ -146,6 +147,7 @@ class Tracking(object):
         self.feature_extraction_total_seconds = 0.0
         self.feature_reduction_total_seconds = 0.0
         self.feature_consolidation_total_seconds = 0.0
+        self.se_total_seconds = 0.0
 
 
         # updates
@@ -193,8 +195,10 @@ class Tracking(object):
         self.initial_frame.predicted_position = self.sample.initial_position
         # for now, the initial frame is the current frame:
         self.current_frame = self.initial_frame
+
         self.tracker.pursuer.set_initial_position(self.initial_frame.previous_position)
         self.tracker.roi_calculator.set_initial_position(self.initial_frame.previous_position)
+        self.tracker.estimator.handle_initial_frame(self.current_frame, self.sample)
 
     async def _get_next_sample_frame(self):
         frame = Frame(tracking=self, number=self.sample.current_frame_id + 1, size=None)
@@ -383,6 +387,11 @@ class Tracking(object):
         ts_start = datetime.now()
         self.pursue_frame(frame)
         self.pursuing_total_seconds += (datetime.now() - ts_start).total_seconds()
+
+        se_start_time = datetime.now()
+        self.estimate_scale(frame)
+        self.se_total_seconds += (datetime.now() - se_start_time).total_seconds()
+
         # ps.append(time.time())  # 6
 
         # lost? TODO: make it modular and nice!
@@ -597,6 +606,16 @@ class Tracking(object):
 
         frame.complete_pursuing()
 
+    def estimate_scale(self, frame=None):
+        if frame is None:
+            frame = self.current_frame
+
+        frame.predicted_position = self.tracker.estimator.estimate_scale(
+            frame=frame,
+            feature_mask=frame.image_mask,
+            mask_scale_factor=frame.mask_scale_factor,
+            tracking=self)
+
     def evaluate_frame(self, frame=None):
         if frame is None:
             frame = self.current_frame
@@ -613,11 +632,15 @@ class Tracking(object):
             result['center_distance'] = gt.center_distance(p)
             result['relative_center_distance'] = gt.relative_center_distance(p)
             result['adjusted_overlap_score'] = gt.adjusted_overlap_score(p)
+            result['gt_size_score'] = gt.width * gt.height * 0.1
+            result['size_score'] = frame.predicted_position.width * frame.predicted_position.height * 0.1
         else:
             result['overlap_score'] = None
             result['center_distance'] = None
             result['relative_center_distance'] = None
             result['adjusted_overlap_score'] = None
+            result['gt_size_score'] = None
+            result['size_score'] = (frame.predicted_position.width * frame.predicted_position.height) * 0.1
         frame.result = result
         frame.complete_evaluation()
 
@@ -797,6 +820,7 @@ class Tracking(object):
                         frame.predicted_position, frame.roi).inner
                     draw.rectangle(pos, None, self.colours['prediction'])
             images[name] = im
+
         return images
 
     def get_frame_target_mask_image(self, frame=None, decorations=True):
@@ -830,6 +854,8 @@ class Tracking(object):
                         frame.ground_truth.inner, None, self.colours['ground_truth'])
             images[n] = im
         return images
+
+
 
     # tracking log evaluation:
     def get_evaluation_figures(self):

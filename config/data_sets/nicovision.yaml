@@ -47,7 +47,7 @@ samples:
 - actual_frames: 595
   attributes: [bright, size-change, non-square, part-occlusion]
   name: lift_sponge_01
-- actual_frames: 772
+- actual_frames: 596
   attributes: [bright, part-occlusion]
   name: lift_sponge_02
 - actual_frames: 772
@@ -177,7 +177,11 @@ samples:
   attributes: [dark, contrast, part-occlusion, size-change, motion-blur]
   name: shake_blue_plush_ball_01
 - actual_frames: 1085
+<<<<<<< HEAD
+  attributes: [dark, non-square, size-change, motion-blur]
+=======
   attributes: [dark, nonsquare, size-change, motion-blur]
+>>>>>>> root_hiob/master
   name: shake_blue_tissue_01
 - actual_frames: 1045
   attributes: [dark, part-occlusion, size-change, motion-blur]

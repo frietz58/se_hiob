@@ -34,6 +34,40 @@ def build_over_fun(overs):
     return f
 
 
+# calculates the ares between two curves
+def area_between_curves(curve1, curve2):
+    assert len(curve1) == len(curve2), "Not the same amount of data points in the two curves"
+    abc = 0
+    for i in range(0, len(curve1)):
+        abc += abs(curve1[i] - curve2[i])
+
+    abc = abc / len(curve1)
+    return round(abc, 2)
+
+
+def normalize_size_datapoints(log):
+
+    size_scores = []
+    gt_size_scores = []
+
+    # get all size scores
+    for line in log:
+        size_scores.append(line['result']['size_score'])
+        gt_size_scores.append(line['result']['gt_size_score'])
+
+    # normalize each size score
+    max_val = max(gt_size_scores)
+    min_val = min(gt_size_scores)
+    if min_val == max_val:
+        min_val = 1
+
+    for line in log:
+        line['result']['size_score'] = (line['result']['size_score'] - min_val) / (max_val - min_val + 0.0025) * 100
+        line['result']['gt_size_score'] = (line['result']['gt_size_score'] - min_val) / (max_val - min_val + 0.0025) * 100
+
+    return log
+
+
 def do_tracking_evaluation(tracking):
     tracker = tracking.tracker
 
@@ -60,6 +94,8 @@ def do_tracking_evaluation(tracking):
     evaluation['feature_extraction_frame_rate'] = tracking.total_frames / tracking.feature_extraction_total_seconds
     evaluation['feature_reduction_frame_rate'] = tracking.total_frames / tracking.feature_reduction_total_seconds
     evaluation['feature_consolidation_frame_rate'] = tracking.total_frames / tracking.feature_consolidation_total_seconds
+    evaluation['se_total_seconds'] = tracking.se_total_seconds
+    evaluation['se_frame_rate'] = tracking.total_frames / tracking.se_total_seconds
 
     tracking_dir = os.path.join(tracker.execution_dir, tracking.name)
     try:
@@ -75,6 +111,9 @@ def do_tracking_evaluation(tracking):
     lost2 = 0
     lost3 = 0
     failures = 0
+
+    log = normalize_size_datapoints(log)
+
     for n, l in enumerate(log):
         r = l['result']
         pos = r['predicted_position']
@@ -99,7 +138,9 @@ def do_tracking_evaluation(tracking):
             r['overlap_score'],
             r['adjusted_overlap_score'],
             r['lost'],
-            r['updated']
+            r['updated'],
+            r['gt_size_score'],
+            r['size_score']
         )
         csv_lines.append(line)
         if r['lost'] == 1:
@@ -137,6 +178,8 @@ def do_tracking_evaluation(tracking):
     ov = np.empty(len(log))
     aov = np.empty(len(log))
     cf = np.empty(len(log))
+    gt_ss = np.empty(len(log))
+    ss = np.empty(len(log))
     in20 = 0
     for n, l in enumerate(log):
         r = l['result']
@@ -147,6 +190,8 @@ def do_tracking_evaluation(tracking):
         ov[n] = r['overlap_score']
         aov[n] = r['adjusted_overlap_score']
         cf[n] = r['prediction_quality']
+        gt_ss[n] = r['gt_size_score']
+        ss[n] = r['size_score']
 
     dim = np.arange(1, len(cd) + 1)
 
@@ -161,6 +206,28 @@ def do_tracking_evaluation(tracking):
     plt.xlim(1, len(cd))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
+
+    # Size Plot:
+    abc = area_between_curves(ss, gt_ss)
+    figure_file2 = os.path.join(tracking_dir, 'size_over_time.svg')
+    figure_file3 = os.path.join(tracking_dir, 'size_over_time.pdf')
+    f = plt.figure()
+    plt.xlabel("frame")
+    plt.ylabel("size")
+    tx = "abc = {0}".format(abc)
+    bbox_props = dict(boxstyle="round", fc="w", ec="0.5", alpha=0.7)
+    plt.text(5.05, 0.05, tx, bbox=bbox_props)
+    plt.plot(dim, ss, color='#648fff', label='predicted size')
+    plt.plot(dim, gt_ss, color='#ffb000', label='groundtruth size', alpha=0.7)
+    plt.fill_between(dim, ss, gt_ss, color="#dc267f")
+    plt.axhline(y=ss[0], color='k', linestyle=':', label='initial size')
+    plt.legend(loc='best')
+    plt.xlim(1, len(ss))
+    plt.savefig(figure_file2)
+    plt.savefig(figure_file3)
+    evaluation['area_between_size_curves'] = abc
+    plt.close()
 
     # distances:
     figure_file2 = os.path.join(tracking_dir, 'relative_center_distance.svg')
@@ -175,6 +242,7 @@ def do_tracking_evaluation(tracking):
     plt.xlim(5, len(rcd))
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
 
     figure_file2 = os.path.join(tracking_dir, 'overlap_score.svg')
     figure_file3 = os.path.join(tracking_dir, 'overlap_score.pdf')
@@ -186,6 +254,7 @@ def do_tracking_evaluation(tracking):
     plt.ylim(ymin=0.0, ymax=1.0)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
 
     figure_file2 = os.path.join(tracking_dir, 'adjusted_overlap_score.svg')
     figure_file3 = os.path.join(tracking_dir, 'adjusted_overlap_score.pdf')
@@ -197,6 +266,7 @@ def do_tracking_evaluation(tracking):
     plt.ylim(ymin=0.0, ymax=1.0)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
+    plt.close()
 
     # eval from paper:
     dfun = build_dist_fun(cd)
@@ -214,8 +284,10 @@ def do_tracking_evaluation(tracking):
     plt.text(5.05, 0.05, tx)
     plt.xlabel("center distance [pixels]")
     plt.ylabel("occurrence")
-    plt.xlim(xmin=0, xmax=400)
+    plt.xlim(xmin=0, xmax=50)
     plt.ylim(ymin=0.0, ymax=1.0)
+    ind = np.where(x == 20.0)[0][0]
+    plt.axvline(x=x[ind], color='c', linestyle=':', label='precision at 20px')
     plt.plot(x, y)
     plt.savefig(figure_file2)
     plt.savefig(figure_file3)
@@ -311,11 +383,13 @@ def do_tracker_evaluation(tracker):
     sroi_generation_sum = 0.0
     feature_reduction_sum = 0.0
     feature_consolidation_sum = 0.0
+    se_sum = 0.0
     preparing_sum = 0.0
     precision_sum = 0.0
     relative_precision_sum = 0.0
     success_sum = 0.0
     adjusted_success_sum = 0.0
+    se_time_total = 0.0
     lost1 = 0
     lost2 = 0
     lost3 = 0
@@ -328,10 +402,10 @@ def do_tracker_evaluation(tracker):
         return {}
     with open(trackings_file, 'w') as f:
 
-        line = "#n,set_name,sample_name,sample_frames,precision_rating,relative_precision_rating,success_rating,adjusted_success_rating,loaded,features_selected,consolidator_trained,tracking_completed,total_seconds,preparing_seconds,tracking_seconds,frame_rate,roi_calculation_sum,sroi_generation_sum,feature_extraction_frame_rate,feature_reduction_sum,feature_consolidation_sum,pursuing_frame_rate,lost1,lost2,lost3,updates_max_frames,updates_confidence,update_total\n"
+        line = "#n,set_name,sample_name,sample_frames,precision_rating,relative_precision_rating,success_rating,adjusted_success_rating,loaded,features_selected,consolidator_trained,tracking_completed,total_seconds,preparing_seconds,tracking_seconds,frame_rate,roi_calculation_sum,sroi_generation_sum,feature_extraction_frame_rate,feature_reduction_sum,feature_consolidation_sum,pursuing_frame_rate,lost1,lost2,lost3,updates_max_frames,updates_confidence,update_total,se_total_seconds,se_frame_rate\n"
         f.write(line)
         for n, e in enumerate(tracker.tracking_evaluations):
-            line = "{n},{set_name},{sample_name},{sample_frames},{precision_rating},{relative_precision_rating},{success_rating},{adjusted_success_rating},{loaded},{features_selected},{consolidator_trained},{tracking_completed},{total_seconds},{preparing_seconds},{tracking_seconds},{frame_rate},{pursuing_frame_rate},{feature_extraction_frame_rate},{lost1},{lost2},{lost3},{updates_max_frames},{updates_confidence},{updates_total}\n".format(
+            line = "{n},{set_name},{sample_name},{sample_frames},{precision_rating},{relative_precision_rating},{success_rating},{adjusted_success_rating},{loaded},{features_selected},{consolidator_trained},{tracking_completed},{total_seconds},{preparing_seconds},{tracking_seconds},{frame_rate},{pursuing_frame_rate},{feature_extraction_frame_rate},{lost1},{lost2},{lost3},{updates_max_frames},{updates_confidence},{updates_total},{se_total_seconds},{se_frame_rate}\n".format(
                 n=n + 1,
                 **e)
             f.write(line)
@@ -342,7 +416,8 @@ def do_tracker_evaluation(tracker):
             sroi_generation_sum += e['sroi_generation_frame_rate']
             feature_extraction_sum += e['feature_extraction_frame_rate']
             feature_reduction_sum += e['feature_reduction_frame_rate']
-            feature_consolidation_sum +=e['feature_consolidation_frame_rate']
+            feature_consolidation_sum += e['feature_consolidation_frame_rate']
+            se_sum += e['se_frame_rate']
             precision_sum += e['precision_rating']
             relative_precision_sum += e['relative_precision_rating']
             success_sum += e['success_rating']
@@ -360,6 +435,7 @@ def do_tracker_evaluation(tracker):
         feature_reduction_frame_rate = feature_reduction_sum / len(tracker.tracking_evaluations)
         feature_consolidation_frame_rate = feature_consolidation_sum / len(tracker.tracking_evaluations)
         pursuing__frame_rate = pursuing_sum / len(tracker.tracking_evaluations)
+        se_frame_rate = se_sum / len(tracker.tracking_evaluations)
 
     # eval from paper:
     dfun = build_dist_fun(tracker.total_center_distances)
@@ -461,6 +537,7 @@ def do_tracker_evaluation(tracker):
     ev['feature_reduction_frame_rate'] = feature_reduction_frame_rate
     ev['feature_consolidation_frame_rate'] = feature_consolidation_frame_rate
     ev['pursuing_frame_rate'] = pursuing__frame_rate
+    ev['se_frame_rate'] = se_frame_rate
     ev['preparing_seconds'] = preparing_sum
     apr = precision_sum / ev['total_samples']
     ev['average_precision_rating'] = apr
@@ -504,6 +581,7 @@ def print_tracking_evaluation(evaluation, log_context):
                     "feature_extraction_frame_rate",
                     "feature_reduction_frame_rate",
                     "feature_consolidation_frame_rate",
+                    "se_frame_rate",
                     "lost1",
                     "lost2",
                     "lost3",

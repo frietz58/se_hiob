@@ -131,7 +131,7 @@ class SwarmPursuer(Pursuer):
         #logger.info("QUALI: %s, %s", image_mask.shape, pos)
         # too small?
         # p1 = time.time()
-        scale_factor_squared = scale_factor[0] *scale_factor[1]
+        scale_factor_squared = scale_factor[0] * scale_factor[1]
         if pos.width < 8 or pos.height < 8:
             return -1e12
         # outside roi?
@@ -181,13 +181,20 @@ class SwarmPursuer(Pursuer):
         mask[mask < self.target_lower_limit] = self.target_punish_low
         mask[mask < 0.0] = 0.0
 
-        #print("a", mask.max(), mask.min(), np.average(mask))
-        img_size = [frame.size[1], frame.size[0]]
+        # check rgb vs gray format
+        # if len(frame.size) == 3:
+        #     img_size = [frame.size[2], frame.size[1]]
+        # elif len(frame.size) == 2:
+        #     img_size = [frame.size[1], frame.size[2]]
+
+        img_size = [frame.size[2], frame.size[1]]
 
         #ps.append(time.time())  # 2
+
         img_mask, scale_factor = self.upscale_mask(mask, frame.roi, img_size)
         #print("a", img_mask.max(), img_mask.min(), np.average(img_mask))
         frame.image_mask = img_mask
+        frame.mask_scale_factor = scale_factor
 
         #ps.append(time.time())  # 3
 
@@ -240,7 +247,9 @@ class SwarmPursuer(Pursuer):
 
         #ps.append(time.time())  # 6
 
+        # Sum up all the pixel values for a candidate on the feature mask, so that a candidate gets a score
         sums = list(self.thread_executor.map(np.sum, slices))
+
         #ps.append(time.time())  # 7
 
         quals = [self.position_quality(pos, frame.roi, img_mask_sum, inner_sum, scale_factor) / total_max
@@ -250,10 +259,10 @@ class SwarmPursuer(Pursuer):
 
         best_arg = np.argmax(quals)
         frame.predicted_position = Rect(locs[best_arg])
+
         # quality of prediction needs to be absolute, so we normalise it with
         # the "perfect" value this prediction would have:
         perfect_quality = 1
-        #print(quals[best_arg], perfect_quality)
         frame.prediction_quality = max(
             0.0, min(1.0, quals[best_arg] / perfect_quality))
         logger.info("Prediction: %s, quality: %f",

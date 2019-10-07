@@ -20,6 +20,7 @@ from . import roi
 from . import selection
 from .sample_provider import DataDirectory
 from .Tracking import Tracking
+from . import scale_estimation
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +118,9 @@ class Tracker:
         self.pursuer = pursuing.SwarmPursuer()
         self.modules.append(self.pursuer)
 
+        self.estimator = scale_estimation.ScaleEstimator()
+        self.modules.append(self.estimator)
+
         # configure modules
         self.roi_calculator.configure(configuration)
         self.sroi_generator.configure(configuration)
@@ -124,6 +128,8 @@ class Tracker:
         self.feature_selector.configure(configuration)
         self.consolidator.configure(configuration)
         self.pursuer.configure(configuration)
+        self.estimator.configure(configuration)
+
         self.is_setup = False
 
         self.current_sample = None
@@ -215,9 +221,6 @@ class Tracker:
                 and (self.current_sample is None or sample.capture_size != self.current_sample.capture_size):
             return self.context
 
-        #if self.current_sample is not None:
-        #self.current_sample = sample
-
         # setup modules
         self.roi_calculator.setup(self)
         size = sample.capture_size
@@ -233,6 +236,9 @@ class Tracker:
             self)
         self.consolidator.setup(self)
         self.pursuer.setup(self)
+
+        self.estimator.setup(self, sample=self.current_sample)
+
         self.is_setup = True
         logger.info("Setup done")
 
