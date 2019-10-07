@@ -25,20 +25,6 @@ class ScaleEstimator:
 
         # configuration values
         self.use_scale_estimation = None
-        self.number_scales = None
-        self.inner_punish_threshold = None
-        self.inner_punish_factor = None
-        self.outer_punish_threshold = None
-        self.scale_factor_range = None
-        self.scale_factor = None
-        self.learning_rate = None
-        self.regularization = None
-        self.scale_sigma_factor = None
-        self.lam = None
-        self.scale_model_max = None
-        self.approach = None
-        self.scale_model_size = None
-        self.padding = None
         self.dyn_min_se_treshold = None
         self.dyn_max_se_treshold = None
         self.update_strategy = None
@@ -64,15 +50,6 @@ class ScaleEstimator:
         self.econf = configuration['scale_estimator']
         self.use_scale_estimation = self.econf['use_scale_estimation']
         self.approach = self.econf['approach']
-        self.inner_punish_threshold = self.econf['inner_punish_threshold']
-        self.outer_punish_threshold = self.econf['outer_punish_threshold']
-        self.scale_factor = self.econf['scale_factor']
-        self.learning_rate = self.econf['learning_rate']
-        self.regularization = self.econf['reg']
-        self.scale_sigma_factor = self.econf['scale_sigma_factor']
-        self.scale_model_max = self.econf['scale_model_max']
-        self.scale_model_size = self.econf['scale_model_size']
-        self.padding = self.econf['padding']
         self.dyn_min_se_treshold = self.econf['dyn_min_se_treshold']
         self.dyn_max_se_treshold = self.econf['dyn_max_se_treshold']
         self.update_strategy = self.econf['update_strategy']
