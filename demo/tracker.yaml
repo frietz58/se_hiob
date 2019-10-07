@@ -9,7 +9,8 @@ roi_scale: [2.0,2.0]
 roi_movement_factor: 0.0
 sroi_size: [200,200]
 #sroi_scale: 0.5
-mask_size: null
+#mask_size: null
+mask_size: [100,100]
 #extractor_net: alexnet
 #features:
 #  - [conv4, 256]

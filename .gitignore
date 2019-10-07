@@ -9,3 +9,4 @@ transitions
 **/.*.swp
 .idea/
 images
+.DS_Store
