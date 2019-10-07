@@ -1,4 +1,3 @@
 from .ScaleEstimator import ScaleEstimator
-from .matlab_dsst import DsstEstimator
-from .custom_dsst import CustomDsst
+from .dsst import CustomDsst
 from .candidates import CandidateApproach
