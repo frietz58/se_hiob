@@ -1,14 +1,16 @@
 HIOB
 ====
-HIOB is modular hierarchical object tracking framework written in python and tensorflow. It uses a combination of offline trained CNNs for visual feature extraction and online trained CNNs to build a model of the tracked object. 
+The **HI**rarchical **OB**ject tracker HIOB is a framework written in python and tensorflow. It uses a combination of offline trained CNNs for visual feature extraction and online trained CNNs to build a model of the tracked object. 
 
-HIOB was created for a diploma thesis on CNNs at the Department of Informatics of the [Universität Hamburg](https://www.uni-hamburg.de/) in the research group [Knowledge Technology (WTM)](https://www.inf.uni-hamburg.de/en/inst/ab/wtm/). During a bachelor thesis the performance has been further improved and it has been adapted to run inside of [ROS](http://www.ros.org/).
+Initially, HIOB has been created by Peer Springstübe (as his diploma thesis) at the Department of Informatics of the [Universität Hamburg](https://www.uni-hamburg.de/) in the research group [Knowledge Technology (WTM)](https://www.inf.uni-hamburg.de/en/inst/ab/wtm/). This version of HIOB can be found [here](https://github.com/kratenko/HIOB/commits/master).
+Tobias Knüppler has further improved and HIOB's performance has been adapted to HIOB to run inside of [ROS](http://www.ros.org/). The ROS integration of HIOB lives in a [separate repository](https://github.com/theCalcaholic/hiob_ros).
 
-The ROS integration of HIOB lives in a separate repository: https://github.com/theCalcaholic/hiob_ros
-The ROS integration of HIOB lives in a separate repository: https://git.informatik.uni-hamburg.de/wtm/hierarchical-object-tracking-ros
-TODO: add link to the docker image of hiob_ros.
+The CNN based tracking algorithm in HIOB is inspired by the [FCNT](https://github.com/scott89/FCNT) by *Wang et al* presented in their [ICCV 2015 paper](http://202.118.75.4/lu/Paper/ICCV2015/iccv15_lijun.pdf). The program code of HIOB is completely independet from the FCNT and has been written by us.
 
-The algorithm in HIOB is inspired by the [FCNT](https://github.com/scott89/FCNT) by *Wang et al* presented in their [ICCV 2015 paper](http://202.118.75.4/lu/Paper/ICCV2015/iccv15_lijun.pdf). The program code of HIOB is completely independet from the FCNT and has been written by us.
+In the scope of my bachelor thesis, I made HIOB scale adaptive, which had been identified to be one of HIOB's weak points. Thus, I've build upon and greatly benefitted from the work that has previously been done on this framework! I won't go into depth explaining the problem, if you are interested in this, I will glady email you a copy (or you can [rend a hardcover version of my thesis](https://kataloge.uni-hamburg.de/DB=1/XMLPRS=N/PPN?PPN=1671600797) at the informatics library at the uni hamburg).
+
+
+
 
 # Installation
 
@@ -31,6 +33,11 @@ Build a virtual environment somewhere outside of the HIOB directory and activate
 
     $ virtualenv -ppython3 hiob_env
     $ source hiob_env/bin/activate
+
+
+# for using your GPU and CUDA
+    (hiob_env) $ cd HIOB
+    (hiob_env) $ pip install -r requirements.txt 
     
 #### Installing CUDA
 In order to run the gpu version, cuda needs to be installed on the machine. In order to install cuda and cudnn, perform the following actions:
@@ -52,43 +59,6 @@ cudnn installation. Therefor go to your virtualenv python installation and add t
 export PYTHONPATH="/usr/local/cuda-9.0/lib64"
 export PYTHONPATH="/usr/local/cuda/lib64"
 ```
-
-
-# for using your GPU and CUDA
-    (hiob_env) $ cd HIOB
-    (hiob_env) $ pip install -r requirements.txt 
-
-    
-#### Installing CUDA
-In order to run the gpu version, cuda needs to be installed on the machine. In order to install cuda and cudnn, perform the following actions:
-1. <b>Install cuda</b> with your method of choice from <a href="https://developer.nvidia.com/cuda-downloads">here</a> 
-(or <a href="https://developer.nvidia.com/cuda-toolkit-archive">older versions</a>) <br>
-Theoretically, Tensorflow >= 1.11 should recogniue CUDA 10.0, but in my case it didn't hence I installed cuda 9.0 which, even though not officially suported,
-runs on Ubuntu 18.04.<br>
-I had the best experience installing cuda via the deb file, but every method should work. Make sure to apt-get --purge remove any previous installations, as this can be
-a bit tricky though, especially if you want to install the custom graphics driver, i highly encourage anyone to read the <a href="http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/CUDA_Installation_Guide_Linux.pdf">official liunx installation guide</a>.
-
-2. <b>Install cudnn</b> from <a href="https://developer.nvidia.com/cudnn">here</a>, you have to register a nvidia developer account in the process.
- Follow the installation instructions from <a href="https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html">here</a> for a smooth installation, for me 
- the installation via tar file worked great.
- 
-3. <b>Add cudnn to the virtualenv path.</b> Maybe this was just buggy for me, but after successful installation of cuda 9.0 and cudnn, tensorflow would not find my
-cudnn installation. Therefor go to your virtualenv python installation and add the following line to your activate file in /path_to_venv/bin/activate, right under the export PATH statement
-
-```
-    export PYTHONPATH="/usr/local/cuda-9.0/lib64"
-    export PYTHONPATH="/usr/local/cuda/lib64"
-```
-
-Helpfull links
-https://github.com/tensorflow/tensorflow/issues/20271
-https://github.com/tensorflow/tensorflow/issues/22940
-https://askubuntu.com/questions/799184/how-can-i-install-cuda-on-ubuntu-16-04
-
-
-# for using your GPU and CUDA
-    (hiob_env) $ cd HIOB
-    (hiob_env) $ pip install -r requirements.txt 
 
     
 #### dependencies
