@@ -34,10 +34,6 @@ Build a virtual environment somewhere outside of the HIOB directory and activate
     $ virtualenv -ppython3 hiob_env
     $ source hiob_env/bin/activate
 
-
-# for using your GPU and CUDA
-    (hiob_env) $ cd HIOB
-    (hiob_env) $ pip install -r requirements.txt 
     
 #### Installing CUDA
 In order to run the gpu version, cuda needs to be installed on the machine. In order to install cuda and cudnn, perform the following actions:
