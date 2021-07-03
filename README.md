@@ -21,11 +21,7 @@ In the scope of my bachelor thesis, I made HIOB scale adaptive, which had been i
 
 clone the repositiory
 
-    $ git clone https://github.com/kratenko/HIOB.git
-
-or
-
-    $ git clone git@github.com:kratenko/HIOB.git
+    $ git clone https://github.com/frietz58/se_hiob
 
 #### virtual environment
 HIOB needs python3 and tensorflow. We recommend building a virtual environment for HIOB.
